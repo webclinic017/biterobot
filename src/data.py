@@ -55,20 +55,20 @@ print("deltaTime = ", data.timeCount())
 
 
 class TestType():
-    def __init__(self, testParam: int, testParam2: float):
-        self.testParam = testParam
-        self.testParam2 = testParam2
+    testParam = 0
+    testParam2 = 0
 
-testStorage = [TestType]
+testStorage = [TestType()]
 
-testObj = TestType(0, 0)
-testObj2 = TestType(0, 0)
+testObj = TestType()
+testObj2 = TestType()
+
 testObj.testParam = 1
-testObj2.testParam2 = 2
-testObj.testParam = 3
+testObj.testParam2 = 2
+testObj2.testParam = 3
 testObj2.testParam2 = 4
-
 
 testStorage.append(testObj)
 testStorage.append(testObj2)
-print(testStorage[0].testParam, testStorage[0].testParam2, testStorage[1].testParam, testStorage[1].testParam2)
+
+print(testStorage[0].testParam, testStorage[0].testParam2, testStorage[1].testParam, testStorage[1].testParam2, testStorage[2].testParam, testStorage[2].testParam2)
