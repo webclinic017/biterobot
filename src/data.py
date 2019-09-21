@@ -17,7 +17,7 @@ class Data():
 
             # Вызов функции Димона с timeRange - преобразуем в строку str
 
-        self.queue = [float]
+        self.queue = []
         self.tickCount = 0
         while (self.getTick() != None and self.tickCount < 30):  #Когда getTick() вернет None => последний тик в данном диапазоне. Второрое условие - временно для теста (будто у нас 30 тиков)
             self.queue.append(self.getTick())
@@ -47,9 +47,9 @@ tr.endTime = b
 
 data = Data(tr)
 
-print("randomTick = ", data.getTick(), '\n')
-print("generatedQueue = ", data.fillQueue(), '\n')
-print("deltaTime = ", data.timeCount(), '\n')
+print("randomTick =", data.getTick(), '\n')
+print("generatedQueue =", data.fillQueue(), '\n')
+print("deltaTime =", data.timeCount(), '\n')
 
 #РАБОТАЕТ ГЕНЕРАЦИЯ ТИКА
 #РАБОТАЕТ ГЕНЕРАЦИЯ ОЧЕРЕДИ С ЗАДАННЫМ ДИАПАЗОНОМ
