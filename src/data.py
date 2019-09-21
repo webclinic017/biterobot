@@ -35,7 +35,7 @@ class Data():
 
 
 
-print("__________DATA_TEST_________")
+print("__________DATA_TEST_________ \n")
 
 a = datetime.datetime(2018, 10, 5, 11, 0, 0)
 b = datetime.datetime(2018, 10, 5, 11, 30, 0)
@@ -45,30 +45,10 @@ tr.endTime = b
 
 data = Data(tr)
 
-print("randomTick = ", data.getTick())
-print("generatedQueue = ", data.fillQueue())
-print("deltaTime = ", data.timeCount())
+print("randomTick = ", data.getTick(), '\n')
+print("generatedQueue = ", data.fillQueue(), '\n')
+print("deltaTime = ", data.timeCount(), '\n')
 
 #РАБОТАЕТ ГЕНЕРАЦИЯ ТИКА
 #РАБОТАЕТ ГЕНЕРАЦИЯ ОЧЕРЕДИ С ЗАДАННЫМ ДИАПАЗОНОМ
 #РАБОТАЕТ РАСЧЕТ ДЕЛЬТЫ ЗАДАННОГО ВРЕМЕНИ
-
-
-class TestType():
-    testParam = 0
-    testParam2 = 0
-
-testStorage = [TestType()]
-
-testObj = TestType()
-testObj2 = TestType()
-
-testObj.testParam = 1
-testObj.testParam2 = 2
-testObj2.testParam = 3
-testObj2.testParam2 = 4
-
-testStorage.append(testObj)
-testStorage.append(testObj2)
-
-print(testStorage[0].testParam, testStorage[0].testParam2, testStorage[1].testParam, testStorage[1].testParam2, testStorage[2].testParam, testStorage[2].testParam2)
