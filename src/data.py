@@ -33,6 +33,8 @@ class Data():
         delta = self.timeRange.endTime - self.timeRange.beginTime
         return delta
 
+    def getTimeRange(self):
+        return self.timeRange
 
 
 print("__________DATA_TEST_________ \n")
