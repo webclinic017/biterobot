@@ -61,8 +61,8 @@ class TestType():
 
 testStorage = [TestType]
 
-testObj = TestType
-testObj2 = TestType
+testObj = TestType(0, 0)
+testObj2 = TestType(0, 0)
 testObj.testParam = 1
 testObj2.testParam2 = 2
 testObj.testParam = 3
