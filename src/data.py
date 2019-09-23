@@ -16,6 +16,7 @@ class Data():
         Args:
             timeRange: Временной промежуток, на котором работаем с данными
         """
+
         self.timeRange = timeRange
 
 
