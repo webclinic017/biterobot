@@ -40,7 +40,8 @@ class Candle():
 
     def fillCandleStorage(self):
         self.candleStorage = []
-        self.candleRange = TimeRange()          # Формирование диапозона свечи на отрезке времени (как в type) СВЕЧИ В МИНУТАХ
+        self.candleRange = TimeRange()
+        # Формирование диапозона свечи на отрезке времени (как в type) СВЕЧИ В МИНУТАХ
         self.tempTimeBegin = datetime.datetime(self.candleRange.beginTime.year, self.candleRange.beginTime.month,
                                              self.candleRange.beginTime.day, self.candleRange.beginTime.hour,
                                              self.candleRange.beginTime.minute,
@@ -59,7 +60,7 @@ class Candle():
                                                  self.tempTimeEnd.day, self.tempTimeEnd.hour,
                                                  self.tempTimeEnd.minute + self.liveTime,
                                                  self.tempTimeEnd.second)
-            self.timeRange = TimeRange
+            self.timeRange = TimeRange()
             self.timeRange.beginTime = self.tempTimeBegin
             self.timeRange.endTime = self.tempTimeEnd
             self.candleStorage.append(self.createCandle(self.timeRange))
@@ -74,13 +75,16 @@ print("__________CANDLE_TEST_________ \n")
 
 a = datetime.datetime(2018, 10, 5, 11, 0, 0)                    #Нужно после minute = 55 -> hour + 1, minute = 0, как вариант time.ctime
 b = datetime.datetime(2018, 10, 5, 11, 30, 0)
-tr = TimeRange
-tr.beginTime = a
+#TODO
+tr = TimeRange  # здесь должен вызываться конструктор, т.е. стоять TimeRange() - со скобками. Иначе здесь ты в
+                # переменную tr записываешь ссылку на тип, а не создаешь новый объект
+tr.beginTime = a #как следствие здесь ты переопределяешь конструктор типа TimeRange
+#из-за этого при создании нового объекта с типом TimeRange у него уже будут прописаны значения beginTime
 tr.endTime = b
 candleQuantity = 7
 liveTime = 5
 
-candle = Candle(candleQuantity, liveTime, tr)
+candle = Candle(candleQuantity, liveTime, tr) # еще одно следствие - здесь ты передаешь в конструктор тип, а не объект
 
 randomCandle = candle.createCandle(tr)
 
