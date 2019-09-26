@@ -75,13 +75,11 @@ print("__________CANDLE_TEST_________ \n")
 
 a = datetime.datetime(2018, 10, 5, 11, 0, 0)                    #Нужно после minute = 55 -> hour + 1, minute = 0, как вариант time.ctime
 b = datetime.datetime(2018, 10, 5, 11, 30, 0)
-#TODO
-tr = TimeRange  # здесь должен вызываться конструктор, т.е. стоять TimeRange() - со скобками. Иначе здесь ты в
+tr = TimeRange()  # здесь должен вызываться конструктор, т.е. стоять TimeRange() - со скобками. Иначе здесь ты в !!!!!
                 # переменную tr записываешь ссылку на тип, а не создаешь новый объект
-tr.beginTime = a #как следствие здесь ты переопределяешь конструктор типа TimeRange
-#из-за этого при создании нового объекта с типом TimeRange у него уже будут прописаны значения beginTime
+tr.beginTime = a
 tr.endTime = b
-candleQuantity = 7
+candleQuantity = 5
 liveTime = 5
 
 candle = Candle(candleQuantity, liveTime, tr) # еще одно следствие - здесь ты передаешь в конструктор тип, а не объект

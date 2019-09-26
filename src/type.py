@@ -15,8 +15,8 @@ class CandleType():
     color: str
 
 class TimeRange():
-    beginTime: datetime.datetime
-    endTime: datetime.datetime
+    beginTime = datetime.datetime(2018, 10, 5, 11, 0, 0)
+    endTime = datetime.datetime(2018, 10, 5, 11, 30, 0)
 
 class StatusFlag(Enum):
     outDeal = 0
