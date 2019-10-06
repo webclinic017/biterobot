@@ -13,9 +13,10 @@ class StrategiInit():
     """
 
     def __init__(self, strategy: Strategy_1):
-        """Класс для работы со свечами
+        """Конструктор класса инициализации стратегии
 
-        В классе реализованы функции для работы со свечами
+        Args:
+            strategy: Стратегия
         """
 
         self.strategy = strategy
