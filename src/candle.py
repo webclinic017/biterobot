@@ -21,35 +21,37 @@ class Candle():
 
         self.candleQuantity = candleQuantity
         self.liveTime = liveTime
-        self.timeRange = timeRange # Считаем в формате даты в классе StrategyInit?, проверить, что liveTime < delta(timeRange)
+        self.timeRange = timeRange  # Считаем в формате даты в классе StrategyInit?, проверить, что liveTime < delta(timeRange)
 
     def createCandle(self, candleRange: TimeRange):
         """Создание свечи
 
         Args:
-            candleRange: Количество свечей
+            candleRange: Диапозон данных для свечи
+
+        Returns:
+            candle: Готовая свеча
         """
-        # Нужно создавать свечу по диапозону времени = жизни свечи, делая отдельные очереди
 
-        # Вызов функции из класса БД с timeRange
+        # Вызов функции из класса БД с timeRange (candleRange)
 
-        data = Data(candleRange) # Нужно передавать диапозон одной свечи на отрезке
+        data = Data(candleRange)  # Нужно передавать диапозон одной свечи на отрезке
         candle = CandleType()
         tickCount = 0
-        currentTick = data.getTick() # Аннотация под TickType, текущий тик
-        candle.input = currentTick   # Больше не трогаем, тк вход = первому тику в диапозоне
+        currentTick = data.getTick()  # Текущий тик
+        candle.input = currentTick  # Больше не трогаем, тк вход = первому тику в диапозоне
         candle.output = currentTick
         candle.min = currentTick
         candle.max = currentTick
-        while (currentTick != None and tickCount < 30):      #Когда getTick() вернет None => последний тик в данном диапазоне. Второрое условие - временно для теста (будто у нас 30 тиков)
-            candle.output = currentTick                       # Присвоится последний тик (до None)
+        while (currentTick != None and tickCount < 30):  # Когда getTick() вернет None => последний тик в данном диапазоне. Второрое условие - временно для теста (будто у нас 30 тиков)
+            candle.output = currentTick  # Присвоится последний тик (до None) = выход из свечи
             currentTick = data.getTick()
-            if (currentTick < candle.min):
+            if (currentTick < candle.min): # Поиск максимального и минимального значения свечи
                 candle.min = currentTick
             if (currentTick > candle.max):
                 candle.max = currentTick
             tickCount += 1
-        if (candle.input < candle.output):
+        if (candle.input < candle.output):  # Присвоение цвета свечи
             candle.color = "GREEN"
         elif (candle.input > candle.output):
             candle.color = "RED"
@@ -58,10 +60,15 @@ class Candle():
         return candle
 
     def fillCandleStorage(self):
+        """Заполнение очереди свечей
+
+        Returns:
+            Очередь свечей
+        """
+
         self.candleStorage = []
         candleRange = TimeRange()
-        # Формирование диапозона свечи на отрезке времени (как в type) СВЕЧИ В МИНУТАХ
-        tempTimeBegin = datetime.datetime(candleRange.beginTime.year, candleRange.beginTime.month,
+        tempTimeBegin = datetime.datetime(candleRange.beginTime.year, candleRange.beginTime.month,  # Формирование диапозона свечи на отрезке времени (как в type) СВЕЧИ В МИНУТАХ
                                              candleRange.beginTime.day, candleRange.beginTime.hour,
                                              candleRange.beginTime.minute,
                                              candleRange.beginTime.second)
@@ -82,12 +89,16 @@ class Candle():
             timeRange = TimeRange()
             timeRange.beginTime = tempTimeBegin
             timeRange.endTime = tempTimeEnd
-            self.candleStorage.append(self.createCandle(timeRange))
+            self.candleStorage.append(self.createCandle(timeRange))  # Добавление свечи в очередь
             i += 1
         return self.candleStorage
 
     def clearCandleStorage(self):
-        self.candleStorage.clear() # Очищение списка свечей
+        """Очищение очереди свечей
+
+        """
+
+        self.candleStorage.clear()
 
 
 print("__________CANDLE_TEST_________ \n")
