@@ -19,7 +19,6 @@ class Data():
 
         self.timeRange = timeRange
 
-
     def getTick(self):
         """Получение тика из БД
 
@@ -27,8 +26,8 @@ class Data():
             Текущий тик из БД
         """
 
-        self.tick = random.uniform(3000.0, 3300.0)  # Вызов ф-ии, котороя вернет Тик из БД, пока рандомное значение
-        return self.tick
+        tick = random.uniform(3000.0, 3300.0)  # Вызов ф-ии, котороя вернет Тик из БД, пока рандомное значение
+        return tick
 
     def fillQueue(self):
         """Создание очереди тиков
@@ -42,10 +41,10 @@ class Data():
         # Вызов функции БД с парметром timeRange(в string?), для инициализации работы с БД
 
         self.queue = []
-        self.tickCount = 0
-        while (self.getTick() != None and self.tickCount < 30):  # Когда getTick() вернет None => последний тик в данном диапазоне. Второрое условие - временно для теста (будто у нас 30 тиков)
+        tickCount = 0
+        while (self.getTick() != None and tickCount < 30):  # Когда getTick() вернет None => последний тик в данном диапазоне. Второрое условие - временно для теста (будто у нас 30 тиков)
             self.queue.append(self.getTick())
-            self.tickCount += 1
+            tickCount += 1
         return self.queue
 
     def clearQueue(self):
