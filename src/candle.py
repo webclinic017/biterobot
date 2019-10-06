@@ -63,7 +63,7 @@ class Candle():
         """Заполнение очереди свечей
 
         Returns:
-            Очередь свечей
+            candleStorage: Очередь свечей
         """
 
         self.candleStorage = []
