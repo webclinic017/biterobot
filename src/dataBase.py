@@ -47,7 +47,7 @@ class DataBase():
 dataBase = DataBase("localhost", "BitBot", "user", "password")
 a = datetime.datetime(2018, 10, 5, 11, 0, 0)
 b = datetime.datetime(2018, 10, 5, 11, 30, 0)
-tr = TimeRange
+tr = TimeRange()
 tr.beginTime = a
 tr.endTime = b
 dataBase.setQueue(tr, "BTCUSD")
