@@ -28,7 +28,7 @@ class DataBase():
             'DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + server + ';DATABASE=' + database +
             ';UID=' + username + ';PWD=' + password)
         self.cursor = self.connection.cursor()
-        self.timeRange = TimeRange(datetime.datetime(1970, 1, 1, 00, 0, 0), datetime.datetime(1970, 1, 1, 00, 0, 0))
+        self.timeRange = TimeRange()
         self.ticker = ""
 
     def setQueue(self, timeRange: TimeRange, ticker: string):
@@ -65,6 +65,7 @@ class DataBase():
 dataBase = DataBase("localhost", "BitBot", "user", "password")
 a = datetime.datetime(2018, 10, 5, 11, 0, 0)
 b = datetime.datetime(2018, 10, 5, 11, 30, 0)
-tr = TimeRange(a, b)
+tr = TimeRange()
+tr.beginTime, tr.endTime = a, b
 dataBase.setQueue(tr, "BTCUSD")
 print(dataBase.getNextData())
