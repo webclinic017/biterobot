@@ -36,18 +36,33 @@ class DataBase():
 
         Args:
             timeRange: временной промежуток, из которого будут возвращаться данные
+            ticker: торговая пара, по которой запрашиваем данные
         """
         self.timeRange = timeRange
         self.ticker = ticker
-        self.cursor.execute("SELECT 1 FROM Pair WHERE Pair.Ticker = '" + self.ticker + "'")
-        if not self.cursor.fetchone():
+        self.cursor.execute("SELECT Pair.id FROM Pair WHERE Pair.Ticker = ?", self.ticker)
+        beginTimestamp = self.timeRange.beginTime.timestamp()
+        endTimestamp = self.timeRange.endTime.timestamp()
+        row = self.cursor.fetchone()
+        if not row:
             raise ValueError("Wrong ticker")
+        self.cursor.execute("""SELECT * FROM Trade Where 
+                               Trade.Pair = ? AND  
+                               Trade.Timestamp > ? AND
+                               Trade.Timestamp < ?""", row.id, beginTimestamp, endTimestamp)
+
+    def getNextData(self):
+        """Возвращает следующую запись из набора запрощенных данных
+
+        Return: следующая запись из очереди данных
+        """
+
+        return self.cursor.fetchone()
 
 
 dataBase = DataBase("localhost", "BitBot", "user", "password")
 a = datetime.datetime(2018, 10, 5, 11, 0, 0)
 b = datetime.datetime(2018, 10, 5, 11, 30, 0)
-tr = TimeRange()
-tr.beginTime = a
-tr.endTime = b
+tr = TimeRange(a, b)
 dataBase.setQueue(tr, "BTCUSD")
+print(dataBase.getNextData())
