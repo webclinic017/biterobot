@@ -16,6 +16,7 @@ class Process:
             lossPercent: максимальный процент потерь
         """
 
+
         self.wallet = wallet
         self.USD_Wallet = self.wallet
         self.BTC_Wallet = BTC_Wallet
@@ -49,6 +50,7 @@ class Process:
 
         """
 
+
         self.price = price
         self.transactionAmount: float
         self.USD_Wallet += self.BTC_Wallet * self.price
@@ -61,6 +63,7 @@ class Process:
             currency: Текущий курс
 
         """
+
 
         self.currency = currency
         if (self.currency == "BTC"):

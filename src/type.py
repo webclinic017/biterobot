@@ -18,6 +18,7 @@ class TimeRange():
     beginTime = datetime.datetime(2018, 10, 5, 11, 0, 0)
     endTime = datetime.datetime(2018, 10, 5, 11, 30, 0)
 
+
 class StatusFlag(Enum):
     outDeal = 0
     inDeal = 1
@@ -27,6 +28,7 @@ class Need():
     candleLiveTime: int
     dataTimeRange: int
 
+
 class Decision(Enum):
     SELL = 0
     BUY = 1
@@ -34,3 +36,4 @@ class Decision(Enum):
 
 def buy():
     wallet =- 5
+

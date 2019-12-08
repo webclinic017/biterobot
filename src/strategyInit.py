@@ -29,6 +29,7 @@ class StrategiInit():
         self.strategyNeed = self.strategy.setNeed()
         if (self.strategyNeed.candleCount != None):
             pass                                     # Выбор диапозона, создание и заполнение свечей
+
         if (self.strategyNeed.dataTimeRange != None):
             print("STRATEGY NEEDS DATA FOR " + str(self.strategyNeed.dataTimeRange) + "MINUTES")
             self.timeRange = TimeRange
@@ -50,6 +51,7 @@ class StrategiInit():
         self.strategy.getDecision()
 
         # Далее либо бесконечный цикл, либо что-то еще
+
 
 strat = Strategy_1
 A = StrategiInit(strat)

@@ -37,6 +37,7 @@ class Strategy_1(Strategy):
             strategyNeed: Требуемые данные для стратегии
         """
 
+
         self.strategyNeed = Need
         self.strategyNeed.candleCount = None
         self.strategyNeed.candleLiveTime = None
@@ -50,6 +51,7 @@ class Strategy_1(Strategy):
             data: Требуемые данные(тики)
         """
 
+
         self.data = data
         self.dataStorage = self.data.fillQueue()
 
@@ -58,6 +60,7 @@ class Strategy_1(Strategy):
 
         """
 
+  
         self.max = self.min =  self.dataStorage[0]
         for self.tick in self.dataStorage:
             if (self.tick > self.max):
@@ -70,6 +73,7 @@ class Strategy_1(Strategy):
         """Процесс торговли по стратегии
 
         """
+
 
         if (self.status == StatusFlag.outDeal):
             self.newTick = self.data.getTick()
@@ -105,5 +109,6 @@ class Strategy_1(Strategy):
 
         self.analysData()
         while(True):  # Пока не вернет исключения или не будет ручного стопа
+
             self.speculate()
         return self.decision

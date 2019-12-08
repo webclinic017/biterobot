@@ -89,9 +89,11 @@ tr.endTime = b
 
 data = Data(tr)
 
+
 print("randomTick =", data.getTick(), '\n')
 print("generatedQueue =", data.fillQueue(), '\n')
 print("deltaTime =", data.timeCount(), '\n')
+
 
 #РАБОТАЕТ ГЕНЕРАЦИЯ ТИКА
 #РАБОТАЕТ ГЕНЕРАЦИЯ ОЧЕРЕДИ С ЗАДАННЫМ ДИАПАЗОНОМ
