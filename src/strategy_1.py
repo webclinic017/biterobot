@@ -15,11 +15,29 @@ DAY = 1440
 
 
 class Strategy_1(Strategy):
+    """Класс Стратегии № 1
+
+    В классе реализована простейшая стратегия с коридором
+    """
     def __init__(self, status: StatusFlag):
+        """Конструктор класса стратегии
+
+
+        Args:
+            status: Текущий статус торговли (в сделке/ не в сделке)
+        """
+
         self.status = status
-        self.process = Process()
+        self.process = Process()  # Создание объекта класса для управления кошельком
 
     def setNeed(self):
+        """Заполнение требуемых данных для стратегии
+
+        Returns:
+            strategyNeed: Требуемые данные для стратегии
+        """
+
+
         self.strategyNeed = Need
         self.strategyNeed.candleCount = None
         self.strategyNeed.candleLiveTime = None
@@ -27,10 +45,22 @@ class Strategy_1(Strategy):
         return self.strategyNeed
 
     def setPastData(self, data: Data):
+        """Получение требемых данных(тиков) для анализа
+
+        Args:
+            data: Требуемые данные(тики)
+        """
+
+
         self.data = data
         self.dataStorage = self.data.fillQueue()
 
     def analysData(self):
+        """Анализ данных
+
+        """
+
+  
         self.max = self.min =  self.dataStorage[0]
         for self.tick in self.dataStorage:
             if (self.tick > self.max):
@@ -39,7 +69,12 @@ class Strategy_1(Strategy):
                 self.min = self.tick
             self.stopPrice = (self.max + self.min) / 2
 
-    def speculate(self):                            # Продумать бесконечнный цикл с вызовом внешних ф-ий покупки/продажи
+    def speculate(self):  # Продумать бесконечнный цикл с вызовом внешних ф-ий покупки/продажи
+        """Процесс торговли по стратегии
+
+        """
+
+
         if (self.status == StatusFlag.outDeal):
             self.newTick = self.data.getTick()
             if (self.newTick > self.max):
@@ -65,8 +100,15 @@ class Strategy_1(Strategy):
                     self.sell(self.newTick)
                     self.status = StatusFlag.outDeal
 
-    def getDecision(self):              # Вызывается в StartegyInit и выдает решение
+    def getDecision(self):  # Вызывается в StartegyInit и выдает решение
+        """Выдача решения стратегии
+
+        Returns:
+            decision: Решение
+        """
+
         self.analysData()
-        while(True):    # Пока не вернет исключения или не будет ручного стопа
+        while(True):  # Пока не вернет исключения или не будет ручного стопа
+
             self.speculate()
         return self.decision

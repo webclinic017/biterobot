@@ -5,93 +5,126 @@ import datetime
 
 
 class Candle():
+    """Класс для работы со свечами
+
+    В классе реализованы функции для работы со свечами
+    """
+
     def __init__(self, candleQuantity: int, liveTime: int, timeRange: TimeRange):
+        """Конструктор класса свечей
+
+        Args:
+            candleQuantity: Количество свечей
+            liveTime: Время жизни свечи
+            timeRange: Временной промежуток, на котором работаем со свечами
+        """
+
         self.candleQuantity = candleQuantity
         self.liveTime = liveTime
-        self.timeRange = timeRange # Считаем в формате даты в классе StrategyInit
+        self.timeRange = timeRange  # Считаем в формате даты в классе StrategyInit?, проверить, что liveTime < delta(timeRange)
 
-    def createCandle(self, candleRange: TimeRange):  # Нужно создавать свечу по диапозону времени = жизни свечи, делая отдельные очереди
+    def createCandle(self, candleRange: TimeRange):
+        """Создание свечи
 
+        Args:
+            candleRange: Диапозон данных для свечи
 
-            # Вызов функции Димона с timeRange
+        Returns:
+            candle: Готовая свеча
+        """
 
-        self.data = Data(candleRange) # Нужно передавать диапозон одной свечи на отрезке
-        self.candle = CandleType
-        self.tickCount = 0
-        self.currentTick = self.data.getTick() # Аннотация под TickType, текущий тик
-        self.candle.input = self.currentTick   # Больше не трогаем, тк вход = первому тику в диапозоне
-        self.candle.output = self.currentTick
-        self.candle.min = self.currentTick
-        self.candle.max = self.currentTick
-        while (self.currentTick != None and self.tickCount < 30):      #Когда getTick() вернет None => последний тик в данном диапазоне. Второрое условие - временно для теста (будто у нас 30 тиков)
-            self.candle.output = self.currentTick                       # Присвоится последний тик (до None)
-            self.currentTick = self.data.getTick()
-            if (self.currentTick < self.candle.min):
-                self.candle.min = self.currentTick
-            if (self.currentTick > self.candle.max):
-                self.candle.max = self.currentTick
-            self.tickCount += 1
-        if (self.candle.input < self.candle.output):
-            self.candle.color = "GREEN"
-        elif (self.candle.input > self.candle.output):
-            self.candle.color = "RED"
+        # Вызов функции из класса БД с timeRange (candleRange)
+
+        data = Data(candleRange)  # Нужно передавать диапозон одной свечи на отрезке
+        candle = CandleType()
+        tickCount = 0
+        currentTick = data.getTick()  # Текущий тик
+        candle.input = currentTick  # Больше не трогаем, тк вход = первому тику в диапозоне
+        candle.output = currentTick
+        candle.min = currentTick
+        candle.max = currentTick
+        while (currentTick != None and tickCount < 30):  # Когда getTick() вернет None => последний тик в данном диапазоне. Второрое условие - временно для теста (будто у нас 30 тиков)
+            candle.output = currentTick  # Присвоится последний тик (до None) = выход из свечи
+            currentTick = data.getTick()
+            if (currentTick < candle.min): # Поиск максимального и минимального значения свечи
+                candle.min = currentTick
+            if (currentTick > candle.max):
+                candle.max = currentTick
+            tickCount += 1
+        if (candle.input < candle.output):  # Присвоение цвета свечи
+            candle.color = "GREEN"
+        elif (candle.input > candle.output):
+            candle.color = "RED"
         else:
-            self.candle.color = "EMPTY"
-        return self.candle
+            candle.color = "EMPTY"
+        return candle
 
     def fillCandleStorage(self):
-        self.candleStorage = [CandleType]
-        self.candleRange = TimeRange                        # Формирование диапозона свечи на отрезке времени (как в type) СВЕЧИ В МИНУТАХ
-        self.tempTimeBegin = datetime.datetime(self.candleRange.beginTime.year, self.candleRange.beginTime.month,
-                                             self.candleRange.beginTime.day, self.candleRange.beginTime.hour,
-                                             self.candleRange.beginTime.minute,
-                                             self.candleRange.beginTime.second)
-        self.tempTimeEnd = datetime.datetime(self.candleRange.beginTime.year, self.candleRange.beginTime.month,
-                                          self.candleRange.beginTime.day, self.candleRange.beginTime.hour,
-                                          self.candleRange.beginTime.minute + self.liveTime,
-                                          self.candleRange.beginTime.second)
+        """Заполнение очереди свечей
+
+        Returns:
+            candleStorage: Очередь свечей
+        """
+
+        self.candleStorage = []
+        candleRange = TimeRange()
+        tempTimeBegin = datetime.datetime(candleRange.beginTime.year, candleRange.beginTime.month,  # Формирование диапозона свечи на отрезке времени (как в type) СВЕЧИ В МИНУТАХ
+                                             candleRange.beginTime.day, candleRange.beginTime.hour,
+                                             candleRange.beginTime.minute,
+                                             candleRange.beginTime.second)
+        tempTimeEnd = datetime.datetime(candleRange.beginTime.year, candleRange.beginTime.month,
+                                          candleRange.beginTime.day, candleRange.beginTime.hour,
+                                          candleRange.beginTime.minute + liveTime,
+                                          candleRange.beginTime.second)
         i = 0
         while (i < self.candleQuantity):
-            self.tempTimeBegin = datetime.datetime(self.tempTimeBegin.year, self.tempTimeBegin.month,
-                                                   self.tempTimeBegin.day, self.tempTimeBegin.hour,
-                                                   self.tempTimeBegin.minute + self.liveTime,
-                                                   self.tempTimeBegin.second)
-            self.tempTimeEnd = datetime.datetime(self.tempTimeEnd.year, self.tempTimeEnd.month,
-                                                 self.tempTimeEnd.day, self.tempTimeEnd.hour,
-                                                 self.tempTimeEnd.minute + self.liveTime,
-                                                 self.tempTimeEnd.second)
-            self.timeRange = TimeRange
-            self.timeRange.beginTime = self.tempTimeBegin
-            self.timeRange.endTime = self.tempTimeEnd
-            self.candleStorage.append(self.createCandle(self.timeRange))
+            tempTimeBegin = datetime.datetime(tempTimeBegin.year, tempTimeBegin.month,
+                                                   tempTimeBegin.day, tempTimeBegin.hour,
+                                                   tempTimeBegin.minute + liveTime,
+                                                   tempTimeBegin.second)
+            tempTimeEnd = datetime.datetime(tempTimeEnd.year, tempTimeEnd.month,
+                                                 tempTimeEnd.day, tempTimeEnd.hour,
+                                                 tempTimeEnd.minute + liveTime,
+                                                 tempTimeEnd.second)
+            timeRange = TimeRange()
+            timeRange.beginTime = tempTimeBegin
+            timeRange.endTime = tempTimeEnd
+            self.candleStorage.append(self.createCandle(timeRange))  # Добавление свечи в очередь
             i += 1
         return self.candleStorage
 
     def clearCandleStorage(self):
-        self.candleStorage.clear() # Очищение списка свечей
+        """Очищение очереди свечей
+
+        """
+
+        self.candleStorage.clear()
 
 
-print("__________CANDLE_TEST_________")
+print("__________CANDLE_TEST_________ \n")
 
 a = datetime.datetime(2018, 10, 5, 11, 0, 0)                    #Нужно после minute = 55 -> hour + 1, minute = 0, как вариант time.ctime
 b = datetime.datetime(2018, 10, 5, 11, 30, 0)
-tr = TimeRange
+tr = TimeRange()
 tr.beginTime = a
 tr.endTime = b
+candleQuantity = 5
+liveTime = 5
 
-candle = Candle(5, 5, tr)            #добавить проверку на (временной диапазон заданный = количество свечей*время)
+candle = Candle(candleQuantity, liveTime, tr)
+
+randomCandle = candle.createCandle(tr)
+
+print("randomCandle =", randomCandle.input, randomCandle.output, randomCandle.min, randomCandle.max, randomCandle.color, '\n')
+
 candleStorage = candle.fillCandleStorage()
 
+print("candleStorage = \n")
 i = 0
-while (i < 5):
-    print(candleStorage[i].input, candleStorage[i].output, candleStorage[i].min, candleStorage[i].max, candleStorage[i].color)
+while (i < candleQuantity):
+    print(candleStorage[i].input, candleStorage[i].output, candleStorage[i].min, candleStorage[i].max, candleStorage[i].color, '\n')
     i += 1
 
-print(candleStorage)
-
-
-
-
-
-
+#РАБОТАЕТ ГЕНЕРАЦИЯ СВЕЧИ
+#РАБОТАЕТ ГЕНЕРАЦИЯ ОЧЕРЕДИ СВЕЧЕЙ
 
