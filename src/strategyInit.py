@@ -5,7 +5,7 @@ from type import TimeRange
 import datetime
 
 
-class StrategiInit():
+class StrategyInit:
     """Класс инициализации стратегии
 
     В классе инициализируется стратегия, собираются данные под требования стратегии,
@@ -28,18 +28,19 @@ class StrategiInit():
 
         self.strategyNeed = self.strategy.setNeed()
         if (self.strategyNeed.candleCount != None):
-            pass                                     # Выбор диапозона, создание и заполнение свечей
+            pass  # Выбор диапозона, создание и заполнение свечей
 
         if (self.strategyNeed.dataTimeRange != None):
             print("STRATEGY NEEDS DATA FOR " + str(self.strategyNeed.dataTimeRange) + "MINUTES")
-            self.timeRange = TimeRange
+            self.timeRange = TimeRange()
             print("Set begin time: \n")
-            self.timeRange.beginTime = datetime.datetime(int(input("year: ")), int(input("month: ")), int(input("day: ")),
+            self.timeRange.beginTime = datetime.datetime(int(input("year: ")), int(input("month: ")),
+                                                         int(input("day: ")),
                                                          int(input("hour: ")), int(input("minute: "), 0))
             print("Set end time: \n")
             self.timeRange.endTime = datetime.datetime(int(input("year: ")), int(input("month: ")),
-                                                         int(input("day: ")),
-                                                         int(input("hour: ")), int(input("minute: "), 0))
+                                                       int(input("day: ")),
+                                                       int(input("hour: ")), int(input("minute: "), 0))
             self.data = Data(self.timeRange)
             self.strategy.setPastData(self.data)
 
@@ -53,10 +54,8 @@ class StrategiInit():
         # Далее либо бесконечный цикл, либо что-то еще
 
 
-strat = Strategy_1
-A = StrategiInit(strat)
-A.getNeed()
-A.start()
-
-
-
+if __name__ == "__main__":
+    strat = Strategy_1()
+    A = StrategyInit(strat)
+    A.getNeed()
+    A.start()

@@ -3,6 +3,7 @@ import string
 import datetime
 from type import TimeRange
 
+
 class DataBase():
     """Класс для работы с базой данных
 
@@ -10,7 +11,7 @@ class DataBase():
     запросов, а лишь явялется оболочкой для заранее заготовленных SQL запросов
     """
 
-    def __init__(self, server: string, database: string, username: string, password:string):
+    def __init__(self, server: string, database: string, username: string, password: string):
         """Конструктор класса бд
 
         Args:
@@ -41,8 +42,8 @@ class DataBase():
         self.timeRange = timeRange
         self.ticker = ticker
         self.cursor.execute("SELECT Pair.id FROM Pair WHERE Pair.Ticker = ?", self.ticker)
-        beginTimestamp = self.timeRange.beginTime.timestamp()
-        endTimestamp = self.timeRange.endTime.timestamp()
+        beginTimestamp = self.timeRange.beginTime
+        endTimestamp = self.timeRange.endTime
         row = self.cursor.fetchone()
         if not row:
             raise ValueError("Wrong ticker")
@@ -62,10 +63,11 @@ class DataBase():
         return self.cursor.fetchone()
 
 
-dataBase = DataBase("localhost", "BitBot", "user", "password")
-a = datetime.datetime(2018, 10, 5, 11, 0, 0)
-b = datetime.datetime(2018, 10, 5, 11, 30, 0)
-tr = TimeRange()
-tr.beginTime, tr.endTime = a, b
-dataBase.setQueue(tr, "BTCUSD")
-print(dataBase.getNextData())
+if __name__ == "__main__":
+    dataBase = DataBase("localhost", "BitBot", "user", "password")
+    a = datetime.datetime(2018, 10, 5, 11, 0, 0)
+    b = datetime.datetime(2018, 10, 5, 11, 30, 0)
+    tr = TimeRange()
+    tr.beginTime, tr.endTime = a, b
+    dataBase.setQueue(tr, "BTCUSD")
+    print(dataBase.getNextData())

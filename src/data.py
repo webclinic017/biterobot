@@ -4,7 +4,7 @@ import random
 import datetime
 
 
-class Data():
+class Data:
     """Класс данных для обработки тиков
 
     В классе реализованы функции для работы с данными по сделкам - тиками
@@ -42,7 +42,8 @@ class Data():
 
         self.queue = []
         tickCount = 0
-        while (self.getTick() != None and tickCount < 30):  # Когда getTick() вернет None => последний тик в данном диапазоне. Второрое условие - временно для теста (будто у нас 30 тиков)
+        while (
+                self.getTick() != None and tickCount < 30):  # Когда getTick() вернет None => последний тик в данном диапазоне. Второрое условие - временно для теста (будто у нас 30 тиков)
             self.queue.append(self.getTick())
             tickCount += 1
         return self.queue
@@ -77,24 +78,22 @@ class Data():
         return self.timeRange
 
 
-#TESTING#
+# TESTING#
+if __name__ == "__main__":
+    print("__________DATA_TEST_________ \n")
 
-print("__________DATA_TEST_________ \n")
+    a = datetime.datetime(2018, 10, 5, 11, 0, 0)
+    b = datetime.datetime(2018, 10, 5, 11, 30, 0)
+    tr = TimeRange()
+    tr.beginTime = a
+    tr.endTime = b
 
-a = datetime.datetime(2018, 10, 5, 11, 0, 0)
-b = datetime.datetime(2018, 10, 5, 11, 30, 0)
-tr = TimeRange()
-tr.beginTime = a
-tr.endTime = b
+    data = Data(tr)
 
-data = Data(tr)
+    print("randomTick =", data.getTick(), '\n')
+    print("generatedQueue =", data.fillQueue(), '\n')
+    print("deltaTime =", data.timeCount(), '\n')
 
-
-print("randomTick =", data.getTick(), '\n')
-print("generatedQueue =", data.fillQueue(), '\n')
-print("deltaTime =", data.timeCount(), '\n')
-
-
-#РАБОТАЕТ ГЕНЕРАЦИЯ ТИКА
-#РАБОТАЕТ ГЕНЕРАЦИЯ ОЧЕРЕДИ С ЗАДАННЫМ ДИАПАЗОНОМ
-#РАБОТАЕТ РАСЧЕТ ДЕЛЬТЫ ЗАДАННОГО ВРЕМЕНИ
+# РАБОТАЕТ ГЕНЕРАЦИЯ ТИКА
+# РАБОТАЕТ ГЕНЕРАЦИЯ ОЧЕРЕДИ С ЗАДАННЫМ ДИАПАЗОНОМ
+# РАБОТАЕТ РАСЧЕТ ДЕЛЬТЫ ЗАДАННОГО ВРЕМЕНИ

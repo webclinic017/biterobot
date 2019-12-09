@@ -2,14 +2,14 @@ from type import StatusFlag
 from type import Need
 from type import TickType
 from type import Decision
-from data import  Data
+from data import Data
 from strategy import Strategy
 from process import Process
-
 
 MINUTE = 1
 HOUR = 60
 DAY = 1440
+
 
 # ОПИСАНИЕ СТРАТЕГИИ (ЛЕНЯ)
 
@@ -19,6 +19,7 @@ class Strategy_1(Strategy):
 
     В классе реализована простейшая стратегия с коридором
     """
+
     def __init__(self, status: StatusFlag):
         """Конструктор класса стратегии
 
@@ -37,7 +38,6 @@ class Strategy_1(Strategy):
             strategyNeed: Требуемые данные для стратегии
         """
 
-
         self.strategyNeed = Need
         self.strategyNeed.candleCount = None
         self.strategyNeed.candleLiveTime = None
@@ -51,7 +51,6 @@ class Strategy_1(Strategy):
             data: Требуемые данные(тики)
         """
 
-
         self.data = data
         self.dataStorage = self.data.fillQueue()
 
@@ -60,8 +59,7 @@ class Strategy_1(Strategy):
 
         """
 
-  
-        self.max = self.min =  self.dataStorage[0]
+        self.max = self.min = self.dataStorage[0]
         for self.tick in self.dataStorage:
             if (self.tick > self.max):
                 self.max = self.tick
@@ -73,7 +71,6 @@ class Strategy_1(Strategy):
         """Процесс торговли по стратегии
 
         """
-
 
         if (self.status == StatusFlag.outDeal):
             self.newTick = self.data.getTick()
@@ -108,7 +105,10 @@ class Strategy_1(Strategy):
         """
 
         self.analysData()
-        while(True):  # Пока не вернет исключения или не будет ручного стопа
+        while (True):  # Пока не вернет исключения или не будет ручного стопа
 
             self.speculate()
         return self.decision
+
+# if __name__ == "__main__":
+
