@@ -71,3 +71,4 @@ if __name__ == "__main__":
     tr.beginTime, tr.endTime = a, b
     dataBase.setQueue(tr, "BTCUSD")
     print(dataBase.getNextData())
+

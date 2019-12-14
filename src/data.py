@@ -2,6 +2,7 @@ from type import TimeRange
 from type import TickType
 import random
 import datetime
+from dataBase import DataBase
 
 
 class Data:
@@ -26,7 +27,7 @@ class Data:
             Текущий тик из БД
         """
 
-        tick = random.uniform(3000.0, 3300.0)  # Вызов ф-ии, котороя вернет Тик из БД, пока рандомное значение
+        tick = dataBase.getNextData()
         return tick
 
     def fillQueue(self):
@@ -38,14 +39,13 @@ class Data:
             Требуемую очередь тиков
         """
 
-        # Вызов функции БД с парметром timeRange(в string?), для инициализации работы с БД
-
         self.queue = []
         tickCount = 0
-        while (
-                self.getTick() != None and tickCount < 30):  # Когда getTick() вернет None => последний тик в данном диапазоне. Второрое условие - временно для теста (будто у нас 30 тиков)
-            self.queue.append(self.getTick())
+        currentTick = self.getTick()
+        while (currentTick != None):  # Когда getTick() вернет None => последний тик в данном диапазоне
+            self.queue.append(currentTick)
             tickCount += 1
+            currentTick = self.getTick()
         return self.queue
 
     def clearQueue(self):
@@ -82,13 +82,15 @@ class Data:
 if __name__ == "__main__":
     print("__________DATA_TEST_________ \n")
 
-    a = datetime.datetime(2018, 10, 5, 11, 0, 0)
-    b = datetime.datetime(2018, 10, 5, 11, 30, 0)
+    a = datetime.datetime(2016, 5, 5, 7, 0, 0)
+    b = datetime.datetime(2016, 5, 5, 7, 30, 0)
     tr = TimeRange()
     tr.beginTime = a
     tr.endTime = b
 
     data = Data(tr)
+    dataBase = DataBase("UZER\SQLEXPRESS", "BitBot", "user", "password")
+    dataBase.setQueue(tr, "BTCUSD")
 
     print("randomTick =", data.getTick(), '\n')
     print("generatedQueue =", data.fillQueue(), '\n')
