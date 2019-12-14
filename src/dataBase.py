@@ -64,7 +64,7 @@ class DataBase():
 
 
 if __name__ == "__main__":
-    dataBase = DataBase("localhost", "BitBot", "user", "password")  # Название сервера поменять на свой (1-й параметр)
+    dataBase = DataBase("UZER\SQLEXPRESS", "BitBot", "user", "password")  # Название сервера поменять на свой (1-й параметр)
     a = datetime.datetime(2016, 5, 5, 7, 0, 0)
     b = datetime.datetime(2016, 5, 5, 7, 30, 0)
     tr = TimeRange()
