@@ -1,5 +1,6 @@
 import type
 
+
 class Process:
     """Класс действий при торговле
 
@@ -15,7 +16,6 @@ class Process:
             eventPercent: допустимый процент от кошелька, для сделки
             lossPercent: максимальный процент потерь
         """
-
 
         self.wallet = wallet
         self.USD_Wallet = self.wallet
@@ -50,7 +50,6 @@ class Process:
 
         """
 
-
         self.price = price
         self.transactionAmount: float
         self.USD_Wallet += self.BTC_Wallet * self.price
@@ -64,7 +63,6 @@ class Process:
 
         """
 
-
         self.currency = currency
         if (self.currency == "BTC"):
             print("YOU HAVE " + self.BTC_Wallet + "BTC \n")
@@ -74,3 +72,4 @@ class Process:
             print("!CHECK CURRENCY CORRECT!")
             return
 
+# if __name__ == "__main__":
