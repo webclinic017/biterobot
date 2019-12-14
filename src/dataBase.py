@@ -64,9 +64,9 @@ class DataBase():
 
 
 if __name__ == "__main__":
-    dataBase = DataBase("localhost", "BitBot", "user", "password")
-    a = datetime.datetime(2018, 10, 5, 11, 0, 0)
-    b = datetime.datetime(2018, 10, 5, 11, 30, 0)
+    dataBase = DataBase("localhost", "BitBot", "user", "password")  # Название сервера поменять на свой (1-й параметр)
+    a = datetime.datetime(2016, 5, 5, 7, 0, 0)
+    b = datetime.datetime(2016, 5, 5, 7, 30, 0)
     tr = TimeRange()
     tr.beginTime, tr.endTime = a, b
     dataBase.setQueue(tr, "BTCUSD")
