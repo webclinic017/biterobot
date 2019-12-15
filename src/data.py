@@ -11,16 +11,18 @@ class Data:
     В классе реализованы функции для работы с данными по сделкам - тиками
     """
 
-    def __init__(self, timeRange: TimeRange):
+    def __init__(self, timeRange: TimeRange, dataBase: DataBase):
         """Конструктор класса данных
 
         Args:
             timeRange: Временной промежуток, на котором работаем с данными
+            dataBase: База данных, с которой работаем
         """
 
         self.timeRange = timeRange
+        dataBase.setQueue(self.timeRange, "BTCUSD")  # Пока работаем только с этой парой, далее передавать параметром
 
-    def getTick(self):
+    def getTick(self, dataBase: DataBase):
         """Получение тика из БД
 
         Returns:
@@ -41,11 +43,11 @@ class Data:
 
         self.queue = []
         tickCount = 0
-        currentTick = self.getTick()
+        currentTick = self.getTick(dataBase)
         while (currentTick != None):  # Когда getTick() вернет None => последний тик в данном диапазоне
             self.queue.append(currentTick)
             tickCount += 1
-            currentTick = self.getTick()
+            currentTick = self.getTick(dataBase)
         return self.queue
 
     def clearQueue(self):
@@ -88,11 +90,11 @@ if __name__ == "__main__":
     tr.beginTime = a
     tr.endTime = b
 
-    data = Data(tr)
     dataBase = DataBase("UZER\SQLEXPRESS", "BitBot", "user", "password")
-    dataBase.setQueue(tr, "BTCUSD")
 
-    print("randomTick =", data.getTick(), '\n')
+    data = Data(tr, dataBase)
+
+    print("randomTick =", data.getTick(dataBase), '\n')
     print("generatedQueue =", data.fillQueue(), '\n')
     print("deltaTime =", data.timeCount(), '\n')
 
