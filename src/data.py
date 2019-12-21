@@ -25,6 +25,9 @@ class Data:
     def getTick(self, dataBase: DataBase):
         """Получение тика из БД
 
+        Args:
+            dataBase: База данных, с которой работаем
+
         Returns:
             Текущий тик из БД
         """

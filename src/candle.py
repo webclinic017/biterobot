@@ -18,6 +18,7 @@ class Candle():
             candleQuantity: Количество свечей
             liveTime: Время жизни свечи
             timeRange: Временной промежуток, на котором работаем со свечами
+            dataBase: База данных, с которой работаем
         """
 
         self.candleQuantity = candleQuantity
