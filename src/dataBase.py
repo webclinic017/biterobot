@@ -1,5 +1,4 @@
 import pyodbc
-import string
 import datetime
 from type import TimeRange
 
@@ -11,7 +10,7 @@ class DataBase():
     запросов, а лишь явялется оболочкой для заранее заготовленных SQL запросов
     """
 
-    def __init__(self, server: string, database: string, username: string, password: string):
+    def __init__(self, server: str, database: str, username: str, password: str):
         """Конструктор класса бд
 
         Args:
@@ -32,7 +31,7 @@ class DataBase():
         self.timeRange = TimeRange()
         self.ticker = ""
 
-    def setQueue(self, timeRange: TimeRange, ticker: string):
+    def setQueue(self, timeRange: TimeRange, ticker: str):
         """Определяем очередь данных, которую хотим получить из бд
 
         Args:
@@ -57,7 +56,7 @@ class DataBase():
 
         Return: следующая запись из очереди данных. Представляет из себя Row, из которой можно получить
                 значения используя . или []
-                Пример: row.id, row[1], row[4] - текущий курс
+                Пример: row.id, row[1]. row.Price - текущий курс
         """
 
         return self.cursor.fetchone()
