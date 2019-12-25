@@ -56,7 +56,7 @@ class Process:
             print("Empty BTC wallet, didn't sell anything")
             return 0.0
         sellBTCamount = self.BTC_Wallet
-        self.USD_Wallet += self.BTC_Wallet * self.price
+        self.USD_Wallet += self.BTC_Wallet * price
         print("YOU SOLD " + str(self.BTC_Wallet) + " BTC at price " + str(price))
         self.BTC_Wallet = 0.0
         return sellBTCamount
