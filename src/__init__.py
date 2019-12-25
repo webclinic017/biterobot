@@ -9,7 +9,7 @@ from src.exampleStrategy import ExampleStrategy
 def main():
     print('BitBot starts')
     try:
-        database = DataBase("UZER\SQLEXPRESS", "BitBot", "user", "password")
+        database = DataBase("localhost", "BitBot", "user", "password")
     except Exception as exc:
         print("Something went wrong with your database\n")
         print(exc)
