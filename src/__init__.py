@@ -1,6 +1,7 @@
 from dataBase import DataBase
 from archiveDataTest import ArchiveDataTest
 from exampleStrategy import ExampleStrategy
+import testStrategy
 from type import TimeRange
 
 
@@ -12,7 +13,7 @@ def main():
         print("Something went wrong with your database\n")
         print(exc)
         return
-    tester = ArchiveDataTest(ExampleStrategy(), TimeRange(), 1000.0, 0.0, database)
+    tester = ArchiveDataTest(testStrategy.OnlySellStrategy(), TimeRange(), 1000.0, 0.0, database)
     result = tester.startTest()
     for item in result:
         print(item + ':  ' + str(result[item]))
