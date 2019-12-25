@@ -17,8 +17,10 @@ class CandleType:
 
 
 class TimeRange:
-    beginTime = datetime.datetime(2018, 10, 5, 11, 0, 0)
-    endTime = datetime.datetime(2018, 10, 5, 11, 30, 0)
+    def __init__(self, beginTime: datetime.datetime = datetime.datetime(2016, 5, 5, 7, 0, 0),
+                 endTime: datetime.datetime = datetime.datetime(2016, 5, 5, 7, 30, 0)):
+        self.beginTime = beginTime
+        self.endTime = endTime
 
 
 class StatusFlag(Enum):

@@ -1,8 +1,7 @@
-from type import StatusFlag
-
-
-class Strategy():
-    def __init__(self, status: StatusFlag):
+class Strategy:
+    def __init__(self):
+        self.eventPercent = 1
+        self.lossPercent = 0.01
         pass
 
     def setNeed(self):
@@ -11,7 +10,7 @@ class Strategy():
     def speculate(self):
         pass
 
-    def getDecision(self):
+    def getDecision(self, currentData):
         pass
 
 # if __name__ == "__main__":

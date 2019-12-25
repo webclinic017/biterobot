@@ -20,9 +20,10 @@ class Data:
         """
 
         self.timeRange = timeRange
-        dataBase.setQueue(self.timeRange, "BTCUSD")  # Пока работаем только с этой парой, далее передавать параметром
+        self.database = dataBase
+        self.database.setQueue(self.timeRange, "BTCUSD")  # Пока работаем только с этой парой, далее передавать параметром
 
-    def getTick(self, dataBase: DataBase):
+    def getTick(self):
         """Получение тика из БД
 
         Args:
@@ -32,7 +33,7 @@ class Data:
             Текущий тик из БД
         """
 
-        tick = dataBase.getNextData()
+        tick = self.database.getNextData()
         return tick
 
     def fillQueue(self):
@@ -46,11 +47,11 @@ class Data:
 
         self.queue = []
         tickCount = 0
-        currentTick = self.getTick(dataBase)
+        currentTick = self.getTick()
         while (currentTick != None):  # Когда getTick() вернет None => последний тик в данном диапазоне
             self.queue.append(currentTick)
             tickCount += 1
-            currentTick = self.getTick(dataBase)
+            currentTick = self.getTick()
         return self.queue
 
     def clearQueue(self):
@@ -97,7 +98,7 @@ if __name__ == "__main__":
 
     data = Data(tr, dataBase)
 
-    print("randomTick =", data.getTick(dataBase), '\n')
+    print("randomTick =", data.getTick(), '\n')
     print("generatedQueue =", data.fillQueue(), '\n')
     print("deltaTime =", data.timeCount(), '\n')
 
