@@ -1,7 +1,7 @@
 from dataBase import DataBase
 from archiveDataTest import ArchiveDataTest
-from exampleStrategy import ExampleStrategy
 import testStrategy
+import userStrategy
 from type import TimeRange
 
 
