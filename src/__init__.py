@@ -7,7 +7,7 @@ from type import TimeRange
 def main():
     print('BitBot starts')
     try:
-        database = DataBase("localhost", "BitBot", "user", "password")
+        database = DataBase("UZER\SQLEXPRESS", "BitBot", "user", "password")
     except Exception as exc:
         print("Something went wrong with your database\n")
         print(exc)
