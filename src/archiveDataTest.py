@@ -24,7 +24,8 @@ class Statistics:
         self.lastBuyPrice = 0
 
     def setFirstPrice(self, price: float):
-        self.maxWalletValue = self.minWalletValue = self.startWalletValue = self.startUSDwallet + self.startBTCwallet * price
+        self.maxWalletValue = self.minWalletValue = self.startWalletValue = self.endWalletValue = \
+            self.startUSDwallet + self.startBTCwallet * price
 
     def addTrade(self, tradeDirection: str, price: float, BTCamount: float, BTCwallet: float, USDwallet: float):
         if tradeDirection == "BUY" and BTCamount > 0:
