@@ -1,20 +1,21 @@
 import pyodbc
+import sqlite3
 import datetime
 from type import TimeRange
 
 
-class DataBase():
+class DataBase:
     """Класс для работы с базой данных
 
     В классе реализованы методы для получения данных и записи в бд. Класс не предоставляет методов для исполнения любых
     запросов, а лишь явялется оболочкой для заранее заготовленных SQL запросов
     """
 
-    def __init__(self, server: str, database: str, username: str, password: str):
+    def __init__(self, server: str, database: str, username: str = "", password: str = ""):
         """Конструктор класса бд
 
         Args:
-            server: адрес сервера
+            server: адрес сервера, если подключаемся к удаленной бд; = "sqlite3", если локально к sqlite3
             database: имя базы данных для подключения
             username: имя пользователя
             password: пароль TODO: Хорошая ли это идея хранить пароль в классе? Нужно ли его хранить вообще?
@@ -24,12 +25,21 @@ class DataBase():
         self.database = database
         self.username = username
         self.password = password
-        self.connection = pyodbc.connect(
-            'DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + server + ';DATABASE=' + database +
-            ';UID=' + username + ';PWD=' + password)
-        self.cursor = self.connection.cursor()
+        if self.server == "sqlite3":
+        #подключаемся к sqlite3
+            self.connection = sqlite3.connect(self.database)
+            self.cursor = self.connection.cursor()
+        else:
+        #подключаемся к удаленной бд
+            self.connection = pyodbc.connect(
+                'DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + server + ';DATABASE=' + database +
+                ';UID=' + username + ';PWD=' + password)
+            self.cursor = self.connection.cursor()
         self.timeRange = TimeRange()
         self.ticker = ""
+
+#    def createDatabase(self):
+
 
     def setQueue(self, timeRange: TimeRange, ticker: str):
         """Определяем очередь данных, которую хотим получить из бд
@@ -40,7 +50,7 @@ class DataBase():
         """
         self.timeRange = timeRange
         self.ticker = ticker
-        self.cursor.execute("SELECT Pair.id FROM Pair WHERE Pair.Ticker = ?", self.ticker)
+        self.cursor.execute("SELECT Pair.id FROM Pair WHERE Pair.Ticker = ? ", [self.ticker])
         beginTimestamp = self.timeRange.beginTime
         endTimestamp = self.timeRange.endTime
         row = self.cursor.fetchone()
@@ -49,7 +59,7 @@ class DataBase():
         self.cursor.execute("""SELECT * FROM Trade Where 
                                Trade.Pair = ? AND  
                                Trade.Timestamp > ? AND
-                               Trade.Timestamp < ?""", row.id, beginTimestamp, endTimestamp)
+                               Trade.Timestamp < ?""", (row[0], beginTimestamp, endTimestamp))
 
     def getNextData(self):
         """Возвращает следующую запись из набора запрощенных данных
@@ -63,7 +73,8 @@ class DataBase():
 
 
 if __name__ == "__main__":
-    dataBase = DataBase("UZER\SQLEXPRESS", "BitBot", "user", "password")  # Название сервера поменять на свой (1-й параметр)
+    dataBase = DataBase("sqlite3", "../resources/db/sqlite3/bitbot.db", "", "")
+    #dataBase = DataBase("localhost", "BitBot", "user", "password") # Название сервера поменять на свой (1-й параметр)
     a = datetime.datetime(2016, 5, 5, 7, 0, 0)
     b = datetime.datetime(2016, 5, 5, 7, 30, 0)
     tr = TimeRange()
