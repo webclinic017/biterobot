@@ -1,5 +1,5 @@
 import bitmex
-from dataBase import DataBase
+from database import DataBase
 
 if __name__ == "__main__":
     client = bitmex.bitmex()

@@ -1,6 +1,6 @@
 import type
 from data import Data
-from dataBase import DataBase
+from database import Database
 from process import Process
 from strategy import Strategy
 
@@ -75,7 +75,7 @@ class ArchiveDataTest:
     """Тестирование на архивных данных
 
     """
-    def __init__(self, strategy: Strategy, timerange: type.TimeRange, USDwallet: float, BTCwallet: float, db: DataBase):
+    def __init__(self, strategy: Strategy, timerange: type.TimeRange, USDwallet: float, BTCwallet: float, db: Database):
         self.strategy = strategy
         self.timerange = timerange
         self.startUSDwallet = USDwallet

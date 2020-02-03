@@ -1,4 +1,4 @@
-from dataBase import DataBase
+from database import Database
 from archiveDataTest import ArchiveDataTest
 from exampleStrategy import ExampleStrategy
 import testStrategy
@@ -8,12 +8,12 @@ from type import TimeRange
 def main():
     print('BitBot starts')
     try:
-        database = DataBase("localhost", "BitBot", "user", "password")
+        database = Database("mssql", "localhost", "BitBot", "user", "password")
     except Exception as exc:
-        print("Something went wrong with your database\n")
+        print("Something went wrong with your database")
         print(exc)
         return
-    tester = ArchiveDataTest(testStrategy.OnlySellStrategy(), TimeRange(), 1000.0, 0.0, database)
+    tester = ArchiveDataTest(ExampleStrategy(), TimeRange(), 1000.0, 0.0, database)
     result = tester.startTest()
     for item in result:
         print(item + ':  ' + str(result[item]))
