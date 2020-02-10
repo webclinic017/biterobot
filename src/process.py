@@ -5,7 +5,7 @@ class Process:
     """
 
     def __init__(self, USD_wallet: float = 1000.0, BTC_Wallet: float = 0, eventPercent: float = 1, lossPercent: float = 0.01):
-        """Конструктор класса свечей
+        """Конструктор класса действий при торговле
 
         Args:
             BTC_Wallet: баланс криптокошелька

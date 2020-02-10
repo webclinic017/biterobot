@@ -2,7 +2,7 @@ import type
 from data import Data
 from database import Database
 from process import Process
-from strategy import Strategy
+
 
 class Statistics:
     """Статистика по сделкам
@@ -71,7 +71,7 @@ class Statistics:
                 'result': self.endWalletValue - self.startWalletValue,
                 'verdict': verdict}
 
-class ArchiveDataTest:
+class Backtest:
     """Тестирование на архивных данных
 
     """
