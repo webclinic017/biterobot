@@ -1,4 +1,4 @@
-from dataBase import DataBase
+from database import Database
 from archiveDataTest import ArchiveDataTest
 import testStrategy
 import userStrategy
@@ -9,9 +9,9 @@ from src.exampleStrategy import ExampleStrategy
 def main():
     print('BitBot starts')
     try:
-        database = DataBase("UZER\SQLEXPRESS", "BitBot", "user", "password")
+        database = Database("mssql", "localhost", "BitBot", "user", "password")
     except Exception as exc:
-        print("Something went wrong with your database\n")
+        print("Something went wrong with your database")
         print(exc)
         return
     tester = ArchiveDataTest(ExampleStrategy(), TimeRange(), 1000.0, 0.0, database)

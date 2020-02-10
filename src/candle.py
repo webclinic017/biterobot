@@ -2,7 +2,7 @@ from type import CandleType
 from type import TimeRange
 from data import Data
 import datetime
-from dataBase import DataBase
+from database import DataBase
 
 
 class Candle():

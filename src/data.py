@@ -4,16 +4,16 @@ from type import TimeRange
 from type import TickType
 import random
 import datetime
-from dataBase import DataBase
+from database import Database
 
-
+#TODO: мб сделать это класс iterable?
 class Data:
     """Класс данных для обработки тиков
 
     В классе реализованы функции для работы с данными по сделкам - тиками
     """
 
-    def __init__(self, timeRange: TimeRange, dataBase: DataBase):
+    def __init__(self, timeRange: TimeRange, dataBase: Database):
         """Конструктор класса данных
 
         Args:
@@ -23,7 +23,9 @@ class Data:
 
         self.timeRange = timeRange
         self.database = dataBase
-        self.database.setQueue(self.timeRange, "BTCUSD")  # Пока работаем только с этой парой, далее передавать параметром
+        self.queue = self.database.getQueue(self.timeRange, "BTCUSD")
+        self.queueIterator = iter(self.queue)
+        # Пока работаем только с этой парой BTCUSD, далее передавать параметром
 
     def getTick(self):
         """Получение тика из БД
@@ -34,8 +36,10 @@ class Data:
         Returns:
             Текущий тик из БД
         """
-
-        tick = self.database.getNextData()
+        try:
+            tick = next(self.queueIterator)
+        except:
+            tick = None
         return tick
 
     def fillQueue(self):
@@ -96,7 +100,7 @@ if __name__ == "__main__":
     tr.beginTime = a
     tr.endTime = b
 
-    dataBase = DataBase("UZER\SQLEXPRESS", "BitBot", "user", "password")
+    dataBase = Database("UZER\SQLEXPRESS", "BitBot", "user", "password")
 
     data = Data(tr, dataBase)
 

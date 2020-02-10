@@ -10,6 +10,6 @@ setup(
     author='Ivanov Gennadij, Starikov Andrej',
     author_email='kethavel.me@gmail.com',
     classifiers=['Development Status :: 3 - Alpha'],
-    install_requires=['pyodbc'],
+    install_requires=['pyodbc', 'ccxt'],
     description=''
 )
