@@ -1,8 +1,9 @@
 from database import Database
 from archiveDataTest import ArchiveDataTest
-from exampleStrategy import ExampleStrategy
 import testStrategy
+import userStrategy
 from type import TimeRange
+from src.exampleStrategy import ExampleStrategy
 
 
 def main():
