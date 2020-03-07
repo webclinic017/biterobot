@@ -71,6 +71,7 @@ class Statistics:
                 'result': self.endWalletValue - self.startWalletValue,
                 'verdict': verdict}
 
+
 class ArchiveDataTest:
     """Тестирование на архивных данных
 
@@ -82,6 +83,10 @@ class ArchiveDataTest:
         self.startBTCwallet = BTCwallet
         self.process = Process(USDwallet, BTCwallet, strategy.eventPercent, strategy.lossPercent)
         self.data = Data(self.timerange, db)
+        # TODO: довести до ума
+        # self.prepareData = Data(type.TimeRange(self.timerange.beginTime - self.strategy.getNeed.getDeltatime(),
+        #                                  self.timerange.beginTime), db)
+        # далее передаем данные для подготовки в стратегию, после чего начинаем тест
         self.statistics = Statistics(self.startUSDwallet, self.startBTCwallet)
 
     def startTest(self):

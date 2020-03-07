@@ -1,4 +1,4 @@
-from type import TimeRange
+from type import TimeRange, Need
 from type import TickType
 import random
 import datetime
@@ -17,8 +17,8 @@ class Data:
         Args:
             timeRange: Временной промежуток, на котором работаем с данными
             dataBase: База данных, с которой работаем
+            neededByStrategy: Какие данные нужны для старта проверки стратегии
         """
-
         self.timeRange = timeRange
         self.database = dataBase
         self.database.setQueue(self.timeRange, "BTCUSD")  # Пока работаем только с этой парой, далее передавать параметром
