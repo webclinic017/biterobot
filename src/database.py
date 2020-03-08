@@ -1,6 +1,6 @@
 import pyodbc
 import sqlite3
-import datetime
+from datetime import datetime
 from type import TimeRange
 from typing import List, Tuple
 
@@ -64,9 +64,6 @@ class Database:
 if __name__ == "__main__":
     dataBase = Database("sqlite3", "../resources/db/sqlite3/bitbot.db", "", "")
     #dataBase = Database("mssql", "localhost", "BitBot", "user", "password") # Название сервера поменять на свой (1-й параметр)
-    a = datetime.datetime(2016, 5, 5, 7, 0, 0)
-    b = datetime.datetime(2016, 5, 5, 7, 30, 0)
-    tr = TimeRange()
-    tr.beginTime, tr.endTime = a, b
+    tr = TimeRange(datetime(2016, 5, 5, 7, 0, 0), datetime(2016, 5, 5, 7, 30, 0))
     response = dataBase.getQueue(tr, "BTCUSD")
     print(response)

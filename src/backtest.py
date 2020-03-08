@@ -75,7 +75,7 @@ class Backtest:
     """Тестирование на архивных данных
 
     """
-    def __init__(self, strategy: Strategy, timerange: type.TimeRange, USDwallet: float, BTCwallet: float, db: Database):
+    def __init__(self, strategy, timerange: type.TimeRange, USDwallet: float, BTCwallet: float, db: Database):
         self.strategy = strategy
         self.timerange = timerange
         self.startUSDwallet = USDwallet

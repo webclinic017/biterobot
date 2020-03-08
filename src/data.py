@@ -2,7 +2,8 @@ from type import TimeRange, Need
 import datetime
 from database import Database
 
-#TODO: мб сделать это класс iterable?
+
+# TODO: мб сделать это класс iterable?
 class Data:
     """Класс данных для обработки тиков
 

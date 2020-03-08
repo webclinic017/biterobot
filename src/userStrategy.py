@@ -1,8 +1,7 @@
-from strategy import Strategy
 import random
 
 
-class ExampleStrategy(Strategy):
+class ExampleStrategy():
 
     def __init__(self):
         self.eventPercent = 1
