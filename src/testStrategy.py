@@ -1,7 +1,6 @@
-from strategy import Strategy
 import random
 
-class OnlySellStrategy(Strategy):
+class OnlySellStrategy:
     def __init__(self):
         self.eventPercent = 1
         self.lossPercent = 1
@@ -10,7 +9,7 @@ class OnlySellStrategy(Strategy):
         return "SELL"
 
 
-class BrokenStrategy(Strategy):
+class BrokenStrategy:
     def __init__(self):
         self.eventPercent = 1
         self.lossPercent = 1

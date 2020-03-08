@@ -1,15 +1,14 @@
-from dataBase import DataBase
-from datetime import datetime
-from archiveDataTest import ArchiveDataTest
-from exampleStrategy import ExampleStrategy
-import testStrategy
+from database import Database
+from backtest import Backtest
+from userStrategy import ExampleStrategy
 from type import TimeRange
 
 
 def main():
     print('BitBot starts')
     try:
-        database = DataBase("localhost", "BitBot", "user", "password")
+        database = Database("mssql", "localhost", "BitBot", "user", "password")
+        #database = Database("sqlite3", "../resources/db/sqlite3/bitbot.db", "", "")
     except Exception as exc:
         print("Something went wrong with your database")
         print(exc)

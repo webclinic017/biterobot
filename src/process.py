@@ -5,7 +5,7 @@ class Process:
     """
 
     def __init__(self, USD_wallet: float = 1000.0, BTC_Wallet: float = 0, eventPercent: float = 1, lossPercent: float = 0.01):
-        """Конструктор класса свечей
+        """Конструктор класса действий при торговле
 
         Args:
             BTC_Wallet: баланс криптокошелька
@@ -56,7 +56,7 @@ class Process:
             print("Empty BTC wallet, didn't sell anything")
             return 0.0
         sellBTCamount = self.BTC_Wallet
-        self.USD_Wallet += self.BTC_Wallet * self.price
+        self.USD_Wallet += self.BTC_Wallet * price
         print("YOU SOLD " + str(self.BTC_Wallet) + " BTC at price " + str(price))
         self.BTC_Wallet = 0.0
         return sellBTCamount
