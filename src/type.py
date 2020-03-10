@@ -37,26 +37,34 @@ class Need:
 
        """
 
-    def __init__(self, numOfCandles: int = None, quantity: timedelta = None, deltatime: timedelta = None):
-        # if (deltatime is None) and (numOfCandles is None or quantity is None):
-        #    raise ValueError() # нужно ввести либо число свечей и их размер, либо временной интервал
-        # if
-        self.numOfCandles: int = numOfCandles
-        self.quantity: timedelta = quantity
-        self.deltatime: timedelta = deltatime  #стандартный тип представления разницы
-        # времени с описанными алгебр. операциями
+    TICKS_WITH_AMOUNT: int = 0
+    TICKS_WITH_TIMEDELTA: int = 1
+    CANDLES: int = 2
 
-    def getDeltatime(self):
-        if self.deltatime is not None:
-            return self.deltatime
+    def __init__(self, worksWith: str = None, preparedAmount: int = None, quantity: timedelta = None,
+                 timedeltaBeforeStart: timedelta = None):
+        worksWith = worksWith.lower()
+        if worksWith == "candles":
+            raise NotImplementedError()
+        # self.prepareType = Need.CANDLES
+        elif worksWith == "ticks":
+            if preparedAmount is not None:
+                raise NotImplementedError()
+            # self.prepareType = Need.TICKS_WITH_AMOUNT
+            elif timedeltaBeforeStart is not None:
+                self.prepareType = Need.TICKS_WITH_TIMEDELTA
+                self.timedeltaBeforeStart = timedeltaBeforeStart
+            else:
+                raise ValueError("You should provide number of ticks or timedelta also")
         else:
-            return self.numOfCandles * self.quantity
+            raise ValueError("You should say if strategy works with candles or ticks. Set parameter worksWith")
 
-    def getCandles(self):
-        if self.quantity is not None and self.numOfCandles is not None:
-            return self.quantity, self.numOfCandles
+
+    def getNeededData(self):
+        if self.prepareType == Need.TICKS_WITH_TIMEDELTA:
+            return Need.TICKS_WITH_TIMEDELTA, self.timedeltaBeforeStart
         else:
-            raise RuntimeError("Candles wasn't set yet. Try to get deltatime")
+            NotImplementedError()
 
 
 class Decision(Enum):
@@ -68,4 +76,6 @@ class Decision(Enum):
 def buy():
     wallet = - 5
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
+    need = Need(worksWith="ticks", timedeltaBeforeStart=timedelta(days=1)).getNeededData()
+    print(need[0] == Need.TICKS_WITH_TIMEDELTA)

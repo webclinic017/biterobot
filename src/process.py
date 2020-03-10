@@ -42,7 +42,7 @@ class Process:
 
         self.USD_Wallet -= buyBTCAmount * price
         self.BTC_Wallet += buyBTCAmount
-        print("YOU BOUGHT " + str(buyBTCAmount) + " BTC at price " + str(price))
+        print("You bought " + str(buyBTCAmount) + " BTC at price " + str(price))
         return buyBTCAmount
 
     def sell(self, price: float):
@@ -69,9 +69,9 @@ class Process:
         """
 
         self.currency = currency
-        if (self.currency == "BTC"):
+        if self.currency == "BTC":
             return self.BTC_Wallet
-        elif (self.currency == "USD"):
+        elif self.currency == "USD":
             return self.USD_Wallet
         else:
             raise ValueError("Currency incorrect")

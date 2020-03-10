@@ -1,5 +1,5 @@
 from type import TimeRange, Need
-import datetime
+from datetime import datetime
 from database import Database
 
 
@@ -90,21 +90,17 @@ class Data:
 
 # TESTING#
 if __name__ == "__main__":
-    print("__________DATA_TEST_________ \n")
+    print("__________DATA_TEST_________")
 
-    a = datetime.datetime(2016, 5, 5, 7, 0, 0)
-    b = datetime.datetime(2016, 5, 5, 7, 30, 0)
-    tr = TimeRange()
-    tr.beginTime = a
-    tr.endTime = b
+    tr = TimeRange(datetime(2016, 5, 5, 7, 0, 0), datetime(2016, 5, 5, 7, 30, 0))
 
-    dataBase = Database("UZER\SQLEXPRESS", "BitBot", "user", "password")
+    dataBase = Database("mssql", "localhost", "BitBot", "user", "password")
 
     data = Data(tr, dataBase)
 
-    print("randomTick =", data.getTick(), '\n')
-    print("generatedQueue =", data.fillQueue(), '\n')
-    print("deltaTime =", data.timeCount(), '\n')
+    print("randomTick =", data.getTick())
+    print("generatedQueue =", data.fillQueue())
+    print("deltaTime =", data.timeCount())
 
 # РАБОТАЕТ ГЕНЕРАЦИЯ ТИКА
 # РАБОТАЕТ ГЕНЕРАЦИЯ ОЧЕРЕДИ С ЗАДАННЫМ ДИАПАЗОНОМ

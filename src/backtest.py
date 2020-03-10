@@ -1,7 +1,7 @@
-import type
 from data import Data
 from database import Database
 from process import Process
+from type import Need, TimeRange
 
 
 class Statistics:
@@ -75,20 +75,34 @@ class Backtest:
     """Тестирование на архивных данных
 
     """
-    def __init__(self, strategy, timerange: type.TimeRange, USDwallet: float, BTCwallet: float, db: Database):
+    def __init__(self, strategy, timerange: TimeRange, USDwallet: float, BTCwallet: float, db: Database):
         self.strategy = strategy
         self.timerange = timerange
         self.startUSDwallet = USDwallet
         self.startBTCwallet = BTCwallet
         self.process = Process(USDwallet, BTCwallet, strategy.eventPercent, strategy.lossPercent)
         self.data = Data(self.timerange, db)
-        # TODO: довести до ума
-        # self.prepareData = Data(type.TimeRange(self.timerange.beginTime - self.strategy.getNeed.getDeltatime(),
-        #                                  self.timerange.beginTime), db)
-        # далее передаем данные для подготовки в стратегию, после чего начинаем тест
+        if self.strategy.needForStart is not None:  # TODO: has attribute!
+            self.prepareForStrategy = self.strategy.needForStart.getNeededData()
+            if self.prepareForStrategy[0] == Need.TICKS_WITH_TIMEDELTA:
+                self.prepareData = Data(TimeRange(self.timerange.beginTime - self.prepareForStrategy[1],
+                                                  self.timerange.beginTime), db)
+            else:
+                raise NotImplementedError()
         self.statistics = Statistics(self.startUSDwallet, self.startBTCwallet)
 
     def startTest(self):
+        # передаем данные для подготовки в стратегию
+        if self.prepareData is not None:
+            if self.prepareForStrategy[0] == Need.TICKS_WITH_TIMEDELTA:
+                currentTick = self.prepareData.getTick()
+                while currentTick:
+                    if self.strategy.prepareForBacktest(currentTick) == 1:
+                        break
+                    currentTick = self.prepareData.getTick()
+            else:
+                raise NotImplementedError()
+        # после чего начинаем тест
         currentTick = self.data.getTick()
         self.statistics.setFirstPrice(currentTick.Price)
         while currentTick:

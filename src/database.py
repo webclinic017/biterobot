@@ -29,9 +29,9 @@ class Database:
         self.username: str = username
         self.password: str = password
         if self.dbms == "sqlite3":
-        #подключаемся к sqlite3
-            self.connection = sqlite3.connect(self.server)
-            self.cursor = self.connection.cursor()
+        # подключаемся к sqlite3
+           self.connection = sqlite3.connect(self.server)
+           self.cursor = self.connection.cursor()
         elif self.dbms == "mssql":
         #подключаемся к MS SQL
             self.connection = pyodbc.connect(
@@ -63,7 +63,8 @@ class Database:
 
 if __name__ == "__main__":
     dataBase = Database("sqlite3", "../resources/db/sqlite3/bitbot.db", "", "")
-    #dataBase = Database("mssql", "localhost", "BitBot", "user", "password") # Название сервера поменять на свой (1-й параметр)
+    # dataBase = Database("mssql", "localhost", "BitBot", "user", "password")
+    # Название сервера поменять на свой (1-й параметр)
     tr = TimeRange(datetime(2016, 5, 5, 7, 0, 0), datetime(2016, 5, 5, 7, 30, 0))
     response = dataBase.getQueue(tr, "BTCUSD")
     print(response)
