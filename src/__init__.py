@@ -15,7 +15,7 @@ def main():
         print("Something went wrong with your database")
         print(exc)
         return
-    tester = Backtest(ExampleStrategy(), TimeRange(datetime(2016, 5, 5, 7, 10, 0), datetime(2016, 5, 5, 7, 30, 0)),
+    tester = Backtest(OnlySellStrategy(), TimeRange(datetime(2016, 5, 5, 7, 10, 0), datetime(2016, 5, 5, 7, 30, 0)),
                       1000.0, 0.0, db)
     result = tester.startTest()
     for item in result:

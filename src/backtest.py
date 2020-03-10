@@ -71,6 +71,7 @@ class Statistics:
                 'result': self.endWalletValue - self.startWalletValue,
                 'verdict': verdict}
 
+
 class Backtest:
     """Тестирование на архивных данных
 
@@ -82,7 +83,7 @@ class Backtest:
         self.startBTCwallet = BTCwallet
         self.process = Process(USDwallet, BTCwallet, strategy.eventPercent, strategy.lossPercent)
         self.data = Data(self.timerange, db)
-        if self.strategy.needForStart is not None:  # TODO: has attribute!
+        if hasattr(self.strategy, "needForStart"):
             self.prepareForStrategy = self.strategy.needForStart.getNeededData()
             if self.prepareForStrategy[0] == Need.TICKS_WITH_TIMEDELTA:
                 self.prepareData = Data(TimeRange(self.timerange.beginTime - self.prepareForStrategy[1],
@@ -93,7 +94,7 @@ class Backtest:
 
     def startTest(self):
         # передаем данные для подготовки в стратегию
-        if self.prepareData is not None:
+        if hasattr(self.strategy, "needForStart"):
             if self.prepareForStrategy[0] == Need.TICKS_WITH_TIMEDELTA:
                 currentTick = self.prepareData.getTick()
                 while currentTick:
@@ -122,6 +123,4 @@ class Backtest:
         return self.statistics.getStatistics()
 
 
-
-
-
+# if __name__ == "__main__":
