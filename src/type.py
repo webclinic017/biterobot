@@ -3,16 +3,19 @@ from enum import Enum
 
 
 class TickType:
-    value: float
-    timeStamp: datetime
+    price: float
+    volume: float
+    timestamp: datetime
 
 
 class CandleType:
     quantity: timedelta  # при таком определении можно будет проводить алгебр. операции
+    beginTimestamp: datetime
+    volume: float
     open: float
     close: float
-    min: float
-    max: float
+    high: float
+    low: float
 
 
 class TimeRange:
