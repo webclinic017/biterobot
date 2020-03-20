@@ -3,9 +3,11 @@ from enum import Enum
 
 
 class TickType:
+    pair: int  # код пары, к которой относится тик. необходимо для мапинга объектов с бд
+    timestamp: datetime
+    tradeDirection: int
     price: float
     volume: float
-    timestamp: datetime
 
 
 class CandleType:
@@ -13,9 +15,9 @@ class CandleType:
     beginTimestamp: datetime
     volume: float
     open: float
-    close: float
     high: float
     low: float
+    close: float
 
 
 class TimeRange:
@@ -39,7 +41,6 @@ class Need:
         timedelta - какой временной интервал
 
        """
-
     TICKS_WITH_AMOUNT: int = 0
     TICKS_WITH_TIMEDELTA: int = 1
     CANDLES: int = 2
@@ -62,7 +63,6 @@ class Need:
         else:
             raise ValueError("You should say if strategy works with candles or ticks. Set parameter worksWith")
 
-
     def getNeededData(self):
         if self.prepareType == Need.TICKS_WITH_TIMEDELTA:
             return Need.TICKS_WITH_TIMEDELTA, self.timedeltaBeforeStart
@@ -78,6 +78,7 @@ class Decision(Enum):
 
 def buy():
     wallet = - 5
+
 
 if __name__ == "__main__":
     need = Need(worksWith="ticks", timedeltaBeforeStart=timedelta(days=1)).getNeededData()

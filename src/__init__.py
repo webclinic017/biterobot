@@ -10,7 +10,7 @@ def main():
     print('BitBot starts')
     try:
         db = Database("mssql", "localhost", "BitBot", "user", "password")
-        # db = Database("sqlite3", "../resources/db/sqlite3/bitbot.db", "", "")
+        # db = Database("sqlite3", "", "../resources/db/sqlite3/bitbot.db", "")
     except Exception as exc:
         print("Something went wrong with your database")
         print(exc)
