@@ -105,7 +105,7 @@ class Backtest:
                 raise NotImplementedError()
         # после чего начинаем тест
         currentTick = self.data.getTick()
-        self.statistics.setFirstPrice(currentTick.Price)
+        self.statistics.setFirstPrice(currentTick.price)
         while currentTick:
             decision = self.strategy.getDecision(currentTick)
             if decision is None:
@@ -113,11 +113,12 @@ class Backtest:
                 continue
 
             if decision == "BUY":
-                self.statistics.addTrade("BUY", currentTick.Price, self.process.buy(currentTick.Price),
+                buyBTCamount = self.process.buy(currentTick.price)
+                self.statistics.addTrade("BUY", currentTick.price, buyBTCamount,
                                          self.process.checkWallet("BTC"), self.process.checkWallet("USD"))
             elif decision == "SELL":
-                self.process.sell(currentTick.Price)
-                self.statistics.addTrade("SELL", currentTick.Price, self.process.sell(currentTick.Price),
+                sellBTCamount = self.process.sell(currentTick.price)
+                self.statistics.addTrade("SELL", currentTick.price, sellBTCamount,
                                          self.process.checkWallet("BTC"), self.process.checkWallet("USD"))
             currentTick = self.data.getTick()
         return self.statistics.getStatistics()

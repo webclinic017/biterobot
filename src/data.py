@@ -1,4 +1,4 @@
-from type import TimeRange, Need
+from type import TimeRange, Need, TickType
 from datetime import datetime
 from database import Database
 
@@ -21,11 +21,14 @@ class Data:
 
         self.timeRange = timeRange
         self.database = dataBase
-        self.queue = self.database.getQueue(self.timeRange, "BTCUSD")
+        self.queue = self.database.getTicks('bitmex', 'btcusd', self.timeRange)
+        if len(self.queue) == 0:
+            raise ValueError("Database doesn't have any data in this timerange. "
+                             "Download it or try again with another timerange.")
         self.queueIterator = iter(self.queue)
         # Пока работаем только с этой парой BTCUSD, далее передавать параметром
 
-    def getTick(self):
+    def getTick(self) -> TickType:
         """Получение тика из БД
 
         Args:

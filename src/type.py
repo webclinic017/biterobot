@@ -3,21 +3,23 @@ from enum import Enum
 
 
 class TickType:
-    pair: int  # код пары, к которой относится тик. необходимо для мапинга объектов с бд
-    timestamp: datetime
-    tradeDirection: int
-    price: float
-    volume: float
+    def __init__(self, timestamp: datetime, tradeDirection: int, price: float, volume: float):
+        self.timestamp = timestamp
+        self.tradeDirection = tradeDirection
+        self.price = price
+        self.volume = volume
 
 
 class CandleType:
-    quantity: timedelta  # при таком определении можно будет проводить алгебр. операции
-    beginTimestamp: datetime
-    volume: float
-    open: float
-    high: float
-    low: float
-    close: float
+    def __init__(self, quantity: timedelta, beginTimestamp: datetime, volume: float,
+                 open: float, high: float, low: float, close: float):
+        self.quantity = quantity
+        self.beginTimestamp = beginTimestamp
+        self.volume = volume
+        self.open = open
+        self.high = high
+        self.low = low
+        self.close = close
 
 
 class TimeRange:

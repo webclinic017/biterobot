@@ -9,13 +9,13 @@ from datetime import datetime
 def main():
     print('BitBot starts')
     try:
-        db = Database("mssql", "localhost", "BitBot", "user", "password")
-        # db = Database("sqlite3", "", "../resources/db/sqlite3/bitbot.db", "")
+        # db = Database("mssql", "localhost", "BitBot", "user", "password")
+        db = Database("sqlite", "", "../resources/db/sqlite3/bitbot_sqlalchemytest2.db")
     except Exception as exc:
         print("Something went wrong with your database")
         print(exc)
         return
-    tester = Backtest(OnlySellStrategy(), TimeRange(datetime(2016, 5, 5, 7, 10, 0), datetime(2016, 5, 5, 7, 30, 0)),
+    tester = Backtest(OnlySellStrategy(), TimeRange(datetime(2016, 5, 5, 0, 0, 0), datetime(2016, 5, 5, 7, 30, 0)),
                       1000.0, 0.0, db)
     result = tester.startTest()
     for item in result:

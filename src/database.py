@@ -1,11 +1,9 @@
-import pyodbc
-import sqlite3
 from datetime import datetime
 from type import TimeRange, TickType, CandleType
 from typing import List, Tuple
 from sqlalchemy import create_engine, Table, Column, MetaData, ForeignKey, UniqueConstraint,\
     Integer, Float, String,  DateTime, Interval
-from sqlalchemy.orm import mapper, sessionmaker
+# from sqlalchemy.orm import mapper, sessionmaker
 
 
 metadata = MetaData()
@@ -42,7 +40,7 @@ tick_table = \
           Column("Price", Float, nullable=False),
           Column("Volume", Float, nullable=False),
           UniqueConstraint("Pair", "Timestamp", "TradeDirection", "Price", "Volume"))
-candles_quantity = \
+candles_quantity_table = \
     Table("CandlesQuantity", metadata,
           Column("Id", Integer, primary_key=True, autoincrement=True),
           Column("Quantity", Interval, nullable=False),
@@ -63,25 +61,22 @@ candles_table = \
           UniqueConstraint("Pair", "Quantity", "BeginTimestamp", "Volume", "Open", "High", "Low", "Close"))
 
 # type.py:
-# class TickType:
-#     pair: int  # код пары, к которой относится тик. необходимо для мапинга объектов с бд
+# TickType:
 #     timestamp: datetime
 #     tradeDirection: int
 #     price: float
 #     volume: float
 
-
-mapper(TickType, tick_table, properties={
-    'pair': tick_table.c.Pair,
-    'timestamp': tick_table.c.Timestamp,
-    'tradeDirection': tick_table.c.TradeDirection,
-    'price': tick_table.c.Price,
-    'volume': tick_table.c.Volume,
-})
+# mapper(TickType, tick_table, properties={
+#     'timestamp': tick_table.c.Timestamp,
+#     'tradeDirection': tick_table.c.TradeDirection,
+#     'price': tick_table.c.Price,
+#     'volume': tick_table.c.Volume,
+# })
 
 # type.py:
-# class CandleType:
-#     quantity: timedelta
+# CandleType:
+#     quantity: timedelta  # при таком определении можно будет проводить алгебр. операции
 #     beginTimestamp: datetime
 #     volume: float
 #     open: float
@@ -89,16 +84,15 @@ mapper(TickType, tick_table, properties={
 #     low: float
 #     close: float
 
-mapper(CandleType, candles_table, properties={
-    'pair': candles_table.c.Pair,
-    'quantity': candles_table.c.Quantity,
-    'beginTimestamp': candles_table.c.BeginTimestamp,
-    'volume': candles_table.c.Volume,
-    'open': candles_table.c.Open,
-    'high': candles_table.c.High,
-    'low': candles_table.c.Low,
-    'close': candles_table.c.Close,
-})
+# mapper(CandleType, candles_table, properties={
+#     'quantity': candles_table.c.Quantity,
+#     'beginTimestamp': candles_table.c.BeginTimestamp,
+#     'volume': candles_table.c.Volume,
+#     'open': candles_table.c.Open,
+#     'high': candles_table.c.High,
+#     'low': candles_table.c.Low,
+#     'close': candles_table.c.Close,
+# })
 
 
 class Database:
@@ -118,61 +112,119 @@ class Database:
             username: имя пользователя
             password: пароль TODO: Хорошая ли это идея хранить пароль в классе? Нужно ли его хранить вообще?
         """
-
         self.dbms: str = dbms.lower()
         self.server: str = server
         self.database: str = database
         self.username: str = username
         self.password: str = password
-        if self.dbms == "sqlite3":
-            # подключаемся к sqlite3
-            # self.connection = sqlite3.connect(self.database)
-            # self.cursor = self.connection.cursor()
+        if self.dbms == "sqlite":
             self.engine = create_engine('sqlite:///' + database)
         elif self.dbms == "mssql":
-            # подключаемся к MS SQL
-            self.connection = pyodbc.connect(
-                'DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + server + ';DATABASE=' + database +
-                ';UID=' + username + ';PWD=' + password)
-            self.cursor = self.connection.cursor()
             self.engine = create_engine('mssql+pyodbc://' + username + ':' + password + '@' + server + '/' + database)
         else:
             raise NotImplementedError("This DBMS doesn't support")
-        self.sessionMaker = sessionmaker(bind=self.engine)
-        self.session = self.sessionMaker()
+        self.connection = self.engine.connect()
 
     def createDatabase(self):
         """Создаем базу данных"""
         metadata.create_all(bind=self.engine)
 
-    def setTickList(self, tickList: List[TickType]):
-        self.session.add_all(tickList)
-        self.session.commit()
+    def insertTicks(self, ticks: List[TickType], exchange: str, ticker: str):
+        """Записываем тики в бд"""
+        pairId = self.__findPairId(exchange, ticker)
+        insert = tick_table.insert()
+        for tick in ticks:
+            self.connection.execute(insert, Pair=pairId,
+                                    Timestamp=tick.timestamp,
+                                    TradeDirection=tick.tradeDirection,
+                                    Price=tick.price,
+                                    Volume=tick.volume)
 
-    def getQueue_(self, exchange: str, ticker: str, timeRange: TimeRange,
-                  candles: bool = False, quantity: str = None,
-                  ticks: bool = False):
-        """Получаем очередь данных из бд через SQLAlchemy"""
-        # if ticks == True:
-        #    self.session
-        pass
+    def insertCandles(self, candles: List[CandleType], quantity: str, exchange: str, ticker: str):
+        """Записываем свечи в бд"""
+        pairId = self.__findPairId(exchange, ticker)
+        quantityId = self.__find(candles_quantity_table, quantity)
+        insert = candles_table.insert()
+        for candle in candles:
+            self.connection.execute(insert, Pair=pairId,
+                                    Quantity=quantityId,
+                                    BeginTimestamp=candle.beginTimestamp,
+                                    Volume=candle.volume,
+                                    Open=candle.open,
+                                    High=candle.high,
+                                    Low=candle.low,
+                                    Close=candle.close)
 
-    def getQueue(self, timeRange: TimeRange, ticker: str) -> List[Tuple]:
-        """Получаем очередь данных из бд
+    def getTicks(self, exchange: str, ticker: str, timeRange: TimeRange) -> List[TickType]:
+        """Получаем очередь сделок из бд"""
+        # находим пару
+        pairId = self.__findPairId(exchange, ticker)
+        # запрашиваем данные
+        # по сделкам
+        select = tick_table.select().where((tick_table.c.Pair == pairId) &
+                                           (tick_table.c.Timestamp >= timeRange.beginTime) &
+                                           (tick_table.c.Timestamp < timeRange.endTime))
+        result = self.connection.execute(select)
+        queue = list()
+        for row in result:
+            queue.append(TickType(timestamp=row['Timestamp'],
+                                  tradeDirection=row['TradeDirection'],
+                                  price=row['Price'],
+                                  volume=row['Volume']))
+        return queue
 
-        Args:
-            timeRange: временной промежуток, из которого будут возвращаться данные
-            ticker: торговая пара, по которой запрашиваем данные
-        """
-        self.cursor.execute("SELECT Pair.id FROM Pair WHERE Pair.Ticker = ? ", [ticker])
-        row = self.cursor.fetchone()
-        if not row:
-            raise ValueError("Wrong ticker")
-        self.cursor.execute("""SELECT * FROM Trade Where 
-                               Trade.Pair = ? AND  
-                               Trade.Timestamp > ? AND
-                               Trade.Timestamp < ?""", (row[0], timeRange.beginTime, timeRange.endTime))
-        return self.cursor.fetchall()
+    def getCandles(self, exchange: str, ticker: str, timeRange: TimeRange, quantity: str) -> List[CandleType]:
+        """Получаем очередь свечей из бд"""
+        pairId = self.__findPairId(exchange, ticker)
+        foundQuantity = self.__find(candles_quantity_table, quantity)
+        quantityId = foundQuantity['Id']
+        # запрашиваем свечи
+        select = candles_table.select().where((candles_table.c.Pair == pairId) &
+                                              (candles_table.c.Quantity == quantityId) &
+                                              (candles_table.c.BeginTimestamp >= timeRange.beginTime) &
+                                              (candles_table.c.BeginTimestamp < timeRange.endTime))
+        result = self.connection.execute(select)
+        queue = list()
+        for row in result:
+            queue.append(CandleType(quantity=foundQuantity['Quantity'],
+                                    beginTimestamp=row['BeginTimestamp'],
+                                    volume=row['Volume'],
+                                    open=row['Open'],
+                                    high=row['High'],
+                                    low=row['Low'],
+                                    close=row['Close'],
+                                    ))
+        return queue
+
+    def __find(self, table: Table, name: str):
+        """Находит одну запись по Name через Select"""
+        if name is None:
+            raise ValueError("You should provide name")
+        select = table.select().where(table.c.Name == name.lower())
+        foundName = self.connection.execute(select).fetchone()
+        if foundName is None:
+            raise ValueError("Wrong name. Does it exist in your database?")
+        return foundName
+
+    def __findPairId(self, exchange: str, ticker: str) -> int:
+        """Находим Id торговой пары"""
+        if exchange is None or ticker is None:
+            raise ValueError("You should provide exchange and ticker")
+
+        # ищем запрашиваемую биржу
+        selectExchange = exchange_table.select().where(exchange_table.c.Name == exchange.lower())
+        foundExchange = self.connection.execute(selectExchange).fetchone()
+        if foundExchange is None:
+            raise ValueError("Wrong exchange. Does it exists in your database?")
+        exchangeId = foundExchange['Id']
+
+        # ищем запрашиваемую торговую пару, которая привязана к этой бирже
+        selectPair = pair_table.select().where((pair_table.c.Exchange == exchangeId) &
+                                               (pair_table.c.Ticker == ticker.lower()))
+        foundPair = self.connection.execute(selectPair).fetchone()
+        if foundPair is None:
+            raise ValueError("Wrong ticker. Does the exchange have this ticker (pair) in your database?")
+        return foundPair['Id']
 
 
 if __name__ == "__main__":
@@ -184,21 +236,6 @@ if __name__ == "__main__":
     # response = database.getQueue(tr, "BTCUSD")
     # print(response)
 
-    db = Database("sqlite3", "", '../resources/db/sqlite3/bitbot_sqlalchemytest2.db')
-    db.createDatabase()
-    #     ("Id", "Pair", "Timestamp", "TradeDirection", "Price", "Amount")
-    # VALUES (1, 1, '2016-05-05 04:50:46.067000000', 2, 447.43000000000001, 1377),
-    tick = TickType()
-    tick.pair = 1
-    tick.tradeDirection = 2
-    tick.price = 447.43000000000001
-    tick.volume = 1377
-    tick.timestamp = datetime(year=2016, month=5, day=5, hour=4, minute=50, second=46, microsecond=67000)
-    tick2 = TickType()
-    tick2.pair = 1
-    tick2.tradeDirection = 1
-    tick2.price = 447.43000000000001
-    tick2.volume = 1377
-    tick2.timestamp = datetime(year=2016, month=5, day=5, hour=4, minute=50, second=46, microsecond=67000)
-    db.setTickList([tick2])
-    print()
+    db = Database("sqlite", "", '../resources/db/sqlite3/bitbot_sqlalchemytest2.db')
+    result = db.getTicks('bitmex','btcusd',TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0), datetime(2017, 1, 1, 0, 0, 0, 0)),)
+    print(result)
