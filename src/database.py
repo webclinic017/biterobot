@@ -1,6 +1,6 @@
 from datetime import datetime
 from type import TimeRange, TickType, CandleType
-from typing import List, Tuple
+from typing import List
 from sqlalchemy import create_engine, Table, Column, MetaData, ForeignKey, UniqueConstraint,\
     Integer, Float, String,  DateTime, Interval
 # from sqlalchemy.orm import mapper, sessionmaker
