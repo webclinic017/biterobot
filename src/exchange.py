@@ -4,7 +4,7 @@ from datetime import datetime
 from type import TimeRange
 
 
-class ExchangeAPI:
+class Exchange:
     """Класс для подключения к биржам"""
 
     def __init__(self, exchange: str):
