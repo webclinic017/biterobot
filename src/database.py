@@ -174,7 +174,13 @@ class Database:
         return queue
 
     def getCandles(self, exchange: str, ticker: str, timeRange: TimeRange, quantity: str) -> List[CandleType]:
-        """Получаем очередь свечей из бд"""
+        """Получаем очередь свечей из бд
+        :param exchange:
+        :param ticker:
+        :param timeRange:
+        :param quantity:
+        :return:
+        """
         pairId = self.__findPairId(exchange, ticker)
         foundQuantity = self.__find(candles_quantity_table, quantity)
         quantityId = foundQuantity['Id']
@@ -197,7 +203,11 @@ class Database:
         return queue
 
     def __find(self, table: Table, name: str):
-        """Находит одну запись по Name через Select"""
+        """Находит одну запись по Name через Select
+        :param table:
+        :param name:
+        :return:
+        """
         if name is None:
             raise ValueError("You should provide name")
         select = table.select().where(table.c.Name == name.lower())
@@ -207,7 +217,12 @@ class Database:
         return foundName
 
     def __findPairId(self, exchange: str, ticker: str) -> int:
-        """Находим Id торговой пары"""
+        """Находим Id торговой пары
+        :rtype: int
+        :param exchange:
+        :param ticker:
+        :return:
+        """
         if exchange is None or ticker is None:
             raise ValueError("You should provide exchange and ticker")
 
