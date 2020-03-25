@@ -210,6 +210,8 @@ class Database:
         """
         if name is None:
             raise ValueError("You should provide name")
+        # TODO: в этом селекте имя таблицы передается изве в виде строки от юзера.
+        #  Это опасно т.к. можно сделать sql инъекцию. Все строки до вставки в запрос должны проверяться
         select = table.select().where(table.c.Name == name.lower())
         foundName = self.connection.execute(select).fetchone()
         if foundName is None:
@@ -227,6 +229,8 @@ class Database:
             raise ValueError("You should provide exchange and ticker")
 
         # ищем запрашиваемую биржу
+        # TODO: в этом селекте имя таблицы передается изве в виде строки от юзера.
+        #  Это опасно т.к. можно сделать sql инъекцию. Все строки до вставки в запрос должны проверяться
         selectExchange = exchange_table.select().where(exchange_table.c.Name == exchange.lower())
         foundExchange = self.connection.execute(selectExchange).fetchone()
         if foundExchange is None:
@@ -234,6 +238,8 @@ class Database:
         exchangeId = foundExchange['Id']
 
         # ищем запрашиваемую торговую пару, которая привязана к этой бирже
+        # TODO: в этом селекте имя таблицы передается изве в виде строки от юзера.
+        #  Это опасно т.к. можно сделать sql инъекцию. Все строки до вставки в запрос должны проверяться
         selectPair = pair_table.select().where((pair_table.c.Exchange == exchangeId) &
                                                (pair_table.c.Ticker == ticker.lower()))
         foundPair = self.connection.execute(selectPair).fetchone()
@@ -252,5 +258,5 @@ if __name__ == "__main__":
     # print(response)
 
     db = Database("sqlite", "", '../resources/db/sqlite3/bitbot_sqlalchemytest2.db')
-    result = db.getTicks('bitmex','btcusd',TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0), datetime(2017, 1, 1, 0, 0, 0, 0)),)
-    print(result)
+    res = db.getTicks('bitmex','btcusd',TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0), datetime(2017, 1, 1, 0, 0, 0, 0)),)
+    print(res)
