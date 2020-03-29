@@ -1,7 +1,7 @@
 from ccxt import bitmex
 from database import Database
-from datetime import datetime
-from type import TimeRange, TickType, CandleType
+from datetime import datetime, timedelta
+from type import TimeRange, TickType, CandleType, CandleQuantity
 from typing import List
 from time import sleep
 
@@ -19,9 +19,20 @@ class Exchange:
             self.exchange = bitmex()
         else:
             raise NotImplementedError()
+        self.rateLimit = self.exchange.rateLimit * 2
+        self.timeOfLastRequest = datetime.now()
+
+    def getMarket(self, ticker: str) -> dict:
+        self.__waitBeforeRequest()
+        result = self.exchange.fetch_markets()
+        for i in result:
+            if i['symbol'] == ticker:
+                return i
+        raise ValueError("No such ticker")
 
     def getTicks(self, ticker: str, timestamp: datetime, limit: int = None) -> List[TickType]:
-        result = self.exchange.fetch_trades(ticker, int(timestamp.timestamp()*1000), limit)
+        self.__waitBeforeRequest()
+        result = self.exchange.fetch_trades(ticker, int(timestamp.timestamp() * 1000), limit)
         returnList = []
         tradeDirection = 0
         for i in result:
@@ -34,21 +45,29 @@ class Exchange:
                                        # TODO: мб так будет быстрее?
                                        tradeDirection,
                                        i['price'],
-                                       i['amount']))
+                                       i['info']['foreignNotional']))  # потому что внутри ccxt баг - она возвращает
+            # количество контрактов, а не количество долларов
         return returnList
 
     def getCandles(self, ticker: str, timestamp: datetime, quantity: str, limit: int) -> List[CandleType]:
-        raise NotImplementedError()
+        self.__waitBeforeRequest()
         result = self.exchange.fetch_ohlcv(ticker, quantity, int(timestamp.timestamp() * 1000), limit)
         returnList = []
-        tradeDirection = 0
+        quantityTimedelta = CandleQuantity.parseQuantity(quantity)
         for i in result:
-            returnList.append(CandleType(datetime.utcfromtimestamp(i['timestamp'] / 1000),
-                                       # datetime.strptime(i['timestamp'], '%Y-%m-%dT%H:%M:%S.%fZ')
-                                       tradeDirection,
-                                       i['price'],
-                                       i['amount']))
+            returnList.append(CandleType(quantityTimedelta, datetime.utcfromtimestamp(i[0] / 1000),
+                                         # datetime.strptime(i['timestamp'], '%Y-%m-%dT%H:%M:%S.%fZ'),
+                                         i[5],
+                                         i[1],
+                                         i[2],
+                                         i[3],
+                                         i[4]))
         return returnList
+
+    def __waitBeforeRequest(self):
+        if self.timeOfLastRequest + timedelta(milliseconds=self.rateLimit) > datetime.now():
+            sleep(int(self.rateLimit / 1000))
+        self.timeOfLastRequest = datetime.now()
 
 
 # if __name__ == "__main__":
@@ -57,10 +76,11 @@ class Exchange:
 if __name__ == "__main__":
     # db = Database('mssql', "UZER\SQLEXPRESS", "BitBot", "user", "password")
     bitmexExch = bitmex()
-    res = bitmexExch.fetch_trades('BTC/USD', int(datetime(2020, 3, 22, 0, 0, 0, 0).timestamp() * 1000), 1000)
-    sleep(5)
+    # TODO: нужно убрать .lower() в параметрах строках во всем проекте. Например здесь тикеры только заглавными пишутся
+    #  поэтому .lower() здесь противопоказан.
     exch = Exchange('bitmex')
-    res2 = exch.getTicks('BTC/USD', datetime(2020, 3, 22, 0, 0, 0, 0), 1000)
+    res = exch.getMarket('BTC/USD')
+    quote = res['quote']
     print('Done!')
 
     # db.insertTicks()

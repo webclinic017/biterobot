@@ -1,8 +1,10 @@
 from datetime import datetime
 from type import TimeRange, TickType, CandleType
 from typing import List
-from sqlalchemy import create_engine, Table, Column, MetaData, ForeignKey, UniqueConstraint,\
-    Integer, Float, String,  DateTime, Interval
+from sqlalchemy import create_engine, Table, Column, MetaData, ForeignKey, UniqueConstraint, \
+    Integer, Float, String, DateTime, Interval
+from sqlalchemy.exc import IntegrityError
+
 # from sqlalchemy.orm import mapper, sessionmaker
 
 
@@ -59,6 +61,7 @@ candles_table = \
           Column("Low", Float, nullable=False),
           Column("Close", Float, nullable=False),
           UniqueConstraint("Pair", "Quantity", "BeginTimestamp", "Volume", "Open", "High", "Low", "Close"))
+
 
 # type.py:
 # TickType:
@@ -129,16 +132,81 @@ class Database:
         """Создаем базу данных"""
         metadata.create_all(bind=self.engine)
 
+    def newCurrency(self, currency: str):
+        """Добавляем валюту"""
+        try:
+            self.__findCurrency(currency)
+        except ValueError:
+            # валюты нет в базе
+            insert = currency_table.insert()
+            self.connection.execute(insert, Ticker=currency)
+
+    def newExchange(self, exchange: str):
+        """Добавляем новую биржу"""
+        try:
+            self.__find(exchange_table, exchange)
+        except ValueError:
+            # биржи нет в базе
+            insert = exchange_table.insert()
+            self.connection.execute(insert, Name=exchange)
+
+    def newPair(self, exchange: str, ticker: str, baseCurrency: str, quoteCurrency: str):
+        """Добавляем пару"""
+        try:
+            self.__findPairId(exchange, ticker)
+        except ValueError:
+            # пары нет в базе
+            # ищем биржу
+            foundExchange = self.__find(exchange_table, exchange)
+            foundExchangeId = foundExchange['Id']
+            # ищем валюты пары
+            foundBase = self.__findCurrency(baseCurrency)
+            foundQuote = self.__findCurrency(quoteCurrency)
+            foundBaseId = foundBase['Id']
+            foundQuoteId = foundQuote['Id']
+            insert = pair_table.insert()
+            self.connection.execute(insert, Ticker=ticker,
+                                    BaseCurrency=foundBaseId,
+                                    QuoteCurrency=foundQuoteId,
+                                    Exchange=foundExchangeId)
+
+    def checkCurrency(self, currency: str) -> bool:
+        """Проверка валюты на существование"""
+        try:
+            self.__findCurrency(currency)
+        except ValueError:
+            return False
+        return True
+
+    def checkPair(self, exchange: str, ticker: str) -> bool:
+        """Проверка пар на существование в бд"""
+        try:
+            self.__findPairId(exchange, ticker)
+        except ValueError:
+            return False
+        return True
+
+    def checkQuantity(self, quantity: str) -> bool:
+        """Проверка размерности свечи на существование"""
+        try:
+            self.__find(candles_quantity_table, quantity)
+        except ValueError:
+            return False
+        return True
+
     def insertTicks(self, ticks: List[TickType], exchange: str, ticker: str):
         """Записываем тики в бд"""
         pairId = self.__findPairId(exchange, ticker)
         insert = tick_table.insert()
         for tick in ticks:
-            self.connection.execute(insert, Pair=pairId,
-                                    Timestamp=tick.timestamp,
-                                    TradeDirection=tick.tradeDirection,
-                                    Price=tick.price,
-                                    Volume=tick.volume)
+            try:
+                self.connection.execute(insert, Pair=pairId,
+                                        Timestamp=tick.timestamp,
+                                        TradeDirection=tick.tradeDirection,
+                                        Price=tick.price,
+                                        Volume=tick.volume)
+            except IntegrityError as e:
+                print("Integrity error while inserting tick: {}".format(e))
 
     def insertCandles(self, candles: List[CandleType], quantity: str, exchange: str, ticker: str):
         """Записываем свечи в бд"""
@@ -146,14 +214,17 @@ class Database:
         quantityId = self.__find(candles_quantity_table, quantity)
         insert = candles_table.insert()
         for candle in candles:
-            self.connection.execute(insert, Pair=pairId,
-                                    Quantity=quantityId,
-                                    BeginTimestamp=candle.beginTimestamp,
-                                    Volume=candle.volume,
-                                    Open=candle.open,
-                                    High=candle.high,
-                                    Low=candle.low,
-                                    Close=candle.close)
+            try:
+                self.connection.execute(insert, Pair=pairId,
+                                        Quantity=quantityId,
+                                        BeginTimestamp=candle.beginTimestamp,
+                                        Volume=candle.volume,
+                                        Open=candle.open,
+                                        High=candle.high,
+                                        Low=candle.low,
+                                        Close=candle.close)
+            except IntegrityError as e:
+                print("Integrity error while inserting candle: {}".format(e))
 
     def getTicks(self, exchange: str, ticker: str, timeRange: TimeRange) -> List[TickType]:
         """Получаем очередь сделок из бд"""
@@ -212,10 +283,22 @@ class Database:
             raise ValueError("You should provide name")
         # TODO: в этом селекте имя таблицы передается изве в виде строки от юзера.
         #  Это опасно т.к. можно сделать sql инъекцию. Все строки до вставки в запрос должны проверяться
-        select = table.select().where(table.c.Name == name.lower())
+        select = table.select().where(table.c.Name == name)
         foundName = self.connection.execute(select).fetchone()
         if foundName is None:
             raise ValueError("Wrong name. Does it exist in your database?")
+        return foundName
+
+    def __findCurrency(self, currency: str):
+        """Находит валюту"""
+        if currency is None:
+            raise ValueError("You should provide currency")
+        # TODO: в этом селекте имя таблицы передается изве в виде строки от юзера.
+        #  Это опасно т.к. можно сделать sql инъекцию. Все строки до вставки в запрос должны проверяться
+        select = currency_table.select().where(currency_table.c.Ticker == currency)
+        foundName = self.connection.execute(select).fetchone()
+        if foundName is None:
+            raise ValueError("Wrong currency. Does it exist in your database?")
         return foundName
 
     def __findPairId(self, exchange: str, ticker: str) -> int:
@@ -231,7 +314,7 @@ class Database:
         # ищем запрашиваемую биржу
         # TODO: в этом селекте имя таблицы передается изве в виде строки от юзера.
         #  Это опасно т.к. можно сделать sql инъекцию. Все строки до вставки в запрос должны проверяться
-        selectExchange = exchange_table.select().where(exchange_table.c.Name == exchange.lower())
+        selectExchange = exchange_table.select().where(exchange_table.c.Name == exchange)
         foundExchange = self.connection.execute(selectExchange).fetchone()
         if foundExchange is None:
             raise ValueError("Wrong exchange. Does it exists in your database?")
@@ -241,7 +324,7 @@ class Database:
         # TODO: в этом селекте имя таблицы передается изве в виде строки от юзера.
         #  Это опасно т.к. можно сделать sql инъекцию. Все строки до вставки в запрос должны проверяться
         selectPair = pair_table.select().where((pair_table.c.Exchange == exchangeId) &
-                                               (pair_table.c.Ticker == ticker.lower()))
+                                               (pair_table.c.Ticker == ticker))
         foundPair = self.connection.execute(selectPair).fetchone()
         if foundPair is None:
             raise ValueError("Wrong ticker. Does the exchange have this ticker (pair) in your database?")
@@ -258,5 +341,7 @@ if __name__ == "__main__":
     # print(response)
 
     db = Database("sqlite", "", '../resources/db/sqlite3/bitbot_sqlalchemytest2.db')
-    res = db.getTicks('bitmex','btcusd',TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0), datetime(2017, 1, 1, 0, 0, 0, 0)),)
+    db.newPair({}, 2, 3, 4)
+    res = db.getTicks('bitmex', 'btcusd',
+                      TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0), datetime(2017, 1, 1, 0, 0, 0, 0)), )
     print(res)

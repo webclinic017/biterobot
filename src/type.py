@@ -29,6 +29,41 @@ class TimeRange:
         self.endTime = endTime
 
 
+class CandleQuantity:
+    YEAR = 'y'
+    MONTH = 'M'
+    WEEK = 'w'
+    DAY = 'd'
+    HOUR = 'h'
+    MINUTE = 'm'
+    SECOND = 's'
+
+    @staticmethod
+    def parseQuantity(quantity: str) -> timedelta:
+        amount = int(quantity[0:-1])
+        unit = quantity[-1]
+        # TODO: каждого года и месяца разная продолжительность. И что с этим делать?
+        if 'y' == unit:
+            raise NotImplementedError()
+            # result = timedelta() # 60 * 60 * 24 * 365
+        elif 'M' == unit:
+            raise NotImplementedError()
+            # result = # 60 * 60 * 24 * 30
+        elif 'w' == unit:
+            result = timedelta(weeks=amount)
+        elif 'd' == unit:
+            result = timedelta(days=amount)
+        elif 'h' == unit:
+            result = timedelta(hours=amount)
+        elif 'm' == unit:
+            result = timedelta(minutes=amount)
+        elif 's' == unit:
+            result = timedelta(seconds=amount)
+        else:
+            raise NotImplementedError('timeframe unit {} is not supported'.format(unit))
+        return result
+
+
 class StatusFlag(Enum):
     outDeal = 0
     inDeal = 1
