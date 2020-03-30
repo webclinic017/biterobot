@@ -133,7 +133,9 @@ class Database:
         metadata.create_all(bind=self.engine)
 
     def newCurrency(self, currency: str):
-        """Добавляем валюту"""
+        """Добавляем валюту
+        :param currency: тикер валюты, которую добавляем в базу
+        """
         try:
             self.__findCurrency(currency)
         except ValueError:
@@ -289,10 +291,11 @@ class Database:
             raise ValueError("Wrong name. Does it exist in your database?")
         return foundName
 
-    def __findCurrency(self, currency: str):
-        """Находит валюту"""
-        if currency is None:
-            raise ValueError("You should provide currency")
+    def __findCurrency(self, currency: str) -> dict:
+        """Находит валюту
+        :param currency: тикер валюты, которую ищем
+        :return: словарь с инфорамацией по валюте из бд
+        """
         # TODO: в этом селекте имя таблицы передается изве в виде строки от юзера.
         #  Это опасно т.к. можно сделать sql инъекцию. Все строки до вставки в запрос должны проверяться
         select = currency_table.select().where(currency_table.c.Ticker == currency)
@@ -341,7 +344,6 @@ if __name__ == "__main__":
     # print(response)
 
     db = Database("sqlite", "", '../resources/db/sqlite3/bitbot_sqlalchemytest2.db')
-    db.newPair({}, 2, 3, 4)
     res = db.getTicks('bitmex', 'btcusd',
                       TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0), datetime(2017, 1, 1, 0, 0, 0, 0)), )
     print(res)

@@ -1,7 +1,6 @@
 from ccxt import bitmex
-from database import Database
 from datetime import datetime, timedelta
-from type import TimeRange, TickType, CandleType, CandleQuantity
+from type import TickType, CandleType, CandleQuantity
 from typing import List
 from time import sleep
 
@@ -19,7 +18,7 @@ class Exchange:
             self.exchange = bitmex()
         else:
             raise NotImplementedError()
-        self.rateLimit = self.exchange.rateLimit * 2
+        self.rateLimit = self.exchange.rateLimit * 2  # для незарегистрированных пользователей интервал в 2 раза больше
         self.timeOfLastRequest = datetime.now()
 
     def getMarket(self, ticker: str) -> dict:

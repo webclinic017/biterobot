@@ -4,10 +4,10 @@ from enum import Enum
 
 class TickType:
     def __init__(self, timestamp: datetime, tradeDirection: int, price: float, volume: float):
-        self.timestamp = timestamp
-        self.tradeDirection = tradeDirection
-        self.price = price
-        self.volume = volume
+        self.timestamp: datetime = timestamp
+        self.tradeDirection: int = tradeDirection
+        self.price: float = price
+        self.volume: float = volume
 
 
 class CandleType:
@@ -118,5 +118,5 @@ def buy():
 
 
 if __name__ == "__main__":
-    need = Need(worksWith="ticks", timedeltaBeforeStart=timedelta(days=1)).getNeededData()
-    print(need[0] == Need.TICKS_WITH_TIMEDELTA)
+    a = TickType('a', 'b', 'c', 'd')
+    print('Done')
