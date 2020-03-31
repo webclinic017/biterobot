@@ -2,7 +2,7 @@ from type import CandleType
 from type import TimeRange
 from data import Data
 import datetime
-from dataBase import DataBase
+from database import Database
 
 
 class Candle():
@@ -11,7 +11,7 @@ class Candle():
     В классе реализованы функции для работы со свечами
     """
 
-    def __init__(self, candleQuantity: int, liveTime: int, timeRange: TimeRange, dataBase: DataBase):
+    def __init__(self, candleQuantity: int, liveTime: int, timeRange: TimeRange, dataBase: Database):
         """Конструктор класса свечей
 
         Args:
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     candleQuantity = 5
     liveTime = 5
 
-    dataBase = DataBase("UZER\SQLEXPRESS", "BitBot", "user", "password")
+    dataBase = Database("UZER\SQLEXPRESS", "BitBot", "user", "password")
 
     candle = Candle(candleQuantity, liveTime, tr, dataBase)
 

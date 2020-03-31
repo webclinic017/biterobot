@@ -3,7 +3,6 @@ from type import Need
 from type import TickType
 from type import Decision
 from data import Data
-from strategy import Strategy
 from process import Process
 
 MINUTE = 1
@@ -14,7 +13,7 @@ DAY = 1440
 # ОПИСАНИЕ СТРАТЕГИИ (ЛЕНЯ)
 
 
-class Strategy_1(Strategy):
+class Strategy_1:
     """Класс Стратегии № 1
 
     В классе реализована простейшая стратегия с коридором

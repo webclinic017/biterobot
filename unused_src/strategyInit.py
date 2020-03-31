@@ -1,6 +1,5 @@
 from strategy_1 import Strategy_1
 from data import Data
-from candle import Candle
 from type import TimeRange
 import datetime
 

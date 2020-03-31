@@ -1,31 +1,34 @@
-import unittest
-
-from type import TimeRange
-from type import TickType
-import random
-import datetime
-from dataBase import DataBase
+from type import TimeRange, Need, TickType
+from datetime import datetime
+from database import Database
 
 
+# TODO: мб сделать это класс iterable?
 class Data:
     """Класс данных для обработки тиков
 
     В классе реализованы функции для работы с данными по сделкам - тиками
     """
 
-    def __init__(self, timeRange: TimeRange, dataBase: DataBase):
+    def __init__(self, timeRange: TimeRange, dataBase: Database):
         """Конструктор класса данных
 
         Args:
             timeRange: Временной промежуток, на котором работаем с данными
             dataBase: База данных, с которой работаем
+            neededByStrategy: Какие данные нужны для старта проверки стратегии
         """
 
         self.timeRange = timeRange
         self.database = dataBase
-        self.database.setQueue(self.timeRange, "BTCUSD")  # Пока работаем только с этой парой, далее передавать параметром
+        self.queue = self.database.getTicks('bitmex', 'btcusd', self.timeRange)
+        if len(self.queue) == 0:
+            raise ValueError("Database doesn't have any data in this timerange. "
+                             "Download it or try again with another timerange.")
+        self.queueIterator = iter(self.queue)
+        # Пока работаем только с этой парой BTCUSD, далее передавать параметром
 
-    def getTick(self):
+    def getTick(self) -> TickType:
         """Получение тика из БД
 
         Args:
@@ -34,8 +37,10 @@ class Data:
         Returns:
             Текущий тик из БД
         """
-
-        tick = self.database.getNextData()
+        try:
+            tick = next(self.queueIterator)
+        except:
+            tick = None
         return tick
 
     def fillQueue(self):
@@ -88,21 +93,17 @@ class Data:
 
 # TESTING#
 if __name__ == "__main__":
-    print("__________DATA_TEST_________ \n")
+    print("__________DATA_TEST_________")
 
-    a = datetime.datetime(2016, 5, 5, 7, 0, 0)
-    b = datetime.datetime(2016, 5, 5, 7, 30, 0)
-    tr = TimeRange()
-    tr.beginTime = a
-    tr.endTime = b
+    tr = TimeRange(datetime(2016, 5, 5, 7, 0, 0), datetime(2016, 5, 5, 7, 30, 0))
 
-    dataBase = DataBase("UZER\SQLEXPRESS", "BitBot", "user", "password")
+    dataBase = Database("mssql", "localhost", "BitBot", "user", "password")
 
     data = Data(tr, dataBase)
 
-    print("randomTick =", data.getTick(), '\n')
-    print("generatedQueue =", data.fillQueue(), '\n')
-    print("deltaTime =", data.timeCount(), '\n')
+    print("randomTick =", data.getTick())
+    print("generatedQueue =", data.fillQueue())
+    print("deltaTime =", data.timeCount())
 
 # РАБОТАЕТ ГЕНЕРАЦИЯ ТИКА
 # РАБОТАЕТ ГЕНЕРАЦИЯ ОЧЕРЕДИ С ЗАДАННЫМ ДИАПАЗОНОМ
