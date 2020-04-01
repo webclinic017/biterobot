@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from type import TimeRange, TickType, CandleType
 from typing import List
 from sqlalchemy import create_engine, Table, Column, MetaData, ForeignKey, UniqueConstraint, \
@@ -128,11 +128,15 @@ class Database:
             raise NotImplementedError("This DBMS doesn't support")
         self.connection = self.engine.connect()
 
-    def createDatabase(self):
+    def createDatabase(self) -> None:
         """Создаем базу данных"""
         metadata.create_all(bind=self.engine)
+        insert = trade_direction_table.insert()
+        # определяем направления торговли
+        self.connection.execute(insert, Direction='buy', Id=1)
+        self.connection.execute(insert, Direction='sell', Id=2)
 
-    def newCurrency(self, currency: str):
+    def newCurrency(self, currency: str) -> None:
         """Добавляем валюту
         :param currency: тикер валюты, которую добавляем в базу
         """
@@ -143,7 +147,7 @@ class Database:
             insert = currency_table.insert()
             self.connection.execute(insert, Ticker=currency)
 
-    def newExchange(self, exchange: str):
+    def newExchange(self, exchange: str) -> None:
         """Добавляем новую биржу"""
         try:
             self.__find(exchange_table, exchange)
@@ -152,7 +156,7 @@ class Database:
             insert = exchange_table.insert()
             self.connection.execute(insert, Name=exchange)
 
-    def newPair(self, exchange: str, ticker: str, baseCurrency: str, quoteCurrency: str):
+    def newPair(self, exchange: str, ticker: str, baseCurrency: str, quoteCurrency: str) -> None:
         """Добавляем пару"""
         try:
             self.__findPairId(exchange, ticker)
@@ -171,6 +175,16 @@ class Database:
                                     BaseCurrency=foundBaseId,
                                     QuoteCurrency=foundQuoteId,
                                     Exchange=foundExchangeId)
+
+    def newQuantity(self, quantityName: str, quantityInterval: timedelta) -> None:
+        """Добавляем размерность свечи"""
+        try:
+            self.__find(candles_quantity_table, quantityName)
+        except ValueError:
+            # размерности нет в бд
+            insert = candles_quantity_table.insert()
+            self.connection.execute(insert, Quantity=quantityInterval,
+                                    Name=quantityName)
 
     def checkCurrency(self, currency: str) -> bool:
         """Проверка валюты на существование"""
@@ -196,7 +210,7 @@ class Database:
             return False
         return True
 
-    def insertTicks(self, ticks: List[TickType], exchange: str, ticker: str):
+    def insertTicks(self, ticks: List[TickType], exchange: str, ticker: str) -> None:
         """Записываем тики в бд"""
         pairId = self.__findPairId(exchange, ticker)
         insert = tick_table.insert()
@@ -208,12 +222,12 @@ class Database:
                                         Price=tick.price,
                                         Volume=tick.volume)
             except IntegrityError as e:
-                print("Integrity error while inserting tick: {}".format(e))
+                raise ValueError("Duplicated tick: {}".format(e))
 
-    def insertCandles(self, candles: List[CandleType], quantity: str, exchange: str, ticker: str):
+    def insertCandles(self, candles: List[CandleType], quantity: str, exchange: str, ticker: str) -> None:
         """Записываем свечи в бд"""
         pairId = self.__findPairId(exchange, ticker)
-        quantityId = self.__find(candles_quantity_table, quantity)
+        quantityId = self.__find(candles_quantity_table, quantity)['Id']
         insert = candles_table.insert()
         for candle in candles:
             try:
@@ -226,7 +240,7 @@ class Database:
                                         Low=candle.low,
                                         Close=candle.close)
             except IntegrityError as e:
-                print("Integrity error while inserting candle: {}".format(e))
+                raise ValueError("Duplicated candle: {}".format(e))
 
     def getTicks(self, exchange: str, ticker: str, timeRange: TimeRange) -> List[TickType]:
         """Получаем очередь сделок из бд"""
@@ -275,14 +289,12 @@ class Database:
                                     ))
         return queue
 
-    def __find(self, table: Table, name: str):
+    def __find(self, table: Table, name: str) -> dict:
         """Находит одну запись по Name через Select
         :param table:
         :param name:
         :return:
         """
-        if name is None:
-            raise ValueError("You should provide name")
         # TODO: в этом селекте имя таблицы передается изве в виде строки от юзера.
         #  Это опасно т.к. можно сделать sql инъекцию. Все строки до вставки в запрос должны проверяться
         select = table.select().where(table.c.Name == name)
@@ -311,9 +323,6 @@ class Database:
         :param ticker:
         :return:
         """
-        if exchange is None or ticker is None:
-            raise ValueError("You should provide exchange and ticker")
-
         # ищем запрашиваемую биржу
         # TODO: в этом селекте имя таблицы передается изве в виде строки от юзера.
         #  Это опасно т.к. можно сделать sql инъекцию. Все строки до вставки в запрос должны проверяться
