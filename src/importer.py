@@ -1,6 +1,6 @@
 from database import Database
 from exchange import Exchange
-from type import TimeRange
+from type import TimeRange, CandleQuantity
 from datetime import datetime
 
 
@@ -24,6 +24,10 @@ class Importer:
                               tickerInfo['base'],
                               tickerInfo['quote'])
 
+    def importQuantity(self, quantity: str):
+        quantityTimedelta = CandleQuantity.parseQuantity(quantity)
+        self.database.newQuantity(quantity, quantityTimedelta)
+
     def importTicks(self, ticker: str, timerange: TimeRange):
         # TODO: По какой-то причине при импорте в базу пытаются попатсть одинаковые записи
         self.__checkDB(ticker)
@@ -31,9 +35,12 @@ class Importer:
         while timestamp < timerange.endTime:
             ticksList = self.exchange.getTicks(ticker, timestamp, self.LIMIT)
             timestamp = ticksList[-1].timestamp
-            self.database.insertTicks(ticksList,
-                                      self.exchange.exchangeName,
-                                      ticker)
+            try:
+                self.database.insertTicks(ticksList,
+                                          self.exchange.exchangeName,
+                                          ticker)
+            except ValueError as e:
+                print(e)
 
     def importCandles(self, ticker: str, timerange: TimeRange, quantity: str):
         self.__checkDB(ticker, quantity)
@@ -41,9 +48,12 @@ class Importer:
         while timestamp < timerange.endTime:
             candlesList = self.exchange.getCandles(ticker, timestamp, quantity, self.LIMIT)
             timestamp = candlesList[-1].beginTimestamp + candlesList[-1].quantity
-            self.database.insertCandles(candlesList, quantity,
-                                        self.exchange.exchangeName,
-                                        ticker)
+            try:
+                self.database.insertCandles(candlesList, quantity,
+                                            self.exchange.exchangeName,
+                                            ticker)
+            except ValueError as e:
+                print(e)
 
     def __checkDB(self, ticker: str, quantity: str = None):
         if self.database.checkPair(self.exchange.exchangeName, ticker) is False:
@@ -56,4 +66,10 @@ if __name__ == '__main__':
     importer = Importer(Database("sqlite", "", '../resources/db/sqlite3/bitbot_sqlalchemytest2.db'),
                         Exchange('bitmex'))
     importer.importPair('BTC/USD')
-    importer.importTicks('BTC/USD', TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0), datetime(2017, 1, 1, 0, 0, 0, 0)))
+    importer.importQuantity('1d')
+    try:
+        importer.importTicks('BTC/USD', TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0), datetime(2016, 1, 1, 2, 0, 0, 0)))
+        importer.importCandles('BTC/USD', TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0), datetime(2016, 2, 1, 0, 0, 0, 0)),
+                               '1d')
+    except ValueError as e:
+        print(e)

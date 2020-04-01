@@ -37,11 +37,14 @@ class CandleQuantity:
     HOUR = 'h'
     MINUTE = 'm'
     SECOND = 's'
+    SUPPORTED_QUANTITY = {'1m', '5m', '1h', '1d'}
 
     @staticmethod
     def parseQuantity(quantity: str) -> timedelta:
         amount = int(quantity[0:-1])
         unit = quantity[-1]
+        if not CandleQuantity.checkSupport(quantity):
+            raise NotImplementedError()
         # TODO: каждого года и месяца разная продолжительность. И что с этим делать?
         if 'y' == unit:
             raise NotImplementedError()
@@ -62,6 +65,10 @@ class CandleQuantity:
         else:
             raise NotImplementedError('timeframe unit {} is not supported'.format(unit))
         return result
+
+    @staticmethod
+    def checkSupport(quantity: str) -> bool:
+        return quantity in CandleQuantity.SUPPORTED_QUANTITY
 
 
 class StatusFlag(Enum):
