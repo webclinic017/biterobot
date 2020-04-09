@@ -1,5 +1,6 @@
 import random
 
+
 class OnlySellStrategy:
     def __init__(self):
         self.eventPercent = 1
