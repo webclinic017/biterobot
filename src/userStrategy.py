@@ -1,6 +1,7 @@
 import random
 from type import Need
 from datetime import timedelta
+from type import TickType
 
 
 class ExampleStrategy:
@@ -14,12 +15,12 @@ class ExampleStrategy:
         self.averagePrice = 0
         self.countOfTicks = 0
 
-    def prepareForBacktest(self, currentTick):
+    def prepareForBacktest(self, currentTick: TickType) -> 0:
         # считаем среднюю цену за период
         self.averagePrice = ((self.averagePrice * self.countOfTicks) + currentTick.Price) / (self.averagePrice + 1)
         return 0  # конец подготовки
 
-    def getDecision(self, currentTick):
+    def getDecision(self, currentTick: TickType) -> str or None:
         if currentTick.Price < self.averagePrice:
             return "BUY"
         elif currentTick.Price > self.averagePrice:

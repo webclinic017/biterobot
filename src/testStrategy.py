@@ -6,7 +6,7 @@ class OnlySellStrategy:
         self.eventPercent = 1
         self.lossPercent = 1
 
-    def getDecision(self, currentData):
+    def getDecision(self, currentData: any) -> str:
         return "SELL"
 
 
@@ -15,5 +15,5 @@ class BrokenStrategy:
         self.eventPercent = 1
         self.lossPercent = 1
 
-    def getDecision(self, currentData):
+    def getDecision(self, currentData: any) -> str:
         return "i am broken"

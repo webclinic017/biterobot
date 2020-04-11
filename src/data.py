@@ -43,7 +43,7 @@ class Data:
             tick = None
         return tick
 
-    def fillQueue(self):
+    def fillQueue(self) -> list[TickType]:
         """Создание очереди тиков
 
         Очередь создается на основе тиков из требуемого промежутка времени (см. __init__ -> Arg: timeRange)
@@ -68,7 +68,7 @@ class Data:
 
         self.queue.clear()
 
-    def timeCount(self):
+    def timeCount(self) -> TimeRange:
         """Расчет времение из промежутка
 
         Вычисляется разница между двумя точками на временном промежутке
@@ -81,7 +81,7 @@ class Data:
         delta = self.timeRange.endTime - self.timeRange.beginTime
         return delta
 
-    def getTimeRange(self):
+    def getTimeRange(self) -> TimeRange:
         """Получение временного промежутка
 
         Returns:
@@ -95,9 +95,9 @@ class Data:
 if __name__ == "__main__":
     print("__________DATA_TEST_________")
 
-    tr = TimeRange(datetime(2016, 5, 5, 7, 0, 0), datetime(2016, 5, 5, 7, 30, 0))
+    tr = TimeRange(datetime(2016, 5, 5, 7, 1, 0), datetime(2016, 5, 5, 7, 20, 0))
 
-    dataBase = Database("mssql", "localhost", "BitBot", "user", "password")
+    dataBase = Database("sqlite", "", "../resources/db/sqlite3/bitbot_sqlalchemytest2.db")
 
     data = Data(tr, dataBase)
 
