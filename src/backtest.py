@@ -76,12 +76,14 @@ class Backtest:
     """Тестирование на архивных данных
 
     """
-    def __init__(self, strategy, timerange: TimeRange, USDwallet: float, BTCwallet: float, db: Database):
+    def __init__(self, strategy, timerange: TimeRange, quoteCurrencyAmount: float, baseCurrencyAmount: float,
+                 db: Database):
         self.strategy = strategy
         self.timerange = timerange
-        self.startUSDwallet = USDwallet
-        self.startBTCwallet = BTCwallet
-        self.process = Process(USDwallet, BTCwallet, strategy.eventPercent, strategy.lossPercent)
+        self.startQuoteCurrency = quoteCurrencyAmount
+        self.startBaseCurrency = baseCurrencyAmount
+        self.process = Process(self.startQuoteCurrency, self.startBaseCurrency,
+                               self.strategy.eventPercent, self.strategy.lossPercent)
         self.data = Data(self.timerange, db)
         if hasattr(self.strategy, "needForStart"):
             self.prepareForStrategy = self.strategy.needForStart.getNeededData()
@@ -90,11 +92,13 @@ class Backtest:
                                                   self.timerange.beginTime), db)
             else:
                 raise NotImplementedError()
-        self.statistics = Statistics(self.startUSDwallet, self.startBTCwallet)
+        else:
+            self.prepareForStrategy = None
+        self.statistics = Statistics(self.startQuoteCurrency, self.startBaseCurrency)
 
     def startTest(self):
         # передаем данные для подготовки в стратегию
-        if hasattr(self.strategy, "needForStart"):
+        if self.prepareForStrategy is not None:
             if self.prepareForStrategy[0] == Need.TICKS_WITH_TIMEDELTA:
                 currentTick = self.prepareData.getTick()
                 while currentTick:
@@ -113,12 +117,12 @@ class Backtest:
                 continue
 
             if decision == "BUY":
-                buyBTCamount = self.process.buy(currentTick.price)
-                self.statistics.addTrade("BUY", currentTick.price, buyBTCamount,
+                buyAmount = self.process.buy(currentTick.price)
+                self.statistics.addTrade("BUY", currentTick.price, buyAmount,
                                          self.process.checkWallet("BTC"), self.process.checkWallet("USD"))
             elif decision == "SELL":
-                sellBTCamount = self.process.sell(currentTick.price)
-                self.statistics.addTrade("SELL", currentTick.price, sellBTCamount,
+                sellAmount = self.process.sell(currentTick.price)
+                self.statistics.addTrade("SELL", currentTick.price, sellAmount,
                                          self.process.checkWallet("BTC"), self.process.checkWallet("USD"))
             currentTick = self.data.getTick()
         return self.statistics.getStatistics()

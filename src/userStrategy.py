@@ -17,7 +17,7 @@ class ExampleStrategy:
     def prepareForBacktest(self, currentTick):
         # считаем среднюю цену за период
         self.averagePrice = ((self.averagePrice * self.countOfTicks) + currentTick.Price) / (self.averagePrice + 1)
-        return 0  # конец подготовки
+        return 0  # тик обработан, готов принять следующий
 
     def getDecision(self, currentTick):
         if currentTick.Price < self.averagePrice:
