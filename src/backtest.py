@@ -30,18 +30,20 @@ class Statistics:
             self.startQuoteAmount + self.startBaseAmount * price
 
     def addTrade(self, tradeDirection: str, price: float, BaseAmount: float,
-                 BaseCurrencyBalance: float, quoteCurrencyBalance: float):
+                 baseCurrencyBalance: float, quoteCurrencyBalance: float):
+        print(tradeDirection + ' ' + str(BaseAmount) + ' at ' + str(price) + '. Now base:' +
+              str(baseCurrencyBalance) + ' , quote:' + str(quoteCurrencyBalance))
         if tradeDirection == "BUY" and BaseAmount > 0:
-            maxQuoteAmount = quoteCurrencyBalance + price * BaseCurrencyBalance
+            maxQuoteAmount = quoteCurrencyBalance + price * baseCurrencyBalance
             self.maxWalletValue = max(self.maxWalletValue, maxQuoteAmount)
             self.minWalletValue = min(self.minWalletValue, maxQuoteAmount)
             self.lastBuyPrice = price
             self.amountOfBuys += 1
             self.endWalletValue = maxQuoteAmount
-            self.endBaseAmount = BaseCurrencyBalance
+            self.endBaseAmount = baseCurrencyBalance
             self.endQuoteAmount = quoteCurrencyBalance
         elif tradeDirection == "SELL" and BaseAmount > 0:
-            maxQuoteAmount = quoteCurrencyBalance + price * BaseCurrencyBalance
+            maxQuoteAmount = quoteCurrencyBalance + price * baseCurrencyBalance
             self.maxWalletValue = max(self.maxWalletValue, maxQuoteAmount)
             self.minWalletValue = min(self.minWalletValue, maxQuoteAmount)
             if price > self.lastBuyPrice:
@@ -50,7 +52,7 @@ class Statistics:
                 self.amountOfBadTrades += 1
             self.amountOfSells += 1
             self.endWalletValue = maxQuoteAmount
-            self.endBaseAmount = BaseCurrencyBalance
+            self.endBaseAmount = baseCurrencyBalance
             self.endQuoteAmount = quoteCurrencyBalance
 
     def getStatistics(self):
@@ -114,6 +116,7 @@ class Backtest:
                 raise NotImplementedError()
         # после чего начинаем тест
         currentTick = self.data.getTick()
+        lastPrice = currentTick.price
         self.statistics.setFirstPrice(currentTick.price)
         while currentTick:
             decision, stopPrice = self.strategy.getDecision(currentTick)
@@ -139,7 +142,12 @@ class Backtest:
                 # заполняем статистику
                 self.statistics.addTrade("CANCEL", currentTick.price, cancelAmount,
                                          self.process.getBaseAmount(), self.process.getQuoteAmount())
+            lastPrice = currentTick.price
             currentTick = self.data.getTick()
+        # закрываем все позиции перед выходом
+        cancelAmount = self.process.cancelPosition(lastPrice)
+        self.statistics.addTrade("CANCEL", lastPrice, cancelAmount,
+                                 self.process.getBaseAmount(), self.process.getQuoteAmount())
         return self.statistics.getStatistics()
 
 

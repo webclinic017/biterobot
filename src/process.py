@@ -64,10 +64,11 @@ class Process:
             buyBaseCurrAmount = self.eventPercent * maxQuoteAmount
 
         try:
+            # TODO: здесь бот должен купить на максимально возможную величину, если введена слишком большая позиция.
+            #  Вместо этого он просто кидает exception
             self.__changePosition(buyBaseCurrAmount, price)
-
         except ValueError as e:
-            return 0
+            return canceledPosition
         # возвращаем количество купленной валюты с учетом отмененной позиции
         return buyBaseCurrAmount + canceledPosition
 
@@ -91,20 +92,23 @@ class Process:
         maxQuoteAmount = self.quoteCurrencyAmount + price * abs(self.baseCurrencyAmount)
         # считаем сколько можно купить с учетом риска неудачной сделки
         sellBaseCurrAmount = (self.lossPercent * maxQuoteAmount) / (stopPrice - price)
-        # покупаем не больше, чем на допустимый процент от кошелька
+        # продаем не больше, чем на допустимый процент от кошелька
         if self.eventPercent * maxQuoteAmount < sellBaseCurrAmount * price:
             sellBaseCurrAmount = self.eventPercent * maxQuoteAmount
 
         try:
+            # TODO: здесь бот должен продать на максимально возможную величину, если введена слишком большая позиция.
+            #  Вместо этого он просто кидает exception
             self.__changePosition(- sellBaseCurrAmount, price)
         except ValueError as e:
-            return 0
+            return canceledPosition
         return sellBaseCurrAmount + canceledPosition
 
     def cancelPosition(self, price):
+        # TODO: в таком виде __changePosition может кинуть exception, если в результате ошибки округления или других
+        #  арифметических операций он посчитает, что на отмену позмции недостаточно денег. Такого быть не должно
         canceledAmount = self.baseCurrencyAmount
-        self.quoteCurrencyAmount = abs(canceledAmount) * price
-        self.baseCurrencyAmount = 0.0
+        self.__changePosition(- canceledAmount, price)
         return canceledAmount
 
     def getBaseAmount(self):
