@@ -1,20 +1,22 @@
 from data import Data
 from database import Database
 from process import Process
-from type import Need, TimeRange
+from type import Need, TimeRange, Strategy
 
 
 class Statistics:
     """Статистика по сделкам
 
     """
-    def __init__(self, startUSDwallet, startBTCwallet):
+    # TODO: переписать эту херню. она больше не работает
+    def __init__(self, startQuoteAmount: float, startBaseAmount: float, leverage: float):
         self.startWalletValue = 0
-        self.startUSDwallet = startUSDwallet
-        self.startBTCwallet = startBTCwallet
+        self.startQuoteAmount = startQuoteAmount
+        self.startBaseAmount = startBaseAmount
+        self.leverage = leverage
         self.endWalletValue = 0
-        self.endUSDwallet = startUSDwallet
-        self.endBTCwallet = startBTCwallet
+        self.endQuoteAmount = startQuoteAmount
+        self.endBaseAmount = startBaseAmount
         self.amountOfSells = 0
         self.amountOfBuys = 0
         self.maxWalletValue = 0
@@ -25,41 +27,42 @@ class Statistics:
 
     def setFirstPrice(self, price: float):
         self.maxWalletValue = self.minWalletValue = self.startWalletValue = self.endWalletValue = \
-            self.startUSDwallet + self.startBTCwallet * price
+            self.startQuoteAmount + self.startBaseAmount * price
 
-    def addTrade(self, tradeDirection: str, price: float, BTCamount: float, BTCwallet: float, USDwallet: float):
-        if tradeDirection == "BUY" and BTCamount > 0:
-            wallet = USDwallet + price * BTCwallet
-            self.maxWalletValue = max(self.maxWalletValue, wallet)
-            self.minWalletValue = min(self.minWalletValue, wallet)
+    def addTrade(self, tradeDirection: str, price: float, BaseAmount: float,
+                 BaseCurrencyBalance: float, quoteCurrencyBalance: float):
+        if tradeDirection == "BUY" and BaseAmount > 0:
+            maxQuoteAmount = quoteCurrencyBalance + price * BaseCurrencyBalance
+            self.maxWalletValue = max(self.maxWalletValue, maxQuoteAmount)
+            self.minWalletValue = min(self.minWalletValue, maxQuoteAmount)
             self.lastBuyPrice = price
             self.amountOfBuys += 1
-            self.endWalletValue = wallet
-            self.endBTCwallet = BTCwallet
-            self.endUSDwallet = USDwallet
-        elif tradeDirection == "SELL" and BTCamount > 0:
-            wallet = USDwallet + price * BTCwallet
-            self.maxWalletValue = max(self.maxWalletValue, wallet)
-            self.minWalletValue = min(self.minWalletValue, wallet)
+            self.endWalletValue = maxQuoteAmount
+            self.endBaseAmount = BaseCurrencyBalance
+            self.endQuoteAmount = quoteCurrencyBalance
+        elif tradeDirection == "SELL" and BaseAmount > 0:
+            maxQuoteAmount = quoteCurrencyBalance + price * BaseCurrencyBalance
+            self.maxWalletValue = max(self.maxWalletValue, maxQuoteAmount)
+            self.minWalletValue = min(self.minWalletValue, maxQuoteAmount)
             if price > self.lastBuyPrice:
                 self.amountOfGoodTrades += 1
             else:
                 self.amountOfBadTrades += 1
             self.amountOfSells += 1
-            self.endWalletValue = wallet
-            self.endBTCwallet = BTCwallet
-            self.endUSDwallet = USDwallet
+            self.endWalletValue = maxQuoteAmount
+            self.endBaseAmount = BaseCurrencyBalance
+            self.endQuoteAmount = quoteCurrencyBalance
 
     def getStatistics(self):
         if self.endWalletValue > self.startWalletValue:
             verdict = "Profitable!"
         else:
             verdict = "Unprofitable."
-        return {'startUSDwallet': self.startUSDwallet,
-                'startBTCwallet': self.startBTCwallet,
+        return {'startUSDwallet': self.startQuoteAmount,
+                'startBTCwallet': self.startBaseAmount,
                 'startWalletValue': self.startWalletValue,
-                'endUSDwallet':   self.endUSDwallet,
-                'endBTCwallet':   self.endBTCwallet,
+                'endUSDwallet':   self.endQuoteAmount,
+                'endBTCwallet':   self.endBaseAmount,
                 'endWalletValue': self.endWalletValue,
                 'amountOfSells':  self.amountOfSells,
                 'amountOfBuys':   self.amountOfBuys,
@@ -76,25 +79,27 @@ class Backtest:
     """Тестирование на архивных данных
 
     """
-    def __init__(self, strategy, timerange: TimeRange, quoteCurrencyAmount: float, baseCurrencyAmount: float,
+    def __init__(self, strategy: Strategy, timerange: TimeRange, exchange: str, ticker: str,
+                 quoteCurrencyAmount: float, baseCurrencyAmount: float, leverage: float,
                  db: Database):
         self.strategy = strategy
         self.timerange = timerange
         self.startQuoteCurrency = quoteCurrencyAmount
         self.startBaseCurrency = baseCurrencyAmount
         self.process = Process(self.startQuoteCurrency, self.startBaseCurrency,
-                               self.strategy.eventPercent, self.strategy.lossPercent)
-        self.data = Data(self.timerange, db)
+                               self.strategy.eventPercent, self.strategy.lossPercent, leverage)
+        self.data = Data(self.timerange, exchange, ticker, db)
         if hasattr(self.strategy, "needForStart"):
             self.prepareForStrategy = self.strategy.needForStart.getNeededData()
             if self.prepareForStrategy[0] == Need.TICKS_WITH_TIMEDELTA:
                 self.prepareData = Data(TimeRange(self.timerange.beginTime - self.prepareForStrategy[1],
-                                                  self.timerange.beginTime), db)
+                                                  self.timerange.beginTime),
+                                        exchange, ticker, db)
             else:
                 raise NotImplementedError()
         else:
             self.prepareForStrategy = None
-        self.statistics = Statistics(self.startQuoteCurrency, self.startBaseCurrency)
+        self.statistics = Statistics(self.startQuoteCurrency, self.startBaseCurrency, leverage)
 
     def startTest(self):
         # передаем данные для подготовки в стратегию
@@ -111,21 +116,40 @@ class Backtest:
         currentTick = self.data.getTick()
         self.statistics.setFirstPrice(currentTick.price)
         while currentTick:
-            decision = self.strategy.getDecision(currentTick)
+            decision, stopPrice = self.strategy.getDecision(currentTick)
             if decision is None:
                 currentTick = self.data.getTick()
                 continue
 
             if decision == "BUY":
-                buyAmount = self.process.buy(currentTick.price)
+                # покупаем
+                buyAmount = self.process.buy(currentTick.price, stopPrice)
+                # заполняем статистику
                 self.statistics.addTrade("BUY", currentTick.price, buyAmount,
-                                         self.process.checkWallet("BTC"), self.process.checkWallet("USD"))
+                                         self.process.getBaseAmount(), self.process.getQuoteAmount())
             elif decision == "SELL":
-                sellAmount = self.process.sell(currentTick.price)
+                # продаем
+                sellAmount = self.process.sell(currentTick.price, stopPrice)
+                # заполняем статистику
                 self.statistics.addTrade("SELL", currentTick.price, sellAmount,
-                                         self.process.checkWallet("BTC"), self.process.checkWallet("USD"))
+                                         self.process.getBaseAmount(), self.process.getQuoteAmount())
+            elif decision == "CANCEL":
+                # закрываем сделку
+                cancelAmount = self.process.cancelPosition(currentTick.price)
+                # заполняем статистику
+                self.statistics.addTrade("CANCEL", currentTick.price, cancelAmount,
+                                         self.process.getBaseAmount(), self.process.getQuoteAmount())
             currentTick = self.data.getTick()
         return self.statistics.getStatistics()
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
+    from userStrategy import ExampleStrategy
+    from datetime import datetime, timedelta
+    strategy = ExampleStrategy()
+    db = Database("sqlite", "", '../resources/db/sqlite3/bitbot_sqlalchemytest2.db')
+    bt = Backtest(strategy,
+                  TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0) + timedelta(minutes=10), datetime(2016, 1, 1, 2, 0, 0, 0)),
+                  'bitmex', 'BTC/USD', 1000, 0, 3, db)
+    print(bt.startTest())
+    print("Done!")
