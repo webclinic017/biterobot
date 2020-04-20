@@ -2,7 +2,6 @@ import random
 from typing import Union
 from type import Need, Strategy, TickType, CandleType
 from datetime import timedelta
-from type import TickType
 
 
 class ExampleStrategy(Strategy):

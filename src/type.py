@@ -5,6 +5,7 @@ from typing import Union
 
 
 class TickType:
+    # TODO: стоит объявить поля как __slots__ и добавить __eq__, __hash__
     def __init__(self, timestamp: datetime, tradeDirection: int, price: float, volume: float):
         self.timestamp: datetime = timestamp
         self.tradeDirection: int = tradeDirection
@@ -13,6 +14,7 @@ class TickType:
 
 
 class CandleType:
+    # TODO: стоит объявить поля как __slots__ и добавить __eq__, __hash__
     def __init__(self, quantity: timedelta, beginTimestamp: datetime, volume: float,
                  open: float, high: float, low: float, close: float):
         self.quantity = quantity

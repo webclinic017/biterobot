@@ -1,9 +1,11 @@
+from typing import List
+
 from type import TimeRange, Need, TickType
 from datetime import datetime
 from database import Database
 
 
-# TODO: мб сделать это класс iterable?
+# TODO: мб сделать это класс iterable? И лишнее нужно удалить
 class Data:
     """Класс данных для обработки тиков
 
@@ -42,7 +44,7 @@ class Data:
             tick = None
         return tick
 
-    def fillQueue(self) -> list[TickType]:
+    def fillQueue(self) -> List[TickType]:
         """Создание очереди тиков
 
         Очередь создается на основе тиков из требуемого промежутка времени (см. __init__ -> Arg: timeRange)

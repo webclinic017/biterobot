@@ -65,6 +65,7 @@ class Process:
         except ValueError:
             return canceledPosition
         # возвращаем количество купленной валюты с учетом отмененной позиции
+        # TODO: нужно возвращать еще и цену ликвидации баланса
         return buyBaseCurrAmount + canceledPosition
 
     def sell(self, price: float, stopPrice: float) -> float:
@@ -95,6 +96,7 @@ class Process:
         except ValueError:
             return canceledPosition
         # возвращаем количество купленной валюты с учетом отмененной позиции
+        # TODO: нужно возвращать еще и цену ликвидации баланса
         return sellBaseCurrAmount + canceledPosition
 
     def cancelPosition(self, price: float) -> float:

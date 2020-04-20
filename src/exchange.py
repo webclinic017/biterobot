@@ -32,6 +32,8 @@ class Exchange:
     def getTicks(self, ticker: str, timestamp: datetime, limit: int = None) -> List[TickType]:
         self.__waitBeforeRequest()
         result = self.exchange.fetch_trades(ticker, int(timestamp.timestamp() * 1000), limit)
+        # TODO: По какой-то причине попадаются одинаковые записи в ответе.
+        #  Надо чекать записи и выкидывать повторяющиеся
         returnList = []
         tradeDirection = 0
         for i in result:
@@ -51,6 +53,8 @@ class Exchange:
     def getCandles(self, ticker: str, timestamp: datetime, quantity: str, limit: int) -> List[CandleType]:
         self.__waitBeforeRequest()
         result = self.exchange.fetch_ohlcv(ticker, quantity, int(timestamp.timestamp() * 1000), limit)
+        # TODO: По какой-то причине попадаются одинаковые записи.
+        #  Надо чекать записи и выкидывать повторяющиеся
         returnList = []
         quantityTimedelta = CandleQuantity.parseQuantity(quantity)
         for i in result:
@@ -75,8 +79,6 @@ class Exchange:
 if __name__ == "__main__":
     # db = Database('mssql', "UZER\SQLEXPRESS", "BitBot", "user", "password")
     bitmexExch = bitmex()
-    # TODO: нужно убрать .lower() в параметрах строках во всем проекте. Например здесь тикеры только заглавными пишутся
-    #  поэтому .lower() здесь противопоказан.
     exch = Exchange('bitmex')
     res = exch.getMarket('BTC/USD')
     quote = res['quote']

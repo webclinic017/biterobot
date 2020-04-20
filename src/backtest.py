@@ -104,12 +104,14 @@ class Backtest:
                         break
                     currentTick = self.prepareData.getTick()
             else:
+                # TODO: добавить поддержку подготовки стратегии со свечами
                 raise NotImplementedError()
         # после чего начинаем тест
         currentTick = self.data.getTick()
         lastPrice = currentTick.price
         self.statistics.setFirstPrice(currentTick.price)
         while currentTick:
+            # TODO: добавить проверку stop-loss и ликвидации баланса
             decision, stopPrice = self.strategy.getDecision(currentTick)
             if decision is None:
                 currentTick = self.data.getTick()

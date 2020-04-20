@@ -1,4 +1,4 @@
-from strategy_1 import Strategy_1
+from unused_src.strategy_1 import Strategy_1
 from data import Data
 from type import TimeRange
 import datetime

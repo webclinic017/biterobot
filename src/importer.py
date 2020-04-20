@@ -29,7 +29,6 @@ class Importer:
         self.database.newQuantity(quantity, quantityTimedelta)
 
     def importTicks(self, ticker: str, timerange: TimeRange):
-        # TODO: По какой-то причине при импорте в базу пытаются попатсть одинаковые записи
         self.__checkDB(ticker)
         timestamp = timerange.beginTime
         while timestamp < timerange.endTime:

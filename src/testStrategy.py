@@ -15,6 +15,7 @@ class OnlySellStrategy(Strategy):
     def getDecision(self, currentData) -> (str, float):
         return "SELL", currentData.price * 1.01
 
+
 class BrokenStrategy(Strategy):
     def prepareForBacktest(self, currentTick: Union[TickType, CandleType]) -> int:
         pass
