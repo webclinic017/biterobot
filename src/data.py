@@ -38,7 +38,7 @@ class Data:
         """
         try:
             tick = next(self.queueIterator)
-        except:
+        except StopIteration as e:
             tick = None
         return tick
 
