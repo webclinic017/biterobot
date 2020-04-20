@@ -354,5 +354,5 @@ if __name__ == "__main__":
 
     db = Database("sqlite", "", '../resources/db/sqlite3/bitbot_sqlalchemytest2.db')
     res = db.getTicks('bitmex', 'btcusd',
-                      TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0), datetime(2017, 1, 1, 0, 0, 0, 0)), )
+                      TimeRange(datetime(2016, 5, 5, 7, 0, 0), datetime(2016, 5, 5, 7, 30, 0)), )
     print(res)

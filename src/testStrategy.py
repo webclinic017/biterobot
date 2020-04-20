@@ -12,9 +12,8 @@ class OnlySellStrategy(Strategy):
         self.eventPercent = 1
         self.lossPercent = 1
 
-    def getDecision(self, currentData):
+    def getDecision(self, currentData) -> (str, float):
         return "SELL", currentData.price * 1.01
-
 
 class BrokenStrategy(Strategy):
     def prepareForBacktest(self, currentTick: Union[TickType, CandleType]) -> int:
@@ -24,5 +23,5 @@ class BrokenStrategy(Strategy):
         self.eventPercent = 1
         self.lossPercent = 1
 
-    def getDecision(self, currentData):
+    def getDecision(self, currentData) -> (str, float):
         return "i am broken", currentData.price * 1.01

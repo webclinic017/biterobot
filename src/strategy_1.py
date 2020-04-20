@@ -30,7 +30,7 @@ class Strategy_1:
         self.status = status
         self.process = Process()  # Создание объекта класса для управления кошельком
 
-    def setNeed(self):
+    def setNeed(self) -> Need:
         """Заполнение требуемых данных для стратегии
 
         Returns:
@@ -105,9 +105,8 @@ class Strategy_1:
 
         self.analysData()
         while (True):  # Пока не вернет исключения или не будет ручного стопа
-
             self.speculate()
-        return self.decision
+        return self.decision  # Не имеет значения, возмонжо нужно в будущем
 
 # if __name__ == "__main__":
 
