@@ -8,7 +8,8 @@ class Statistics:
     """Статистика по сделкам
 
     """
-    # TODO: переписать эту херню. она больше не работает
+
+    # TODO: переписать эту херню. она больше не работает т.к. добавилась маржиналка
     def __init__(self, startQuoteAmount: float, startBaseAmount: float, leverage: float):
         self.startWalletValue = 0
         self.startQuoteAmount = startQuoteAmount
@@ -26,54 +27,43 @@ class Statistics:
         self.lastBuyPrice = 0
 
     def setFirstPrice(self, price: float):
-        self.maxWalletValue = self.minWalletValue = self.startWalletValue = self.endWalletValue = \
-            self.startQuoteAmount + self.startBaseAmount * price
+        if self.leverage > 0:
+            self.maxWalletValue = self.minWalletValue = self.startWalletValue = self.endWalletValue = \
+                self.startQuoteAmount + self.startBaseAmount * price / self.leverage
+        else:
+            self.maxWalletValue = self.minWalletValue = self.startWalletValue = self.endWalletValue = \
+                self.startQuoteAmount + self.startBaseAmount * price
 
     def addTrade(self, tradeDirection: str, price: float, BaseAmount: float,
                  baseCurrencyBalance: float, quoteCurrencyBalance: float):
-        print(tradeDirection + ' ' + str(BaseAmount) + ' at ' + str(price) + '. Now base:' +
-              str(baseCurrencyBalance) + ' , quote:' + str(quoteCurrencyBalance))
-        if tradeDirection == "BUY" and BaseAmount > 0:
-            maxQuoteAmount = quoteCurrencyBalance + price * baseCurrencyBalance
-            self.maxWalletValue = max(self.maxWalletValue, maxQuoteAmount)
-            self.minWalletValue = min(self.minWalletValue, maxQuoteAmount)
-            self.lastBuyPrice = price
+        # print(tradeDirection + ' ' + str(BaseAmount) + ' at ' + str(price) + '. Now base:' +
+        #      str(baseCurrencyBalance) + ' , quote:' + str(quoteCurrencyBalance))
+        if tradeDirection == 'BUY':
             self.amountOfBuys += 1
-            self.endWalletValue = maxQuoteAmount
-            self.endBaseAmount = baseCurrencyBalance
-            self.endQuoteAmount = quoteCurrencyBalance
-        elif tradeDirection == "SELL" and BaseAmount > 0:
-            maxQuoteAmount = quoteCurrencyBalance + price * baseCurrencyBalance
-            self.maxWalletValue = max(self.maxWalletValue, maxQuoteAmount)
-            self.minWalletValue = min(self.minWalletValue, maxQuoteAmount)
-            if price > self.lastBuyPrice:
-                self.amountOfGoodTrades += 1
-            else:
-                self.amountOfBadTrades += 1
+        elif tradeDirection == 'SELL':
             self.amountOfSells += 1
-            self.endWalletValue = maxQuoteAmount
-            self.endBaseAmount = baseCurrencyBalance
-            self.endQuoteAmount = quoteCurrencyBalance
+        self.endBaseAmount = baseCurrencyBalance
+        self.endQuoteAmount = quoteCurrencyBalance
 
     def getStatistics(self):
-        if self.endWalletValue > self.startWalletValue:
+        if self.endQuoteAmount - self.startWalletValue > 0:
             verdict = "Profitable!"
         else:
             verdict = "Unprofitable."
-        return {'startUSDwallet': self.startQuoteAmount,
-                'startBTCwallet': self.startBaseAmount,
-                'startWalletValue': self.startWalletValue,
-                'endUSDwallet':   self.endQuoteAmount,
-                'endBTCwallet':   self.endBaseAmount,
-                'endWalletValue': self.endWalletValue,
-                'amountOfSells':  self.amountOfSells,
-                'amountOfBuys':   self.amountOfBuys,
-                'maxWalletValue': self.maxWalletValue,
-                'minWalletValue': self.minWalletValue,
-                'amountOfGoodTrades': self.amountOfGoodTrades,
-                'amountOfBadTrades':  self.amountOfBadTrades,
-                'amountOfTrades': self.amountOfBadTrades + self.amountOfGoodTrades,
-                'result': self.endWalletValue - self.startWalletValue,
+        return {'start quote wallet': self.startQuoteAmount,
+                'start base wallet': self.startBaseAmount,
+                # 'start wallet value': self.startWalletValue,
+                'end quote wallet': self.endQuoteAmount,
+                'end base wallet': self.endBaseAmount,
+                # 'end wallet value': self.endWalletValue,
+                'sells': self.amountOfSells,
+                'buys': self.amountOfBuys,
+                # 'max wallet value': self.maxWalletValue,
+                # 'min wallet value': self.minWalletValue,
+                # 'amount Of good trades': self.amountOfGoodTrades,
+                # 'amount Of bad trades':  self.amountOfBadTrades,
+                'amount Of trades': self.amountOfBadTrades + self.amountOfGoodTrades,
+                'result': self.endQuoteAmount - self.startWalletValue,
                 'verdict': verdict}
 
 
@@ -81,6 +71,7 @@ class Backtest:
     """Тестирование на архивных данных
 
     """
+
     def __init__(self, strategy: Strategy, timerange: TimeRange, exchange: str, ticker: str,
                  quoteCurrencyAmount: float, baseCurrencyAmount: float, leverage: float,
                  db: Database):
@@ -154,10 +145,12 @@ class Backtest:
 if __name__ == "__main__":
     from userStrategy import ExampleStrategy
     from datetime import datetime, timedelta
+
     strategy = ExampleStrategy()
     db = Database("sqlite", "", '../resources/db/sqlite3/bitbot_sqlalchemytest2.db')
     bt = Backtest(strategy,
-                  TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0) + timedelta(minutes=10), datetime(2016, 1, 1, 2, 0, 0, 0)),
+                  TimeRange(datetime(2016, 1, 1, 0, 0, 0, 0) + timedelta(minutes=10) - timedelta(hours=3),
+                            datetime(2016, 1, 1, 2, 0, 0, 0) - timedelta(hours=3)),
                   'bitmex', 'BTC/USD', 1000, 0, 3, db)
     print(bt.startTest())
     print("Done!")
