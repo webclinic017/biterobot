@@ -10,7 +10,7 @@ class Data:
     В классе реализованы функции для работы с данными по сделкам - тиками
     """
 
-    def __init__(self, timeRange: TimeRange, dataBase: Database):
+    def __init__(self, timeRange: TimeRange, exchange: str, ticker: str, dataBase: Database):
         """Конструктор класса данных
 
         Args:
@@ -21,12 +21,11 @@ class Data:
 
         self.timeRange = timeRange
         self.database = dataBase
-        self.queue = self.database.getTicks('bitmex', 'btcusd', self.timeRange)
+        self.queue = self.database.getTicks(exchange, ticker, self.timeRange)
         if len(self.queue) == 0:
             raise ValueError("Database doesn't have any data in this timerange. "
                              "Download it or try again with another timerange.")
         self.queueIterator = iter(self.queue)
-        # Пока работаем только с этой парой BTCUSD, далее передавать параметром
 
     def getTick(self) -> TickType:
         """Получение тика из БД
@@ -39,7 +38,7 @@ class Data:
         """
         try:
             tick = next(self.queueIterator)
-        except:
+        except StopIteration as e:
             tick = None
         return tick
 

@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 from enum import Enum
+from abc import ABC, abstractmethod
+from typing import Union
 
 
 class TickType:
@@ -74,6 +76,27 @@ class CandleQuantity:
 class StatusFlag(Enum):
     outDeal = 0
     inDeal = 1
+
+
+class Strategy(ABC):
+    """Абстрактный класс, описывающий функционал стратегии"""
+
+    def __init__(self):
+        # Параметры риска стратегии
+        self.eventPercent: float = 0  # На сколько процентов от депозита можно максимально совершить сделку.
+        # 1.0 - на 100 процентов т.е. на весь депозит, 0.5 - на 50% от депозита
+        self.lossPercent: float = 0  # Какой максимальный процент от всего депозита можно потерять на неудачной сделке
+        # Определим данные для подготовки к работе перед тестом
+        self.needForStart: Need = Need(worksWith="ticks", timedeltaBeforeStart=timedelta(minutes=10))
+        # Какие данные необходимы для подготовки стратегии к тесту
+
+    @abstractmethod
+    def prepareForBacktest(self, currentTick: Union[TickType, CandleType]) -> int:
+        pass
+
+    @abstractmethod
+    def getDecision(self, currentTick: TickType) -> [str, float]:
+        pass
 
 
 class Need:
