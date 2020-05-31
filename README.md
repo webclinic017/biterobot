@@ -16,6 +16,8 @@
 5) Запустить __init__.py
 
 # Структура проекта
+![](/resources/image.png)​
+
 Весь проект можно разбить на две условные части:
 1. Система работы с данными
 Она включает в себя классы Exchange (exchange.py), Importer (importer.py), Database (database.py), Data (data.py).
