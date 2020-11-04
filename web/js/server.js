@@ -1,0 +1,542 @@
+
+/******************************************************************
+ ************************ dataInput block *************************
+ ******************************************************************/
+
+/** Id generation **/
+function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+
+/** Creating json for loading **/
+function loadStrategy(startName, stratFile, description) {
+    let request = {
+        code: 1101,
+        name: startName,
+        description: description,
+        file: {
+            name: document.forma.myFile.files[0].name,
+            body: stratFile
+        }
+    };
+
+    let json = JSON.stringify(request);
+    console.log(json)
+    return (json);
+}
+
+
+/** Creating json for updating **/
+function updateStrategy(startName, stratFile, description) {
+    let request = {};
+    if (description !== document.forma.descriptSelect.value && stratFile !== '') {
+        request = {
+            code: 1101,
+            name: startName,
+            description: description,
+            file: {
+                name: document.forma.myFile.files[0].name,
+                body: stratFile
+            }
+        };
+    } else if (description !== document.forma.descriptSelect.value && stratFile == '') {
+        request = {
+            code: 1101,
+            name: startName,
+            description: description
+        };
+    } else if (description == document.forma.descriptSelect.value && stratFile !== '') {
+        request = {
+            code: 1101,
+            name: startName,
+            file: {
+                name: document.forma.myFile.files[0].name,
+                body: stratFile
+            }
+        };
+    } else {
+        return '';
+    }
+
+    let json = JSON.stringify(request);
+    console.log(json)
+    return (json);
+}
+
+
+/** Creating json for deleting strategy **/
+function deleteStrategy(startName) {
+    let request = {
+        code: 1111,
+        name: startName
+    };
+
+    let json = JSON.stringify(request);
+    console.log(json)
+    return (json);
+    //sendRequest(json, 1111, '', false);
+}
+
+
+/** Creating json for testing **/
+function testStrategy(frdate, todate, stratSelect, startName, stratFile) {
+    let req_id = uuidv4();
+    console.log(uuidv4)
+    if (frdate !== '' && todate !== '') {
+        let request = {};
+        if (stratFile != null && (stratSelect == '' || startName !== stratSelect)) {
+            request = {
+                code: 1201,
+                id: req_id,
+                frDate: frdate,
+                toDate: todate,
+                name: startName,
+                isNew: false,
+                file: {
+                    name: document.forma.myFile.files[0].name,
+                    body: stratFile
+                }
+            };
+        } else if (stratSelect !== '') {
+            request = {
+                code: 1201,
+                id: req_id,
+                frDate: frdate,
+                toDate: todate,
+                name: stratSelect,
+                isNew: true
+            };
+        } else {
+            return 'Error: File is empty!!!'
+        }
+
+        let json = JSON.stringify(request);
+        console.log(json)
+        return (json);
+        //sendRequest(json, 1201, req_id, false);
+    } else {
+        return('Dates must be chosen!!!');
+    }
+}
+
+
+/** Choosing action **/
+async function chooseAction () {
+    let frdate = document.forma.frdt.value;
+    let todate = document.forma.todt.value;
+    let stratSelect = document.forma.stratSelect.value;
+    let desriptionSelect = document.forma.descriptSelect.value;
+    let description = document.forma.descript.value;
+    //let stratText = document.forma.textar.value;
+    let startName = document.forma.strname.value;
+    let stratFile = document.forma.myFile.files[0];
+    let action = document.forma.action.value;
+
+    let strRes = ''/*document.resform.res.value*/;
+
+    if (action == 'load') { // Loading strategy
+        if (stratFile !== undefined) {
+            let reader = new FileReader();
+
+            reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
+
+            reader.onload = function() {
+                console.log(reader.result)
+                if (reader.result != null) {
+                    strRes = loadStrategy(startName, reader.result, description);
+                    sendActionStrategy(strRes, 'load')
+                } else {
+                    strRes = 'Error: File is empty';
+                }
+                writeString(strRes);
+            };
+        } else {
+            writeString('Error: File is empty');
+        }
+
+    } else if (action == 'update') { // Updating strategy
+        if (stratFile !== undefined) {
+            let reader = new FileReader();
+
+            reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
+
+            reader.onload = function() {
+                console.log(reader.result)
+                if (reader.result != null) {
+                    strRes = updateStrategy(startName, reader.result, description);
+                    sendActionStrategy(strRes, 'update')
+                } else {
+                    strRes = 'Error: File is empty';
+                }
+                writeString(strRes);
+            };
+        } else if (description !== '' && stratFile == undefined) {
+
+            strRes = updateStrategy(startName, '', description);
+            sendActionStrategy(strRes, 'update')
+            //writeString(strRes);
+        } else {
+            writeString('Error: Choose strategy firstly');
+        }
+
+    }  else if (action == 'delete') { // Deleting strategy
+        if (stratSelect !== '') {
+            strRes = deleteStrategy(startName);
+            sendActionStrategy(strRes, 'delete')
+            //writeString(strRes);
+        } else {
+            writeString('Error: Choose strategy');
+        }
+
+    } else if (action == 'test') { // Testing strategy
+        if (document.forma.myFile.files[0] !== undefined) {
+            let reader = new FileReader();
+
+            reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
+
+            reader.onload = function () {
+                console.log(reader.result)
+                strRes = testStrategy(frdate, todate, stratSelect, startName, reader.result);
+                workStrategyRequest(strRes, 1201, '', 0, 'validate');
+                //writeString(strRes);
+            };
+        } else if (stratSelect !== '') {
+            strRes = testStrategy(frdate, todate, stratSelect, startName, null);
+            workStrategyRequest(strRes, 1202, '', 0, 'test');
+            //writeString(strRes);
+        } else {
+            writeString('Error: No strategy to test');
+        }
+    } else {
+        writeString('Error: No strategy to test');
+    }
+
+}
+
+/** Creating json for data **/
+function loadData(frdate, todate, ticker) {
+    let request = {
+        code: 1301,
+        frDate: frdate,
+        toDate: todate,
+        ticker: ticker
+    };
+
+    let json = JSON.stringify(request);
+    console.log(json)
+    return (json);
+}
+
+/** Load new data **/
+function addData () {
+    let frdate = document.dataForm.frdt.value;
+    let todate = document.dataForm.todt.value;
+    let ticker = document.dataForm.ticker.value;
+    let strRes = '';
+    if (frdate !== '' && todate !== '') {
+        if (ticker !== '') {
+            strRes = loadData(frdate, todate, ticker);
+
+        } else {
+            writeString('Error: Ticker must be chosen');
+        }
+    } else {
+        writeString('Error: Dates must be chosen');
+    }
+}
+
+/******************************************************************
+ ************************ dataOutput block ************************
+ ******************************************************************/
+
+/** Write string in output **/
+function writeString(str) {
+    let strRes = document.resform.res.value;
+    if (strRes !== '') {
+        strRes = strRes + '\n';
+    }
+    strRes = strRes + 'BR$> ' + str;
+    document.resform.res.value = strRes;
+}
+
+/******************************************************************
+ ************************ pageUpdater block ***********************
+ ******************************************************************/
+
+/** Update strategySelector **/
+function updateStrategySelector(strategies) {
+    let strategyName = document.getElementById("stratSelect");
+    let description = document.getElementById("descriptSelect");
+    let option = document.createElement("option");
+    strategyName.innerHTML = '';
+    description.innerHTML = '';
+    option.text = '';
+    strategyName.add(option, null);
+    description.add(option, null);
+    strategies.forEach((item) => {
+        option.text = item.name;
+        strategyName.add(option, null);
+        option.text = item.description;
+        description.add(option, null);
+    });
+}
+
+/** Update data **/
+function updateDataTable(data) {
+    //TODO: add page and test it
+}
+
+/******************************************************************
+ ************************ pageLoader block ************************
+ ******************************************************************/
+
+/** Generating upload request **/
+function generateUpdateRequest(code) {
+    let request = {
+        code: code
+    };
+
+    let json = JSON.stringify(request);
+    console.log(json)
+    return (json);
+}
+
+
+/** Uploading strategySelector **/
+async function uploadStrategies() {
+    sendUploadingRequest(generateUpdateRequest(1001),'strategy');
+}
+
+
+/** Uploading data **/
+async function uploadData() {
+    sendUploadingRequest(generateUpdateRequest(1011),'data');
+}
+
+/******************************************************************
+ ********************** messageBroker block ***********************
+ ******************************************************************/
+
+/** Generating test steps **/
+function testStep(code, req_id) {
+    let request = {
+        code: code,
+        id: req_id
+    };
+
+    let json = JSON.stringify(request);
+    console.log(json)
+    return (json);
+}
+
+
+/** Send request to test strategy **/
+function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
+    fetch (document.forma.url_address.value/*'/strategy/' + str*/, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: blob
+    })
+        .then(res => {
+            if (res.status >= 200 && res.status <= 300) {
+                return res;
+            } else {
+                let error = new Error(res.statusText);
+                error.response = res;
+                throw error
+            }
+        })
+        .then(res => {
+            if (res.headers['Content-Type'] !== 'application/json') {
+                let error = new Error('Incorrect server response');
+                error.response = res;
+                throw error
+            }
+            return res;
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.code == 2201) {
+                writeString('Strategy validated');
+                workStrategyRequest(testStep(1202, session), 1202, session, endConnetion, 'test');
+            } else if (data.code == 2202) {
+                writeString('Start test');
+                while (endConnetion == workStrategyRequest(testStep(1203, session), 1203, session, endConnetion, 'isredy') !== true) {
+                    setTimeout('', 5000);
+                };
+                if (endConnetion !== 2) {
+                    workStrategyRequest(testStep(1204, session), 1204, session, 0, 'result');
+                } else {
+                    return endConnetion;
+                }
+            } else if (data.code == 2203) {
+                return endConnetion;
+            } else if (data.code == 2213) {
+                writeString('Test finished');
+                return 1;
+            } else if (data.code == 2204) {
+                writeString('Results');
+                //getTestResults();
+            }else if (data.code == 4001) {
+                writeString('Error: ' + data.errMsg);
+                endConnetion = 2;
+            } else {
+                endConnetion = 2;
+                writeString('Error: Incorrect code');
+            }
+        })
+        .catch(e => {
+            writeString('Error: ' + e.message);
+            writeString(e.response);
+            endConnetion = 2;
+        })
+    return endConnetion;
+}
+
+
+/** Send request to do some action with strategy **/
+function sendActionStrategy (blob, str) {
+    fetch ('https://a51d6b62-1920-45e4-b298-e0c28a5e20f9.mock.pstmn.io/strategy/load/'/*'/strategy/' + str*/, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: blob
+    })
+        .then(res => {
+            if (res.status >= 200 && res.status <= 300) {
+                return res;
+            } else {
+                let error = new Error(res.statusText);
+                error.response = res;
+                throw error
+            }
+        })
+        .then(res => {
+            if (res.headers['Content-Type'] !== 'application/json') {
+                let error = new Error('Incorrect server response');
+                console.log(res);
+                error.response = res;
+                throw error
+            }
+            return res;
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.resCode == 2101) {
+                writeString('Strategies loaded');
+                uploadStrategies();
+            } else if (data.resCode == 2111) {
+                writeString('Strategies updated');
+                uploadStrategies();
+            } else if (data.resCode == 2121) {
+                writeString('Strategies deleted');
+                uploadStrategies();
+            } else if (data.resCode == 4001) {
+                writeString('Error: ' + data.errMsg);
+            } else {
+                writeString('Error: Unknown result code (' + data.resCode + ')');
+            }
+        })
+        .catch(e => {
+            writeString('Error: ' + e.message);
+            writeString(e.response.headers[0] + ' ' + e.response.headers[1]);
+            /*endConnetion = 2;*/
+        })
+    /*return endConnetion;*/
+}
+
+/** Send request to update data/strategies **/
+function sendUploadingRequest (blob, req_name) {
+    fetch (document.forma.url_address.value/*'/'+ req_name + '/upload'*/, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: blob
+    })
+        .then(res => {
+            if (res.status >= 200 && res.status <= 300) {
+                return res;
+            } else {
+                let error = new Error(res.statusText);
+                error.response = res;
+                throw error
+            }
+        })
+        .then(res => {
+            if (res.headers['Content-Type'] !== 'application/json') {
+                let error = new Error('Incorrect server response');
+                error.response = res;
+                throw error
+            }
+            return res;
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.code == 2011) {
+                updateStrategySelector(data.strategies);
+                writeString('Strategy updated');
+            } else if (data.code == 2301) {
+                updateDataTable(data.strategies);
+                writeString('Data updated');
+            } else if (data.code == 4001) {
+                writeString('Error: ' + data.errMsg);
+            } else {
+                writeString('Error: Incorrect code');
+            }
+        })
+        .catch(e => {
+            writeString('Error: ' + e.message);
+            writeString(e.response);
+        })
+}
+
+/** Send request to load data **/
+function sendData(blob) {
+    fetch ('/data/load', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: blob
+    })
+        .then(res => {
+            if (res.status >= 200 && res.status <= 300) {
+                return res;
+            } else {
+                let error = new Error(res.statusText);
+                error.response = res;
+                throw error
+            }
+        })
+        .then(res => {
+            if (res.headers['Content-Type'] !== 'application/json') {
+                let error = new Error('Incorrect server response');
+                error.response = res;
+                throw error
+            }
+            return res;
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.resCode == 2301) {
+                writeString('Data loaded');
+                uploadData();
+            } else if (data.resCode == 4001) {
+                writeString('Error: ' + data.errMsg);
+            } else {
+                writeString('Error: Unknown result code (' + data.resCode + ')');
+            }
+        })
+        .catch(e => {
+            writeString('Error: ' + e.message);
+            writeString(e.response);
+        })
+}

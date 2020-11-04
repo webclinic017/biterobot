@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>strategyEditor</title>
+    <script src="js/client.js"></script>
+    <script src="js/server.js"></script>
+</head>
+<body onload="uploadStrategies()">
+<table>
+    <tr>
+        <td><h1>Strategy Editor</h1></td>
+        <td><h1>Results</h1></td>
+    </tr>
+    <tr>
+        <td>
+            <form name="forma">
+                <label>Date begin: </label><input name="frdt" type="date" ><br>
+                <label>Date end: </label><input name="todt" type="date" ><br>
+                <select name="stratSelect" id="stratSelect" onchange="changeStrategy()">
+                    <option></option>
+                    <option>Strategy 1</option>
+                    <option>Strategy 2</option>
+                </select>
+                <select name="descriptSelect" id="descriptSelect" hidden>
+                    <option></option>
+                    <option>Description 1</option>
+                    <option>Description 2</option>
+                </select><br>
+                <label>Description: </label><input name="descript" type="text"><br>
+                <label>Name: </label><input name="strname" id="strname" type="text"><br>
+                <textarea id="strtext" name="textar" placeholder="text..."
+                          style="background-color:black; color:white;"
+                          cols="60" rows="20"></textarea><br>
+                <input name="myFile" id="strfile" type="file"
+                       onchange="loadStrategyInEditor()"
+                       accept=".py, .txt"><br>
+                <div>
+                    <input type="radio" name="action" value="load">Load<br>
+                    <input type="radio" name="action" value="update">Update<br>
+                    <input type="radio" name="action" value="delete">Delete<br>
+                    <input type="radio" name="action" value="test">Test<br>
+                </div>
+                <input type="button" name="bt" value="Submit"onclick="chooseAction()"><br>
+                <label>Адрес запроса: </label><input type="text" name="url_address">
+            </form>
+        </td>
+        <td>
+            <form name="resform">
+        <textarea name="res" placeholder="result..."
+                  style="background-color:black; color:white;"
+                  cols="60" rows="20" readonly></textarea>
+                <input type="reset" value="Clear">
+            </form>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
