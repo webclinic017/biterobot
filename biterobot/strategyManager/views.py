@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from rest_framework import viewsets
 
-# Create your views here.
+from .models import StrategyModel
+from .serializers import StrategySerializer
+
+
+class StrategyViewSet(viewsets.ModelViewSet):
+    serializer_class = StrategySerializer
+    queryset = StrategyModel.objects.all()
