@@ -4,9 +4,20 @@ from .models import StrategyModel
 
 
 class StrategySerializer(serializers.ModelSerializer):
+    code = serializers.IntegerField()
+    body = serializers.CharField(max_length=1000)
     class Meta:
         model = StrategyModel
         fields = ['name', 'description', 'version']
+        extra_kwargs = {
+            'code': {'allow_blank': True, 'allow_null': True, 'required': True},
+            'body': {'allow_blank': True, 'allow_null': True, 'required': True}
+        }
+
+        def create(self, validated_data):
+            print(validated_data.pop('code'), validated_data.pop('body'))
+            validated_data.update({'filePath': 'testPath'})
+            return StrategyModel.objects.create(**validated_data)
 
 class StrategySerializerGET(serializers.Serializer):
     name = serializers.CharField(max_length=200)
