@@ -15,10 +15,10 @@ class StrategyView(APIView):
         strategies = StrategyModel.objects.all()
         serializer = StrategySerializerGET(strategies, many=True)
 
-        return Response({"strategies": serializer.data})
+        return Response(serializer.data)
 
     def post(self, request):
-        strategy = request.data.get('strategy')
+        strategy = request.data
         serializer = StrategySerializerPOST(data=strategy)
         if serializer.is_valid(raise_exception=True):
             strategy_saved = serializer.save()
