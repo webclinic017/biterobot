@@ -11,7 +11,7 @@ from .serializers import StrategySerializerGET, StrategySerializerPOST
 #     queryset = StrategyModel.objects.all()
 
 class StrategyView(APIView):
-    def get(self, request, pk):
+    def get(self, request):
         strategies = StrategyModel.objects.all()
         serializer = StrategySerializerGET(strategies, many=True)
 
@@ -28,7 +28,7 @@ class StrategyView(APIView):
     def update(self, request):
         pass
 
-    def delete(self, request, pk, many=True):
+    def delete(self, request, pk):
         strategy = get_object_or_404(StrategyModel.objects.all(), name=pk)
         strategy.delete()
 
