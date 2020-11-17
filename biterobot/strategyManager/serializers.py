@@ -41,4 +41,18 @@ class StrategySerializerPOST(serializers.Serializer):
 
         return StrategyModel.objects.create(**validated_data)
 
+    def update(self, instance, validated_data):
+        validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
+        blobFile = validated_data.pop('file')['body']
 
+        saveFile(blobToFile(blobFile))  # Сохраняем файл в '/strategies/text.txt', название чуть позже прикручу
+
+        validated_data.update({'filePath': '/strategies/text.txt'})
+
+        instance.name = validated_data.get('name', instance.name)
+        instance.description = validated_data.get('description', instance.description)
+        instance.filePath = validated_data.get('filePath', instance.filePath)
+
+        instance.save()
+
+        return instance
