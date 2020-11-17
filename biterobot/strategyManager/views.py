@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -11,7 +11,7 @@ from .serializers import StrategySerializerGET, StrategySerializerPOST
 #     queryset = StrategyModel.objects.all()
 
 class StrategyView(APIView):
-    def get(self, request):
+    def get(self, request, pk):
         strategies = StrategyModel.objects.all()
         serializer = StrategySerializerGET(strategies, many=True)
 
@@ -25,3 +25,11 @@ class StrategyView(APIView):
 
         return Response({"success": "Strategy '{}' created successfully".format(strategy_saved.name)})
 
+    def update(self, request):
+        pass
+
+    def delete(self, request, pk, many=True):
+        strategy = get_object_or_404(StrategyModel.objects.all(), name=pk)
+        strategy.delete()
+
+        return Response({"message": "Strategy with name `{}` has been deleted.".format(pk)}, status=204)

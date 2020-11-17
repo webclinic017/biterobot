@@ -11,4 +11,5 @@ from .views import StrategyView
 
 urlpatterns = [
     path('', StrategyView.as_view()),
+    path('<str:pk>', StrategyView.as_view()),
 ]

@@ -40,3 +40,5 @@ class StrategySerializerPOST(serializers.Serializer):
         validated_data.update({'filePath': '/strategies/text.txt'})
 
         return StrategyModel.objects.create(**validated_data)
+
+
