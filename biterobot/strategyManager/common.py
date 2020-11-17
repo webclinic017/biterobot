@@ -10,6 +10,6 @@ def blobToFile(data: str):
 
     return base64_message
 
-def saveFile(data: str, filePath: str = '/strategies/text.txt'):
+def saveFile(data: str, filePath: str = 'C:\\Users\\uzer\PycharmProjects\\biterobot\\biterobot\strategyManager\strategies\\text.txt'):
     file = open(filePath, 'w')
     file.write(data)

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import StrategyModel
+from .common import blobToFile, saveFile
 
 
 # class StrategySerializer(serializers.ModelSerializer):
@@ -31,7 +32,11 @@ class StrategySerializerPOST(serializers.Serializer):
     file = FileSerializer()
 
     def create(self, validated_data):
-        print(validated_data.pop('code'), validated_data.pop('file'))  # в 'file' словарь из ключей name и body
-        validated_data.update({'filePath': 'testPath'})
+        validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
+        blobFile = validated_data.pop('file')['body']
+
+        saveFile(blobToFile(blobFile))  # Сохраняем файл в '/strategies/text.txt', название чуть позже прикручу
+
+        validated_data.update({'filePath': '/strategies/text.txt'})
 
         return StrategyModel.objects.create(**validated_data)
