@@ -15,6 +15,10 @@ from .models import StrategyModel
 #             validated_data.update({'filePath': 'testPath'})
 #             return StrategyModel.objects.create(**validated_data)
 
+class FileSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=200)
+    body = serializers.CharField(max_length=4000)
+
 class StrategySerializerGET(serializers.Serializer):
     name = serializers.CharField(max_length=200)
     version = serializers.IntegerField()
@@ -24,9 +28,9 @@ class StrategySerializerPOST(serializers.Serializer):
     code = serializers.IntegerField()
     name = serializers.CharField(max_length=200)
     description = serializers.CharField(max_length=1000)
-    body = serializers.CharField(max_length=1000)
+    file = FileSerializer()
 
     def create(self, validated_data):
-        print(validated_data.pop('code'), validated_data.pop('body'))
+        print(validated_data.pop('code'), validated_data.pop('file'))  # в 'file' словарь из кллючей name и body
         validated_data.update({'filePath': 'testPath'})
         return StrategyModel.objects.create(**validated_data)
