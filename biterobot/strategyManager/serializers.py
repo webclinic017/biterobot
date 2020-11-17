@@ -33,4 +33,5 @@ class StrategySerializerPOST(serializers.Serializer):
     def create(self, validated_data):
         print(validated_data.pop('code'), validated_data.pop('file'))  # в 'file' словарь из ключей name и body
         validated_data.update({'filePath': 'testPath'})
+
         return StrategyModel.objects.create(**validated_data)

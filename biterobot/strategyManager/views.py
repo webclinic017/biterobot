@@ -22,5 +22,6 @@ class StrategyView(APIView):
         serializer = StrategySerializerPOST(data=strategy)
         if serializer.is_valid(raise_exception=True):
             strategy_saved = serializer.save()
+
         return Response({"success": "Strategy '{}' created successfully".format(strategy_saved.name)})
 
