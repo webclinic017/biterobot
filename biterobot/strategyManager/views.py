@@ -6,9 +6,9 @@ from .models import StrategyModel
 from .serializers import StrategySerializerGET, StrategySerializerPOST
 
 
-#class StrategyViewSet(viewsets.ModelViewSet):
-    #serializer_class = StrategySerializer
-    #queryset = StrategyModel.objects.all()
+# class StrategyViewSet(viewsets.ModelViewSet):
+#     serializer_class = StrategySerializer
+#     queryset = StrategyModel.objects.all()
 
 class StrategyView(APIView):
     def get(self, request):
