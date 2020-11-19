@@ -23,7 +23,7 @@ class StrategyView(APIView):
         if serializer.is_valid(raise_exception=True):
             strategy_saved = serializer.save()
 
-        return Response({"success": "Strategy '{}' created successfully".format(strategy_saved.name)})
+        return Response({"success": "Strategy '{}' created successfully!".format(strategy_saved.name)})
 
     def put(self, request, pk):
         saved_strategy = get_object_or_404(StrategyModel.objects.all(), name=pk)
@@ -32,7 +32,7 @@ class StrategyView(APIView):
         if serializer.is_valid(raise_exception=True):
             strategy_saved = serializer.save()
 
-        return Response({"success": "Strategy '{}' updated successfully".format(strategy_saved.name)})
+        return Response({"success": "Strategy '{}' updated successfully!".format(strategy_saved.name)})
 
 
     def delete(self, request, pk):
