@@ -6,7 +6,16 @@
     <script src="js/client.js"></script>
     <script src="js/server.js"></script>
 </head>
-<body>
+<body onload="uploadData()">
+<table border='1'>
+    <thead><tr>
+        <td>Ticker</td>
+        <td>Name</td>
+        <td>Date begin</td>
+        <td>Date end</td>
+    </tr></thead>
+    <tbody name='dataTable'></tbody>
+</table>
 <form name="dataForm">
     <label>Date begin: </label><input name="frdt" type="date" ><br>
     <label>Date end: </label><input name="todt" type="date" ><br>
