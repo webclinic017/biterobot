@@ -3,6 +3,8 @@
  ************************ dataInput block *************************
  ******************************************************************/
 
+/*********************** For Strategies **************************/
+
 /** Id generation **/
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -68,20 +70,6 @@ function updateStrategy(startName, stratFile, description) {
 }
 
 
-/** Creating json for deleting strategy **/
-function deleteStrategy(startName) {
-    let request = {
-        code: 1111,
-        name: startName
-    };
-
-    let json = JSON.stringify(request);
-    console.log(json)
-    return (json);
-    //sendRequest(json, 1111, '', false);
-}
-
-
 /** Creating json for testing **/
 function testStrategy(frdate, todate, stratSelect, startName, stratFile) {
     let req_id = uuidv4();
@@ -136,7 +124,7 @@ async function chooseAction () {
     let stratFile = document.forma.myFile.files[0];
     let action = document.forma.action.value;
 
-    let strRes = ''/*document.resform.res.value*/;
+    let strRes = '';
 
     if (action == 'load') { // Loading strategy
         if (stratFile !== undefined) {
@@ -147,12 +135,10 @@ async function chooseAction () {
             reader.onload = function() {
                 console.log(reader.result)
                 if (reader.result != null) {
-                    strRes = loadStrategy(startName, reader.result, description);
-                    sendActionStrategy(strRes, 'load')
+                    sendLoadStrategyRequest(loadStrategy(startName, reader.result, description));
                 } else {
-                    strRes = 'Error: File is empty';
+                    writeString('Error: File is empty');
                 }
-                writeString(strRes);
             };
         } else {
             writeString('Error: File is empty');
@@ -167,27 +153,20 @@ async function chooseAction () {
             reader.onload = function() {
                 console.log(reader.result)
                 if (reader.result != null) {
-                    strRes = updateStrategy(startName, reader.result, description);
-                    sendActionStrategy(strRes, 'update')
+                    sendUpdateStrategyRequest(updateStrategy(stratSelect, reader.result, description), stratSelect);
                 } else {
-                    strRes = 'Error: File is empty';
+                    writeString('Error: File is empty');
                 }
-                writeString(strRes);
             };
         } else if (description !== '' && stratFile == undefined) {
-
-            strRes = updateStrategy(startName, '', description);
-            sendActionStrategy(strRes, 'update')
-            //writeString(strRes);
+            sendUpdateStrategyRequest(updateStrategy(stratSelect, '', description), stratSelect);
         } else {
             writeString('Error: Choose strategy firstly');
         }
 
-    }  else if (action == 'delete') { // Deleting strategy
+    } else if (action == 'delete') { // Deleting strategy
         if (stratSelect !== '') {
-            strRes = deleteStrategy(startName);
-            sendActionStrategy(strRes, 'delete')
-            //writeString(strRes);
+            sendDeleteStrategyRequest(stratSelect);
         } else {
             writeString('Error: Choose strategy');
         }
@@ -217,6 +196,9 @@ async function chooseAction () {
 
 }
 
+
+/************************************ For Data *****************************/
+
 /** Creating json for data **/
 function loadData(frdate, todate, ticker) {
     let request = {
@@ -231,6 +213,7 @@ function loadData(frdate, todate, ticker) {
     return (json);
 }
 
+
 /** Load new data **/
 function addData () {
     let frdate = document.dataForm.frdt.value;
@@ -239,8 +222,8 @@ function addData () {
     let strRes = '';
     if (frdate !== '' && todate !== '') {
         if (ticker !== '') {
-            strRes = loadData(frdate, todate, ticker);
-
+            strRes = sendData(loadData(frdate, todate, ticker));
+            writeString(strRes);
         } else {
             writeString('Error: Ticker must be chosen');
         }
@@ -400,9 +383,9 @@ function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
 }
 
 
-/** Send request to do some action with strategy **/
-function sendActionStrategy (blob, str) {
-    fetch ('https://a51d6b62-1920-45e4-b298-e0c28a5e20f9.mock.pstmn.io/strategy/load/'/*'/strategy/' + str*/, {
+/** Send request to load strategy **/
+function sendLoadStrategyRequest(blob) {
+    fetch (document.forma.url_address.value, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -410,56 +393,82 @@ function sendActionStrategy (blob, str) {
         body: blob
     })
         .then(res => {
-            if (res.status >= 200 && res.status <= 300) {
-                return res;
+            if (res.code == 200  || res.code == 201) {
+                writeString('Strategy loaded');
+            } else if (res.code == 204) {
+                writeString('Error: Content was not send');
+            } else if (res.status = 500) {
+                writeString(res.message);
             } else {
                 let error = new Error(res.statusText);
                 error.response = res;
-                throw error
-            }
-        })
-        .then(res => {
-            if (res.headers['Content-Type'] !== 'application/json') {
-                let error = new Error('Incorrect server response');
-                console.log(res);
-                error.response = res;
-                throw error
-            }
-            return res;
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.resCode == 2101) {
-                writeString('Strategies loaded');
-                uploadStrategies();
-            } else if (data.resCode == 2111) {
-                writeString('Strategies updated');
-                uploadStrategies();
-            } else if (data.resCode == 2121) {
-                writeString('Strategies deleted');
-                uploadStrategies();
-            } else if (data.resCode == 4001) {
-                writeString('Error: ' + data.errMsg);
-            } else {
-                writeString('Error: Unknown result code (' + data.resCode + ')');
+                throw error;
             }
         })
         .catch(e => {
             writeString('Error: ' + e.message);
-            writeString(e.response.headers[0] + ' ' + e.response.headers[1]);
-            /*endConnetion = 2;*/
         })
-    /*return endConnetion;*/
 }
 
-/** Send request to update data/strategies **/
-function sendUploadingRequest (blob, req_name) {
-    fetch (document.forma.url_address.value/*'/'+ req_name + '/upload'*/, {
-        method: 'POST',
+
+/** Send request to update strategy **/
+function sendUpdateStrategyRequest(blob, stat_name) {
+    fetch (document.forma.url_address.value + stat_name, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: blob
+    })
+        .then(res => {
+            if (res.code == 200  || res.code == 201) {
+                return 'Strategy updated';
+            } else if (res.code == 204) {
+                return 'Error: Content was not send';
+            } else if (res.status == 500) {
+                writeString(res.message);
+            } else {
+                let error = new Error(res.statusText);
+                error.response = res;
+                throw error;
+            }
+        })
+        .catch(e => {
+            writeString('Error: ' + e.message);
+        })
+}
+
+
+/** Send request to delete strategy **/
+function sendDeleteStrategyRequest(stat_name) {
+    fetch (document.forma.url_address.value + stat_name, {
+        method: 'DELETE'
+    })
+        .then(res => {
+            if (res.code == 200  || res.code == 201) {
+                return 'Strategy deleted';
+            }  else if (res.status = 500) {
+                writeString(res.message);
+            } else {
+                let error = new Error(res.statusText);
+                error.response = res;
+                throw error;
+            }
+        })
+        .catch(e => {
+            writeString('Error: ' + e.message);
+        })
+}
+
+
+//TODO: Этот блок надо обсудить с Андреем (пока не работает)
+/** Send request to update data/strategies **/
+function sendUploadingRequest (req_name) {
+    fetch (document.forma.url_address.value + req_name, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
     })
         .then(res => {
             if (res.status >= 200 && res.status <= 300) {
@@ -494,9 +503,9 @@ function sendUploadingRequest (blob, req_name) {
         })
         .catch(e => {
             writeString('Error: ' + e.message);
-            writeString(e.response);
         })
 }
+
 
 /** Send request to load data **/
 function sendData(blob) {
@@ -508,35 +517,17 @@ function sendData(blob) {
         body: blob
     })
         .then(res => {
-            if (res.status >= 200 && res.status <= 300) {
-                return res;
+            if (res.code == 200  || res.code == 201) {
+                return 'Strategy deleted';
+            }  else if (res.status = 500) {
+                return res.message;
             } else {
                 let error = new Error(res.statusText);
                 error.response = res;
-                throw error
-            }
-        })
-        .then(res => {
-            if (res.headers['Content-Type'] !== 'application/json') {
-                let error = new Error('Incorrect server response');
-                error.response = res;
-                throw error
-            }
-            return res;
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.resCode == 2301) {
-                writeString('Data loaded');
-                uploadData();
-            } else if (data.resCode == 4001) {
-                writeString('Error: ' + data.errMsg);
-            } else {
-                writeString('Error: Unknown result code (' + data.resCode + ')');
+                throw error;
             }
         })
         .catch(e => {
             writeString('Error: ' + e.message);
-            writeString(e.response);
         })
 }
