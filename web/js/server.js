@@ -21,7 +21,7 @@ function loadStrategy(startName, stratFile, description) {
         name: startName,
         description: description,
         file: {
-            name: document.forma.myFile.files[0].name,
+            name: document.req_form.stratFile.files[0].name,
             body: stratFile
         }
     };
@@ -35,28 +35,28 @@ function loadStrategy(startName, stratFile, description) {
 /** Creating json for updating **/
 function updateStrategy(startName, stratFile, description) {
     let request = {};
-    if (description !== document.forma.descriptSelect.value && stratFile !== '') {
+    if (description !== document.req_form.descriptionSelect.value && stratFile !== '') {
         request = {
             code: 1101,
             name: startName,
             description: description,
             file: {
-                name: document.forma.myFile.files[0].name,
+                name: document.req_form.stratFile.files[0].name,
                 body: stratFile
             }
         };
-    } else if (description !== document.forma.descriptSelect.value && stratFile == '') {
+    } else if (description !== document.req_form.descriptionSelect.value && stratFile == '') {
         request = {
             code: 1101,
             name: startName,
             description: description
         };
-    } else if (description == document.forma.descriptSelect.value && stratFile !== '') {
+    } else if (description == document.req_form.descriptionSelect.value && stratFile !== '') {
         request = {
             code: 1101,
             name: startName,
             file: {
-                name: document.forma.myFile.files[0].name,
+                name: document.req_form.stratFile.files[0].name,
                 body: stratFile
             }
         };
@@ -85,7 +85,7 @@ function testStrategy(frdate, todate, stratSelect, startName, stratFile) {
                 name: startName,
                 isNew: false,
                 file: {
-                    name: document.forma.myFile.files[0].name,
+                    name: document.req_form.stratFile.files[0].name,
                     body: stratFile
                 }
             };
@@ -114,15 +114,15 @@ function testStrategy(frdate, todate, stratSelect, startName, stratFile) {
 
 /** Choosing action **/
 async function chooseAction () {
-    let frdate = document.forma.frdt.value;
-    let todate = document.forma.todt.value;
-    let stratSelect = document.forma.stratSelect.value;
-    let desriptionSelect = document.forma.descriptSelect.value;
-    let description = document.forma.descript.value;
+    let frdate = document.req_form.date_begin.value;
+    let todate = document.req_form.date_end.value;
+    let stratSelect = document.req_form.stratSelect.value;
+    let desriptionSelect = document.req_form.descriptionSelect.value;
+    let description = document.req_form.stratDescription.value;
     //let stratText = document.forma.textar.value;
-    let startName = document.forma.strname.value;
-    let stratFile = document.forma.myFile.files[0];
-    let action = document.forma.action.value;
+    let startName = document.req_form.stratName.value;
+    let stratFile = document.req_form.stratFile.files[0];
+    let action = document.req_form.stratAction.value;
 
     let strRes = '';
 
@@ -172,7 +172,7 @@ async function chooseAction () {
         }
 
     } else if (action == 'test') { // Testing strategy
-        if (document.forma.myFile.files[0] !== undefined) {
+        if (document.req_form.stratFile.files[0] !== undefined) {
             let reader = new FileReader();
 
             reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
@@ -184,7 +184,7 @@ async function chooseAction () {
                 //writeString(strRes);
             };
         } else if (stratSelect !== '') {
-            strRes = testStrategy(frdate, todate, stratSelect, startName, null);
+            strRes = testStrategy(frdate, todate, stratSelect, startName, '');
             workStrategyRequest(strRes, 1202, '', 0, 'test');
             //writeString(strRes);
         } else {
@@ -238,12 +238,12 @@ function addData () {
 
 /** Write string in output **/
 function writeString(str) {
-    let strRes = document.resform.res.value;
+    let strRes = document.res_form.resultText.value;
     if (strRes !== '') {
         strRes = strRes + '\n';
     }
     strRes = strRes + 'BR$> ' + str;
-    document.resform.res.value = strRes;
+    document.res_form.resultText.value = strRes;
 }
 
 /******************************************************************
@@ -253,7 +253,7 @@ function writeString(str) {
 /** Update strategySelector **/
 function updateStrategySelector(strategies) {
     let strategyName = document.getElementById("stratSelect");
-    let description = document.getElementById("descriptSelect");
+    let description = document.getElementById("descriptionSelect");
     let option = document.createElement("option");
     strategyName.innerHTML = '';
     description.innerHTML = '';
@@ -339,7 +339,7 @@ function testStep(code, req_id) {
 
 /** Send request to test strategy **/
 function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
-    fetch (document.forma.url_address.value/*'/strategy/' + str*/, {
+    fetch (document.req_form.url_address.value/*'/strategy/' + str*/, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -405,7 +405,7 @@ function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
 
 /** Send request to load strategy **/
 function sendLoadStrategyRequest(blob) {
-    fetch (document.forma.url_address.value, {
+    fetch (document.req_form.url_address.value, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -417,7 +417,7 @@ function sendLoadStrategyRequest(blob) {
                 writeString('Strategy loaded');
             } else if (res.code == 204) {
                 writeString('Error: Content was not send');
-            } else if (res.status = 500) {
+            } else if (res.status == 500) {
                 writeString(res.message);
             } else {
                 let error = new Error(res.statusText);
@@ -433,7 +433,7 @@ function sendLoadStrategyRequest(blob) {
 
 /** Send request to update strategy **/
 function sendUpdateStrategyRequest(blob, stat_name) {
-    fetch (document.forma.url_address.value + stat_name, {
+    fetch (document.req_form.url_address.value + stat_name, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -461,13 +461,13 @@ function sendUpdateStrategyRequest(blob, stat_name) {
 
 /** Send request to delete strategy **/
 function sendDeleteStrategyRequest(stat_name) {
-    fetch (document.forma.url_address.value + stat_name, {
+    fetch (document.req_form.url_address.value + stat_name, {
         method: 'DELETE'
     })
         .then(res => {
             if (res.code == 200  || res.code == 201) {
                 return 'Strategy deleted';
-            }  else if (res.status = 500) {
+            }  else if (res.status == 500) {
                 writeString(res.message);
             } else {
                 let error = new Error(res.statusText);
@@ -484,7 +484,7 @@ function sendDeleteStrategyRequest(stat_name) {
 //TODO: Этот блок надо обсудить с Андреем (пока не работает)
 /** Send request to update data/strategies **/
 function sendUploadingRequest (req_name) {
-    fetch (document.forma.url_address.value + req_name, {
+    fetch (document.req_form.url_address.value + req_name, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -539,7 +539,7 @@ function sendData(blob) {
         .then(res => {
             if (res.code == 200  || res.code == 201) {
                 return 'Strategy deleted';
-            }  else if (res.status = 500) {
+            }  else if (res.status == 500) {
                 return res.message;
             } else {
                 let error = new Error(res.statusText);

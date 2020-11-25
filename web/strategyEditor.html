@@ -1,60 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="min-width: 100%; min-height: 100%;">
 <head>
     <meta charset="UTF-8">
-    <title>strategyEditor</title>
+    <title>Strategy editor</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
     <script src="js/client.js"></script>
     <script src="js/server.js"></script>
 </head>
-<body onload="uploadStrategies()">
-<table>
-    <tr>
-        <td><h1>Strategy Editor</h1></td>
-        <td><h1>Results</h1></td>
-    </tr>
-    <tr>
-        <td>
-            <form name="forma">
-                <label>Date begin: </label><input name="frdt" type="date" ><br>
-                <label>Date end: </label><input name="todt" type="date" ><br>
-                <select name="stratSelect" id="stratSelect" onchange="changeStrategy()">
-                    <option></option>
-                    <option>Strategy 1</option>
-                    <option>Strategy 2</option>
-                </select>
-                <select name="descriptSelect" id="descriptSelect" hidden>
-                    <option></option>
-                    <option>Description 1</option>
-                    <option>Description 2</option>
-                </select><br>
-                <label>Description: </label><input name="descript" type="text"><br>
-                <label>Name: </label><input name="strname" id="strname" type="text"><br>
-                <textarea id="strtext" name="textar" placeholder="text..."
-                          style="background-color:black; color:white;"
-                          cols="60" rows="20"></textarea><br>
-                <input name="myFile" id="strfile" type="file"
-                       onchange="loadStrategyInEditor()"
-                       accept=".py, .txt"><br>
-                <div>
-                    <input type="radio" name="action" value="load">Load<br>
-                    <input type="radio" name="action" value="update">Update<br>
-                    <input type="radio" name="action" value="delete">Delete<br>
-                    <input type="radio" name="action" value="test">Test<br>
-                </div>
-                <input type="button" name="bt" value="Submit"onclick="chooseAction()"><br>
-                <label>Адрес запроса: </label><input type="text" name="url_address">
-            </form>
-        </td>
-        <td>
-            <form name="resform">
-        <textarea name="res" placeholder="result..."
-                  style="background-color:black; color:white;"
-                  cols="60" rows="20" readonly></textarea>
-                <input type="reset" value="Clear">
-            </form>
-        </td>
-    </tr>
-</table>
+<body style="background: url(./images/bg_image.jpg) center / cover, rgb(77,77,77);border-color: rgb(40,40,40);min-height: 100%;min-width: 100%;" onload="uploadStrategies()">
+<div class="container d-inline-block float-left" style="width: 50%;min-width: 358px;">
+    <form name="req_form">
+        <h1 class="text-center text-light">Strategy editor</h1>
 
+        <div class="form-group text-left" style="margin-bottom: 0px;">
+            <label class="text-light">Date begin:</label>
+            <input type="date" name="date_begin" style="margin-left: 45px;"/>
+        </div>
+
+        <div class="form-group">
+            <label class="text-light">Date end:</label>
+            <input type="date" style="margin-left: 59px;" name="date_end"/>
+        </div>
+
+        <div class="form-group">
+            <label class="text-light">Loaded strategies:</label>
+            <select style="min-width: 159px;" name="stratSelect" id="stratSelect" onchange="changeStrategy()">
+                <option></option>
+                <option>Strategy 1</option>
+                <option>Strategy 2</option>
+                <option>Strategy 3</option>
+            </select>
+        </div>
+
+        <div class="form-group d-none">
+            <label class="text-light">Loaded description:</label>
+            <select style="min-width: 159px;" name="descriptionSelect" id="descriptionSelect">
+                <option></option>
+                <option>Description 1</option>
+                <option>Description 2</option>
+                <option>Description 3</option>
+            </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0px;">
+            <label class="text-light">Description:</label>
+            <input type="text" name="stratDescription" style="min-width: 300px;"/>
+        </div>
+
+        <div class="form-group" style="margin: 0px;">
+            <label class="text-light">Name:</label>
+            <input type="text" name="stratName" style="min-width: 212px;margin-left: 38px;"/>
+        </div>
+
+        <textarea style="min-height: 590px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255)" placeholder="Strategy text..." name="stratText" id="stratText"></textarea>
+
+        <input class="d-none" id="inputFile-1" type="file" name="stratFile" style="width: 100%;margin-bottom: 15px;" onchange="loadStrategyInEditor()" accept=".py, .txt"/>
+
+        <div class="form-group">
+            <label class="text-light border rounded border-dark btn-dark" style="margin-right: 5px;padding-left: 10px;padding-right: 10px;padding-top: 5px; padding-bottom: 5px;" for="inputFile-1">Choose file</label>
+            <input type="text" style="width: 60%;" name="fileName" placeholder="file name..." readonly/>
+        </div>
+
+        <div class="custom-control custom-control-inline custom-radio" style="width: 20%;min-width: 110px;margin-bottom: 5px; margin-right: 0px; margin-left: 7%">
+            <input id="formCheck-1" class="custom-control-input d-none" type="radio" name="stratAction" value="load"/>
+            <label class="custom-control-label text-light btn btn-dark" for="formCheck-1">Load</label>
+        </div>
+
+        <div class="custom-control custom-control-inline custom-radio" style="width: 20%;min-width: 110px;margin-bottom: 5px;">
+            <input id="formCheck-2" class="custom-control-input d-none" type="radio" name="stratAction" value="update"/>
+            <label class="custom-control-label text-light btn btn-dark" for="formCheck-2">Update</label>
+        </div>
+
+        <div class="custom-control custom-control-inline custom-radio" style="width: 20%;min-width: 110px;margin-bottom: 5px;">
+            <input id="formCheck-3" class="custom-control-input d-none" type="radio" name="stratAction" value="delete"/>
+            <label class="custom-control-label text-light btn btn-dark" for="formCheck-3">Delete</label>
+        </div>
+
+        <div class="custom-control custom-control-inline custom-radio" style="width: 20%;min-width: 110px;margin-bottom: 5px;">
+            <input id="formCheck-4" class="custom-control-input d-none" type="radio" name="stratAction" value="test"/>
+            <label class="custom-control-label text-light btn btn-dark" for="formCheck-4">Test</label>
+        </div>
+
+        <div class="btn-group" role="group"></div>
+        <button class="btn btn-dark" type="button" style="margin-right: 40%;margin-left: 40%;margin-top: 11px; padding-right: 20px; padding-left: 20px" onclick="chooseAction()">Submit</button>
+
+        <!-- На время тестирования -->
+        <div class="form-group" style="margin-bottom: 0px;">
+            <label class="text-light">Request address:</label>
+            <input type="text" name="url_address" style="min-width: 300px; margin-top: 10px;"/>
+        </div>
+    </form>
+</div>
+
+<div class="container d-inline-block float-left" style="width: 50%;min-width: 358px;">
+    <form name="res_form">
+        <h1 class="text-center text-light">Result</h1>
+        <textarea style="min-height: 200px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);" name="resultText" placeholder="Result..."></textarea>
+        <button class="btn btn-dark" type="button" style="margin-left: 80%;" onclick="clearResults()">Clear</button>
+        <img style="min-width: 100%; min-height: 100%" src="">
+    </form>
+</div>
+<script src="js/bootstrap.min.js"></script>
 </body>
 </html>

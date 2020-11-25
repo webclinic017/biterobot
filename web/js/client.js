@@ -1,28 +1,37 @@
 /** Uploading strategy in editor**/
 function loadStrategyInEditor() {
-    let file = document.getElementById("strfile").files[0];
+    let file = document.getElementById("inputFile-1").files[0];
+    if (file !== undefined) {
+        let reader = new FileReader();
+        reader.onload = function (e) {
+            let textArea = document.getElementById("stratText");
+            textArea.value = e.target.result;
+        };
 
-    let reader = new FileReader();
-    reader.onload = function (e) {
-        let textArea = document.getElementById("strtext");
-        textArea.value = e.target.result;
-    };
-
-    reader.readAsText(file);
-    let str = file.name;
-    if (str.indexOf('.txt',1) !== -1) {
-        document.forma.strname.value = str.slice(0, str.indexOf('.txt',1));
-    } else if (str.indexOf('.py',1) !== -1)  {
-        document.forma.strname.value = str.slice(0, str.indexOf('.py',1));
-    } else {}
-
+        reader.readAsText(file);
+        let str = file.name;
+        document.req_form.fileName.value = str;
+        if (str.indexOf('.txt',1) !== -1) {
+            document.req_form.stratName.value = str.slice(0, str.indexOf('.txt',1));
+        } else if (str.indexOf('.py',1) !== -1)  {
+            document.req_form.stratName.value = str.slice(0, str.indexOf('.py',1));
+        } else {}
+    } else {
+        document.req_form.stratText.value = '';
+        document.req_form.fileName.value = '';
+    }
 }
 
 /** Change strategy and description **/
 function changeStrategy() {
     let strategyName = document.getElementById("stratSelect");
-    let description = document.getElementById("descriptSelect");
+    let description = document.getElementById("descriptionSelect");
     let index = strategyName.selectedIndex;
-    document.forma.strname.value = strategyName.value;
-    document.forma.descript.value = description.options[index].value;
+    document.req_form.stratName.value = strategyName.value;
+    document.req_form.stratDescription.value = description.options[index].value;
+}
+
+/** Clear result console **/
+function clearResults() {
+    document.res_form.resultText.value = '';
 }
