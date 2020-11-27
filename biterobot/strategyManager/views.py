@@ -34,6 +34,7 @@ class StrategyView(APIView):
     def put(self, request, pk):
         saved_strategy = get_object_or_404(StrategyModel.objects.all(), name=pk)
         data = request.data
+        data.update({'name': pk})  # Подставляем имя, тк прередается пустое с фронта. Если пустое = Bad Request 400
         serializer = StrategySerializerPOST(instance=saved_strategy, data=data, partial=True)
         if serializer.is_valid(raise_exception=True):
             strategy_saved = serializer.save()

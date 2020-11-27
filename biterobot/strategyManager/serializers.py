@@ -45,7 +45,7 @@ class StrategySerializerPOST(serializers.Serializer):
         validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
         fileInfo = validated_data.pop('file')
 
-        saveFile(blobToFile(fileInfo['body']))
+        saveFile(blobToFile(fileInfo['body']), filePath=f'strategyManager/strategies/{fileInfo["name"]}')
 
         validated_data.update({'filePath': f'/strategies/{fileInfo["name"]}'})
 
