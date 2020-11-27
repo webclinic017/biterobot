@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.generics import get_object_or_404
 from rest_framework.renderers import StaticHTMLRenderer
@@ -7,6 +6,7 @@ from rest_framework.views import APIView
 
 from .models import StrategyModel
 from .serializers import StrategySerializerGET, StrategySerializerPOST
+from .common import deleteFile
 
 
 # class StrategyViewSet(viewsets.ModelViewSet):
@@ -44,5 +44,7 @@ class StrategyView(APIView):
     def delete(self, request, pk):
         strategy = get_object_or_404(StrategyModel.objects.all(), name=pk)
         strategy.delete()
+
+        deleteFile(filePath=f'strategies\\{pk}.txt')
 
         return Response({"message": "Strategy with name `{}` has been deleted.".format(pk)}, status=204)
