@@ -1,4 +1,7 @@
+from django.http import HttpResponse
+from django.shortcuts import render
 from rest_framework.generics import get_object_or_404
+from rest_framework.renderers import StaticHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -11,11 +14,14 @@ from .serializers import StrategySerializerGET, StrategySerializerPOST
 #     queryset = StrategyModel.objects.all()
 
 class StrategyView(APIView):
+    renderer_classes = [StaticHTMLRenderer]
+    template_name = 'strategyEditor.html'
+
     def get(self, request):
         strategies = StrategyModel.objects.all()
         serializer = StrategySerializerGET(strategies, many=True)
 
-        return Response(serializer.data)
+        return render(request, self.template_name)
 
     def post(self, request):
         strategy = request.data
