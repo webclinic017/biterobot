@@ -216,9 +216,9 @@ function loadData(frdate, todate, ticker) {
 
 /** Load new data **/
 function addData () {
-    let frdate = document.dataForm.frdt.value;
-    let todate = document.dataForm.todt.value;
-    let ticker = document.dataForm.ticker.value;
+    let frdate = document.data_form.date_begin.value;
+    let todate = document.data_form.date_end.value;
+    let ticker = document.data_form.ticker.value;
     let strRes = '';
     if (frdate !== '' && todate !== '') {
         if (ticker !== '') {
@@ -270,10 +270,15 @@ function updateStrategySelector(strategies) {
 
 /** Update data **/
 function updateDataTable(data) {
-    let tabBody = document.dataTable.item(0);
-
+    let tabBody = document.data_form.dataTable.item(0);
+    let tickerList = document.getElementById("tickers");
+    let option = document.createElement("option");
+    tickerList.innerHTML = '';
     tabBody.innerHTML = '';
     data.forEach((item) => {
+        option.text = item.ticker;
+        tickerList.add(option, null);
+
         let newRow = tabBody.insertRow();
         let newCell = newRow.insertCell();
         let newValue = document.createTextNode(item.ticker);

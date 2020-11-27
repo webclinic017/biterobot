@@ -35,3 +35,9 @@ function changeStrategy() {
 function clearResults() {
     document.res_form.resultText.value = '';
 }
+
+$(document).ready(function () {
+    $('#data_table').DataTable();
+    $('.dataTables_length').addClass('bs-select');
+});
+
