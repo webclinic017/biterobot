@@ -256,17 +256,23 @@ function writeString(str) {
 function updateStrategySelector(strategies) {
     let strategyName = document.getElementById("stratSelect");
     let description = document.getElementById("descriptionSelect");
+    if (strategyName.length > 0) {
+        strategyName.remove(strategyName.length-1);
+    }
+    if (description.length > 0) {
+        description.remove(description.length-1);
+    }
     let option = document.createElement("option");
-    strategyName.innerHTML = '';
-    description.innerHTML = '';
     option.text = '';
     strategyName.add(option, null);
     description.add(option, null);
     strategies.forEach((item) => {
         option.text = item.name;
-        strategyName.add(option, null);
+        console.log(item.name);
+        strategyName.add(option);
         option.text = item.description;
-        description.add(option, null);
+        console.log(item.description);
+        description.add(option);
     });
 }
 
@@ -492,10 +498,10 @@ function sendDeleteStrategyRequest(stat_name) {
 /** Send request to update data/strategies **/
 function sendUploadingRequest (req_name) {
     fetch (server_url + req_name + '/', {
-        method: 'GET',
+        method: 'GET'/*,
         headers: {
             'Content-Type': 'application/json'
-        }
+        }*/
     })
         .then(res => {
             if (res.status >= 200 && res.status <= 300) {
@@ -506,24 +512,24 @@ function sendUploadingRequest (req_name) {
                 throw error
             }
         })
-        .then(res => {
+        /*.then(res => {
             if (res.headers['Content-Type'] !== 'application/json') {
                 let error = new Error('Incorrect server response');
                 error.response = res;
                 throw error
             }
             return res;
+        })*/
+        .then(res => {
+            return res.json();
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.code == 2011) {
-                updateStrategySelector(data.strategies);
+        .then(res => {
+            if (req_name == 'strategies') {
+                updateStrategySelector(res);
                 writeString('Strategy updated');
-            } else if (data.code == 2301) {
-                updateDataTable(data.strategies);
+            } else if (req_name == 'data') {
+                updateDataTable(res);
                 writeString('Data updated');
-            } else if (data.code == 4001) {
-                writeString('Error: ' + data.errMsg);
             } else {
                 writeString('Error: Incorrect code');
             }
