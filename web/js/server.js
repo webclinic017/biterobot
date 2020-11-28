@@ -412,7 +412,7 @@ function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
 
 /** Send request to load strategy **/
 function sendLoadStrategyRequest(blob) {
-    fetch (server_url, {
+    fetch (server_url + 'strategies/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
