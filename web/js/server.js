@@ -1,4 +1,4 @@
-var server_url = 'http://127.0.0.1:8000/strategyManager/';
+var server_url = 'https://a51d6b62-1920-45e4-b298-e0c28a5e20f9.mock.pstmn.io/strategyManager/';
 
 
 /******************************************************************
@@ -256,23 +256,30 @@ function writeString(str) {
 function updateStrategySelector(strategies) {
     let strategyName = document.getElementById("stratSelect");
     let description = document.getElementById("descriptionSelect");
-    if (strategyName.length > 0) {
-        strategyName.remove(strategyName.length-1);
+    console.log(strategyName.length);
+    while (strategyName.length > 0) {
+        strategyName.remove(strategyName.length - 1);
     }
-    if (description.length > 0) {
-        description.remove(description.length-1);
+    while (description.length > 0) {
+        description.remove(description.length - 1);
     }
+    console.log(strategyName.length);
     let option = document.createElement("option");
+    let option1 = document.createElement("option");
     option.text = '';
-    strategyName.add(option, null);
-    description.add(option, null);
+    option1.text = '';
+    strategyName.appendChild(option);
+    description.appendChild(option1);
+    console.log(strategyName.length);
     strategies.forEach((item) => {
+        let option = document.createElement("option");
         option.text = item.name;
         console.log(item.name);
         strategyName.add(option);
-        option.text = item.description;
+        let option1 = document.createElement("option");
+        option1.text = item.description;
         console.log(item.description);
-        description.add(option);
+        description.add(option1);
     });
 }
 
