@@ -316,13 +316,13 @@ function generateUpdateRequest(code) {
 
 /** Uploading strategySelector **/
 async function uploadStrategies() {
-    sendUploadingRequest(generateUpdateRequest(1001),'strategy');
+    sendUploadingRequest('strategies');
 }
 
 
 /** Uploading data **/
 async function uploadData() {
-    sendUploadingRequest(generateUpdateRequest(1011),'data');
+    sendUploadingRequest('data');
 }
 
 /******************************************************************
@@ -410,7 +410,7 @@ function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
 
 /** Send request to load strategy **/
 function sendLoadStrategyRequest(blob) {
-    fetch (document.req_form.url_address.value, {
+    fetch ('http://127.0.0.1:8000/strategies/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -438,7 +438,7 @@ function sendLoadStrategyRequest(blob) {
 
 /** Send request to update strategy **/
 function sendUpdateStrategyRequest(blob, stat_name) {
-    fetch (document.req_form.url_address.value + stat_name, {
+    fetch ('http://127.0.0.1:8000/strategies/' + stat_name, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -466,7 +466,7 @@ function sendUpdateStrategyRequest(blob, stat_name) {
 
 /** Send request to delete strategy **/
 function sendDeleteStrategyRequest(stat_name) {
-    fetch (document.req_form.url_address.value + stat_name, {
+    fetch ('http://127.0.0.1:8000/strategies/' + stat_name, {
         method: 'DELETE'
     })
         .then(res => {
@@ -489,7 +489,7 @@ function sendDeleteStrategyRequest(stat_name) {
 //TODO: Этот блок надо обсудить с Андреем (пока не работает)
 /** Send request to update data/strategies **/
 function sendUploadingRequest (req_name) {
-    fetch (document.req_form.url_address.value + req_name, {
+    fetch ('http://127.0.0.1:8000/' + req_name + '/', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
