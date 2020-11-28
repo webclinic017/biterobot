@@ -20,3 +20,13 @@ class InstrumentModel(models.Model):
 
     def __str__(self):
         return self.name
+
+class CandleModel(models.Model):
+    instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)
+    interval = models.DateTimeField()
+    o = models.FloatField()  # Открытие свечи
+    c = models.FloatField()  # Закрытие свечи
+    h = models.FloatField()  # Высший уровень свечи - хвост
+    l = models.FloatField()  # Низший уровень свечи - хвост
+    v = models.IntegerField()  # Объем торгов
+    candleTime = models.DateTimeField()
