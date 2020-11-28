@@ -13,15 +13,16 @@ from .common import deleteFile
 #     serializer_class = StrategySerializer
 #     queryset = StrategyModel.objects.all()
 
+def startPage(request):
+    return render(request, 'strategyEditor.html')
+
 class StrategyView(APIView):
-    renderer_classes = [StaticHTMLRenderer]
-    template_name = 'strategyEditor.html'
 
     def get(self, request):
         strategies = StrategyModel.objects.all()
         serializer = StrategySerializerGET(strategies, many=True)
 
-        return render(request, self.template_name)
+        return Response(serializer.data)
 
     def post(self, request):
         strategy = request.data

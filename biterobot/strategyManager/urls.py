@@ -2,6 +2,7 @@ from django.urls import path
 #from rest_framework.routers import DefaultRouter
 
 from .views import StrategyView
+from . import views
 
 
 #router = DefaultRouter()
@@ -10,6 +11,7 @@ from .views import StrategyView
 #urlpatterns = router.urls
 
 urlpatterns = [
-    path('', StrategyView.as_view()),
+    path('strategies/', StrategyView.as_view()),
     path('<str:pk>', StrategyView.as_view()),
+    path('', views.startPage)
 ]
