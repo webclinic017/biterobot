@@ -255,12 +255,6 @@ function updateStrategySelector(strategies) {
     let strategyName = document.getElementById("stratSelect");
     let description = document.getElementById("descriptionSelect");
     console.log(strategyName.length);
-    /*while (strategyName.length > 0) {
-        strategyName.remove(strategyName.length - 1);
-    }
-    while (description.length > 0) {
-        description.remove(description.length - 1);
-    }*/
     strategyName.innerHTML = '';
     description.innerHTML = '';
     console.log(strategyName.length);
@@ -274,11 +268,10 @@ function updateStrategySelector(strategies) {
     strategies.forEach((item) => {
         let option = document.createElement("option");
         option.text = item.name;
-        console.log(item.name);
         strategyName.add(option);
+
         let option1 = document.createElement("option");
         option1.text = item.description;
-        console.log(item.description);
         description.add(option1);
     });
 }
