@@ -9,14 +9,14 @@ TYPE_CHOICES = (
 
 class InstrumentModel(models.Model):
     name = models.CharField(max_length=200)
-    ticker = models.CharField(max_length=100)
-    figi = models.CharField(max_length=150)
+    ticker = models.CharField(max_length=100)  # Сокращенное название инструмента
+    figi = models.CharField(max_length=150)  # Идентификатор торгового инструмента
     instrumentType = models.CharField(max_length=20, choices=TYPE_CHOICES, default="BOND")
-    isin = models.CharField(max_length=150)
-    minPriceIncrement = models.FloatField()
-    lot = models.IntegerField()
-    minQuantity = models.IntegerField()
-    currency = models.CharField(max_length=50)
+    isin = models.CharField(max_length=150)  # Международный идентификационный код ценной бумаги
+    minPriceIncrement = models.FloatField()  # Минимальная цена
+    lot = models.IntegerField()  # Минимальный лот
+    minQuantity = models.IntegerField()  # Минимальное количество
+    currency = models.CharField(max_length=50)  # Валюта
 
     def __str__(self):
         return self.name
