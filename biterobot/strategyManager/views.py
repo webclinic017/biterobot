@@ -1,6 +1,6 @@
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.generics import get_object_or_404
-from rest_framework.renderers import StaticHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -13,6 +13,7 @@ from .common import deleteFile
 #     serializer_class = StrategySerializer
 #     queryset = StrategyModel.objects.all()
 
+@csrf_exempt
 def startPage(request):
     return render(request, 'strategyEditor.html')
 
