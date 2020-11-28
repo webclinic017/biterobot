@@ -1,5 +1,5 @@
-var server_url = 'https://a51d6b62-1920-45e4-b298-e0c28a5e20f9.mock.pstmn.io/strategyManager/';
-
+var server_url = 'http://127.0.0.1:8000/strategyManager/';
+//var server_url = 'https://a51d6b62-1920-45e4-b298-e0c28a5e20f9.mock.pstmn.io/strategyManager/';
 
 /******************************************************************
  ************************ dataInput block *************************
@@ -183,12 +183,10 @@ async function chooseAction () {
                 console.log(reader.result)
                 strRes = testStrategy(frdate, todate, stratSelect, startName, reader.result);
                 workStrategyRequest(strRes, 1201, '', 0, 'validate');
-                //writeString(strRes);
             };
         } else if (stratSelect !== '') {
             strRes = testStrategy(frdate, todate, stratSelect, startName, '');
             workStrategyRequest(strRes, 1202, '', 0, 'test');
-            //writeString(strRes);
         } else {
             writeString('Error: No strategy to test');
         }
@@ -257,12 +255,14 @@ function updateStrategySelector(strategies) {
     let strategyName = document.getElementById("stratSelect");
     let description = document.getElementById("descriptionSelect");
     console.log(strategyName.length);
-    while (strategyName.length > 0) {
+    /*while (strategyName.length > 0) {
         strategyName.remove(strategyName.length - 1);
     }
     while (description.length > 0) {
         description.remove(description.length - 1);
-    }
+    }*/
+    strategyName.innerHTML = '';
+    description.innerHTML = '';
     console.log(strategyName.length);
     let option = document.createElement("option");
     let option1 = document.createElement("option");
@@ -287,12 +287,15 @@ function updateStrategySelector(strategies) {
 function updateDataTable(data) {
     let tabBody = document.data_form.dataTable.item(0);
     let tickerList = document.getElementById("tickers");
-    let option = document.createElement("option");
     tickerList.innerHTML = '';
     tabBody.innerHTML = '';
+    let option = document.createElement("option");
+    option.text = '';
+    tickerList.add(option);
     data.forEach((item) => {
+        let option = document.createElement("option");
         option.text = item.ticker;
-        tickerList.add(option, null);
+        tickerList.add(option);
 
         let newRow = tabBody.insertRow();
         let newCell = newRow.insertCell();
@@ -434,6 +437,7 @@ function sendLoadStrategyRequest(blob) {
     })
         .then(res => {
             if (res.code == 200  || res.code == 201) {
+                uploadStrategies();
                 writeString('Strategy loaded');
             } else if (res.code == 204) {
                 writeString('Error: Content was not send');
@@ -453,7 +457,7 @@ function sendLoadStrategyRequest(blob) {
 
 /** Send request to update strategy **/
 function sendUpdateStrategyRequest(blob, stat_name) {
-    fetch (server_url + stat_name, {
+    fetch (server_url + 'strategies/' + stat_name, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -462,9 +466,11 @@ function sendUpdateStrategyRequest(blob, stat_name) {
     })
         .then(res => {
             if (res.code == 200  || res.code == 201) {
-                return 'Strategy updated';
+                uploadStrategies();
+                writeString('Strategy updated');
             } else if (res.code == 204) {
-                return 'Error: Content was not send';
+                uploadStrategies();
+                writeString('Error: Content was not send');
             } else if (res.status == 500) {
                 writeString(res.message);
             } else {
@@ -481,11 +487,12 @@ function sendUpdateStrategyRequest(blob, stat_name) {
 
 /** Send request to delete strategy **/
 function sendDeleteStrategyRequest(stat_name) {
-    fetch (server_url + stat_name, {
+    fetch (server_url + 'strategies/' + stat_name, {
         method: 'DELETE'
     })
         .then(res => {
             if (res.code == 200  || res.code == 201) {
+                uploadStrategies();
                 return 'Strategy deleted';
             }  else if (res.status == 500) {
                 writeString(res.message);
@@ -501,14 +508,10 @@ function sendDeleteStrategyRequest(stat_name) {
 }
 
 
-//TODO: Этот блок надо обсудить с Андреем (пока не работает)
 /** Send request to update data/strategies **/
 function sendUploadingRequest (req_name) {
     fetch (server_url + req_name + '/', {
-        method: 'GET'/*,
-        headers: {
-            'Content-Type': 'application/json'
-        }*/
+        method: 'GET'
     })
         .then(res => {
             if (res.status >= 200 && res.status <= 300) {
@@ -549,7 +552,7 @@ function sendUploadingRequest (req_name) {
 
 /** Send request to load data **/
 function sendData(blob) {
-    fetch ('/data/load', {
+    fetch (server_url + 'data/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -558,7 +561,8 @@ function sendData(blob) {
     })
         .then(res => {
             if (res.code == 200  || res.code == 201) {
-                return 'Strategy deleted';
+                uploadData();
+                //writeString('Data loaded');
             }  else if (res.status == 500) {
                 return res.message;
             } else {
