@@ -1,8 +1,9 @@
 from django.urls import path
 
-from . import views
+from .views import startPage, InstrumentView
 
 
 urlpatterns = [
-    path('', views.startPage)
+    path('', startPage),
+    path('instruments/', InstrumentView.as_view()),
 ]
