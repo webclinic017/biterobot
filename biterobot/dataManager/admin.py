@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import InstrumentModel, CandleModel
+
+
+admin.site.register(InstrumentModel)
+admin.site.register(CandleModel)
