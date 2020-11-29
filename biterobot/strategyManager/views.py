@@ -18,7 +18,6 @@ def startPage(request):
     return render(request, 'strategyEditor.html')
 
 class StrategyView(APIView):
-
     def get(self, request):
         strategies = StrategyModel.objects.all()
         serializer = StrategySerializerGET(strategies, many=True)
