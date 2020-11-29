@@ -10,6 +10,8 @@ TYPE_CHOICES = (
 class InstrumentModel(models.Model):
     name = models.CharField(max_length=200)
     ticker = models.CharField(max_length=100)  # Сокращенное название инструмента
+    dateBegin = models.DateTimeField()
+    dateEnd = models.DateTimeField()
     figi = models.CharField(max_length=150)  # Идентификатор торгового инструмента
     instrumentType = models.CharField(max_length=20, choices=TYPE_CHOICES, default="BOND")
     isin = models.CharField(max_length=150)  # Международный идентификационный код ценной бумаги
