@@ -242,7 +242,7 @@ function writeString(str) {
     if (strRes !== '') {
         strRes = strRes + '\n';
     }
-    strRes = strRes + 'BR$> ' + str;
+    strRes = strRes + 'BR:> ' + str;
     document.res_form.resultText.value = strRes;
 }
 
