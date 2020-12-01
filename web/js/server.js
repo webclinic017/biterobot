@@ -219,16 +219,24 @@ function addData () {
     let frdate = document.data_form.date_begin.value;
     let todate = document.data_form.date_end.value;
     let ticker = document.data_form.ticker.value;
-    let strRes = '';
     if (frdate !== '' && todate !== '') {
         if (ticker !== '') {
-            strRes = sendData(loadData(frdate, todate, ticker));
-            writeString(strRes);
+            sendData(loadData(frdate, todate, ticker));
         } else {
-            writeString('Error: Ticker must be chosen');
+            console.log('Error: Ticker must be chosen');
+            document.data_form.ticker.style.backgroundColor = "#ff3535";
+            setTimeout(function () {
+                document.data_form.ticker.style.backgroundColor = "white";
+            },1000);
         }
     } else {
-        writeString('Error: Dates must be chosen');
+        console.log('Error: Dates must be chosen');
+        document.data_form.date_begin.style.backgroundColor = "#ff3535";
+        document.data_form.date_end.style.backgroundColor = "#ff3535";
+        setTimeout(function () {
+            document.data_form.date_begin.style.backgroundColor = "white";
+            document.data_form.date_end.style.backgroundColor = "white";
+        },1000);
     }
 }
 
@@ -421,6 +429,7 @@ function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
 
 /** Send request to load strategy **/
 function sendLoadStrategyRequest(blob) {
+    writeString('Start uploading');
     fetch (server_url + 'strategies/', {
         method: 'POST',
         headers: {
@@ -431,7 +440,7 @@ function sendLoadStrategyRequest(blob) {
         .then(res => {
             if (res.code == 200  || res.code == 201) {
                 uploadStrategies();
-                writeString('Strategy loaded');
+                writeString('Strategy uploaded');
             } else if (res.code == 204) {
                 writeString('Error: Content was not send');
             } else if (res.status == 500) {
@@ -450,6 +459,7 @@ function sendLoadStrategyRequest(blob) {
 
 /** Send request to update strategy **/
 function sendUpdateStrategyRequest(blob, stat_name) {
+    writeString('Start updating');
     fetch (server_url + 'strategies/' + stat_name, {
         method: 'PUT',
         headers: {
@@ -480,6 +490,7 @@ function sendUpdateStrategyRequest(blob, stat_name) {
 
 /** Send request to delete strategy **/
 function sendDeleteStrategyRequest(stat_name) {
+    writeString('Start deleting');
     fetch (server_url + 'strategies/' + stat_name, {
         method: 'DELETE'
     })
@@ -529,16 +540,16 @@ function sendUploadingRequest (req_name) {
         .then(res => {
             if (req_name == 'strategies') {
                 updateStrategySelector(res);
-                writeString('Strategy updated');
+                console.log('Strategy updated');
             } else if (req_name == 'data') {
                 updateDataTable(res);
-                writeString('Data updated');
+                console.log('Data updated');
             } else {
-                writeString('Error: Incorrect code');
+                console.log('Error: Incorrect code');
             }
         })
         .catch(e => {
-            writeString('Error: ' + e.message);
+            console.log('Error: ' + e.message);
         })
 }
 
@@ -555,9 +566,9 @@ function sendData(blob) {
         .then(res => {
             if (res.code == 200  || res.code == 201) {
                 uploadData();
-                //writeString('Data loaded');
+                console.log('Data loaded');
             }  else if (res.status == 500) {
-                return res.message;
+                console.log(res.message);
             } else {
                 let error = new Error(res.statusText);
                 error.response = res;
@@ -565,6 +576,6 @@ function sendData(blob) {
             }
         })
         .catch(e => {
-            writeString('Error: ' + e.message);
+            console.log('Error: ' + e.message);
         })
 }

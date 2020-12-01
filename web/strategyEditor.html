@@ -15,12 +15,12 @@
 
         <div class="form-group text-left" style="margin-bottom: 0px;">
             <label class="text-light">Date begin:</label>
-            <input type="date" name="date_begin" style="margin-left: 45px;"/>
+            <input type="date" name="date_begin" style="margin-left: 45px;" id="date_begin" onchange="setMinDate();"/>
         </div>
 
         <div class="form-group">
             <label class="text-light">Date end:</label>
-            <input type="date" style="margin-left: 59px;" name="date_end"/>
+            <input type="date" style="margin-left: 59px;" name="date_end" id="date_end" onchange="setMaxDate();"/>
         </div>
 
         <div class="form-group">
@@ -56,7 +56,7 @@
 
         <div style="margin-bottom: 5px; float: right;">
             <label class="text-light">Them:</label>
-            <select name="seletTheam" onchange="chg()">
+            <select name="seletTheam" onchange="changeEditorStyle()">
                 <optgroup label="Bright">
                     <option value="ace/theme/chrome">Chrome</option>
                     <option value="ace/theme/clouds">Clouds</option>

@@ -37,13 +37,36 @@ function clearResults() {
     document.res_form.resultText.value = '';
 }
 
+/** Loading table's elements **/
 $(document).ready(function () {
     $('#data_table').DataTable();
     $('.dataTables_length').addClass('bs-select');
 });
 
-function chg() {
+/** Changing style of editor **/
+function changeEditorStyle() {
     var editor = ace.edit("editor");
     editor.setTheme(document.req_form.seletTheam.value);
     editor.session.setMode("ace/mode/python");
+}
+
+
+function setMinDate () {
+    let dtbegin = document.getElementById("date_begin");
+    let dtend = document.getElementById("date_end");
+    if (dtbegin.value !== '') {
+        dtend.setAttribute("min", dtbegin.value);
+    } else {
+        dtend.removeAttribute("min");
+    }
+}
+
+function setMaxDate () {
+    let dtbegin = document.getElementById("date_begin");
+    let dtend = document.getElementById("date_end");
+    if (dtend.value !== '') {
+        dtbegin.setAttribute("max", dtend.value);
+    } else {
+        dtbegin.removeAttribute("max");
+    }
 }
