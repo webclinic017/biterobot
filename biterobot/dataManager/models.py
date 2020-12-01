@@ -1,19 +1,23 @@
 from django.db import models
 
+# TODO: Дописать типы
+# Stock, Currency, Bond, Etf
+
+TYPE_BOND = "BOND"
 
 TYPE_CHOICES = (
-    ("BOND", "BOND"),
-    ("SHARE", "SHARE"),
+    ("Bond", TYPE_BOND),
 )
 
+
+# TODO: дописать типы и валюты
+# RUB, USD, EUR, GBP, HKD, CHF, JPY, CNY, TRY
 
 class InstrumentModel(models.Model):
     name = models.CharField(max_length=200)
     ticker = models.CharField(max_length=100)  # Сокращенное название инструмента
-    dateBegin = models.DateTimeField()
-    dateEnd = models.DateTimeField()
     figi = models.CharField(max_length=150)  # Идентификатор торгового инструмента
-    instrumentType = models.CharField(max_length=20, choices=TYPE_CHOICES, default="BOND")
+    instrumentType = models.CharField(max_length=20, choices=TYPE_CHOICES, default=TYPE_BOND)
     isin = models.CharField(max_length=150)  # Международный идентификационный код ценной бумаги
     minPriceIncrement = models.FloatField()  # Минимальная цена
     lot = models.IntegerField()  # Минимальный лот
@@ -22,6 +26,9 @@ class InstrumentModel(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# TODO: еще одна модель на список загруженных данных
 
 class CandleModel(models.Model):
     instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)
