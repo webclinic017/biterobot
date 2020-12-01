@@ -4,8 +4,9 @@ function loadStrategyInEditor() {
     if (file !== undefined) {
         let reader = new FileReader();
         reader.onload = function (e) {
-            let textArea = document.getElementById("stratText");
-            textArea.value = e.target.result;
+            //let textArea = document.getElementsByClassName("ace_text-input");
+            editor.setValue(e.target.result.toString());
+            console.log(editor.getValue());
         };
 
         reader.readAsText(file);
@@ -17,7 +18,7 @@ function loadStrategyInEditor() {
             document.req_form.stratName.value = str.slice(0, str.indexOf('.py',1));
         } else {}
     } else {
-        document.req_form.stratText.value = '';
+        editor.setValue('');
         document.req_form.fileName.value = '';
     }
 }
@@ -41,3 +42,8 @@ $(document).ready(function () {
     $('.dataTables_length').addClass('bs-select');
 });
 
+function chg() {
+    var editor = ace.edit("editor");
+    editor.setTheme(document.req_form.seletTheam.value);
+    editor.session.setMode("ace/mode/python");
+}

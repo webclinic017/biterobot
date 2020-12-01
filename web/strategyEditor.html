@@ -53,7 +53,63 @@
             <input type="text" name="stratName" style="min-width: 212px;margin-left: 38px;"/>
         </div>
 
-        <textarea style="min-height: 590px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255)" placeholder="Strategy text..." name="stratText" id="stratText"></textarea>
+
+        <div style="margin-bottom: 5px; float: right;">
+            <label class="text-light">Them:</label>
+            <select name="seletTheam" onchange="chg()">
+                <optgroup label="Bright">
+                    <option value="ace/theme/chrome">Chrome</option>
+                    <option value="ace/theme/clouds">Clouds</option>
+                    <option value="ace/theme/crimson_editor">Crimson Editor</option>
+                    <option value="ace/theme/dawn">Dawn</option>
+                    <option value="ace/theme/dreamweaver">Dreamweaver</option>
+                    <option value="ace/theme/eclipse">Eclipse</option>
+                    <option value="ace/theme/github">GitHub</option>
+                    <option value="ace/theme/iplastic">IPlastic</option>
+                    <option value="ace/theme/solarized_light">Solarized Light</option>
+                    <option value="ace/theme/textmate">TextMate</option>
+                    <option value="ace/theme/tomorrow">Tomorrow</option>
+                    <option value="ace/theme/xcode">Xcode</option>
+                    <option value="ace/theme/kuroir">Kuroir</option>
+                    <option value="ace/theme/katzenmilch">KatzenMilch</option>
+                    <option value="ace/theme/sqlserver">SQL Server</option>
+                </optgroup>
+                <optgroup label="Dark">
+                    <option value="ace/theme/ambiance">Ambiance</option>
+                    <option value="ace/theme/chaos">Chaos</option>
+                    <option value="ace/theme/clouds_midnight">Clouds Midnight</option>
+                    <option value="ace/theme/dracula">Dracula</option>
+                    <option value="ace/theme/cobalt">Cobalt</option>
+                    <option value="ace/theme/gruvbox">Gruvbox</option>
+                    <option value="ace/theme/gob">Green on Black</option>
+                    <option value="ace/theme/idle_fingers">idle Fingers</option>
+                    <option value="ace/theme/kr_theme">krTheme</option>
+                    <option value="ace/theme/merbivore">Merbivore</option>
+                    <option value="ace/theme/merbivore_soft">Merbivore Soft</option>
+                    <option value="ace/theme/mono_industrial">Mono Industrial</option>
+                    <option value="ace/theme/monokai">Monokai</option>
+                    <option value="ace/theme/nord_dark">Nord Dark</option>
+                    <option value="ace/theme/pastel_on_dark">Pastel on dark</option>
+                    <option value="ace/theme/solarized_dark">Solarized Dark</option>
+                    <option value="ace/theme/terminal">Terminal</option>
+                    <option selected value="ace/theme/tomorrow_night">Tomorrow Night</option>
+                    <option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option>
+                    <option value="ace/theme/tomorrow_night_bright">Tomorrow Night Bright</option>
+                    <option value="ace/theme/tomorrow_night_eighties">Tomorrow Night 80s</option>
+                    <option value="ace/theme/twilight">Twilight</option>
+                    <option value="ace/theme/vibrant_ink">Vibrant Ink</option>
+                </optgroup>
+            </select>
+        </div>
+        <!--<textarea style="min-height: 590px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255)" placeholder="Strategy text..." name="stratText" id="stratText"></textarea>-->
+        <pre style="min-height: 590px;width: 100%;" placeholder="Strategy text..." name="stratText" id="editor"></pre>
+
+        <script src="./ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script>
+            var editor = ace.edit("editor");
+            editor.setTheme(document.req_form.seletTheam.value);
+            editor.session.setMode("ace/mode/python");
+        </script>
 
         <input class="d-none" id="inputFile-1" type="file" name="stratFile" style="width: 100%;margin-bottom: 15px;" onchange="loadStrategyInEditor()" accept=".py, .txt"/>
 
