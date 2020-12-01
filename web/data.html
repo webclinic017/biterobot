@@ -81,6 +81,24 @@
             </datalist>
         </div>
 
+        <div class="form-group">
+            <label class="text-light">Candle length:</label>
+            <select style="min-width: 159px;" name="candleLengthSelect" id="candleLengthSelect">
+                <option></option>
+                <option value="MONTH">1 month</option>
+                <option value="WEEK">1 week</option>
+                <option value="DAY">1 day</option>
+                <option value="HOUR">1 hour</option>
+                <option value="MIN_30">30 minutes</option>
+                <option value="MIN_15">15 minutes</option>
+                <option value="MIN_10">10 minutes</option>
+                <option value="MIN_5">5 minutes</option>
+                <option value="MIN_3">3 minutes</option>
+                <option value="MIN_2">2 minutes</option>
+                <option value="MIN_1">1 minute</option>
+            </select>
+        </div>
+
         <button class="btn btn-dark border rounded border-dark" type="button" onclick="addData()">Submit</button>
     </div>
 </form>

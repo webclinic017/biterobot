@@ -174,24 +174,35 @@ async function chooseAction () {
         }
 
     } else if (action == 'test') { // Testing strategy
-        if (document.req_form.stratFile.files[0] !== undefined) {
-            let reader = new FileReader();
+        if (frdate !== '' && todate !== '') {
+            if (document.req_form.stratFile.files[0] !== undefined) {
+                let reader = new FileReader();
 
-            reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
+                reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
 
-            reader.onload = function () {
-                console.log(reader.result)
-                strRes = testStrategy(frdate, todate, stratSelect, startName, reader.result);
-                workStrategyRequest(strRes, 1201, '', 0, 'validate');
-            };
-        } else if (stratSelect !== '') {
-            strRes = testStrategy(frdate, todate, stratSelect, startName, '');
-            workStrategyRequest(strRes, 1202, '', 0, 'test');
+                reader.onload = function () {
+                    console.log(reader.result)
+                    strRes = testStrategy(frdate, todate, stratSelect, startName, reader.result);
+                    workStrategyRequest(strRes, 1201, '', 0, 'validate');
+                };
+            } else if (stratSelect !== '') {
+                strRes = testStrategy(frdate, todate, stratSelect, startName, '');
+                workStrategyRequest(strRes, 1202, '', 0, 'test');
+            } else {
+                writeString('Error: No strategy to test');
+            }
         } else {
-            writeString('Error: No strategy to test');
+            writeString('Error: Date fields must be filled');
+            document.req_form.date_begin.style.backgroundColor = "#ff3535";
+            document.req_form.date_end.style.backgroundColor = "#ff3535";
+            setTimeout(function () {
+                document.req_form.date_begin.style.backgroundColor = "white";
+                document.req_form.date_end.style.backgroundColor = "white";
+            },1000);
         }
+
     } else {
-        writeString('Error: No strategy to test');
+        writeString('Error: Choose action firstly');
     }
 
 }
@@ -200,12 +211,13 @@ async function chooseAction () {
 /************************************ For Data *****************************/
 
 /** Creating json for data **/
-function loadData(frdate, todate, ticker) {
+function loadData(frdate, todate, ticker, candle) {
     let request = {
         code: 1301,
         frDate: frdate,
         toDate: todate,
-        ticker: ticker
+        ticker: ticker,
+        candleLength: candle
     };
 
     let json = JSON.stringify(request);
@@ -219,25 +231,35 @@ function addData () {
     let frdate = document.data_form.date_begin.value;
     let todate = document.data_form.date_end.value;
     let ticker = document.data_form.ticker.value;
-    if (frdate !== '' && todate !== '') {
-        if (ticker !== '') {
-            sendData(loadData(frdate, todate, ticker));
+    let candleLength = document.data_form.candleLengthSelect.value;
+    if (candleLength !== '') {
+        if (frdate !== '' && todate !== '') {
+            if (ticker !== '') {
+                sendData(loadData(frdate, todate, ticker, candleLength));
+            } else {
+                console.log('Error: Ticker must be chosen');
+                document.data_form.ticker.style.backgroundColor = "#ff3535";
+                setTimeout(function () {
+                    document.data_form.ticker.style.backgroundColor = "white";
+                },1000);
+            }
         } else {
-            console.log('Error: Ticker must be chosen');
-            document.data_form.ticker.style.backgroundColor = "#ff3535";
+            console.log('Error: Dates must be chosen');
+            document.data_form.date_begin.style.backgroundColor = "#ff3535";
+            document.data_form.date_end.style.backgroundColor = "#ff3535";
             setTimeout(function () {
-                document.data_form.ticker.style.backgroundColor = "white";
+                document.data_form.date_begin.style.backgroundColor = "white";
+                document.data_form.date_end.style.backgroundColor = "white";
             },1000);
         }
     } else {
-        console.log('Error: Dates must be chosen');
-        document.data_form.date_begin.style.backgroundColor = "#ff3535";
-        document.data_form.date_end.style.backgroundColor = "#ff3535";
+        console.log('Error: Candle length not chosen');
+        document.data_form.candleLengthSelect.style.backgroundColor = "#ff3535";
         setTimeout(function () {
-            document.data_form.date_begin.style.backgroundColor = "white";
-            document.data_form.date_end.style.backgroundColor = "white";
+            document.data_form.candleLengthSelect.style.backgroundColor = "white";
         },1000);
     }
+
 }
 
 /******************************************************************
