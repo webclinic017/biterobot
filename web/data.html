@@ -14,7 +14,7 @@
 
 </head>
 <body style="background: url(./images/bg_image.jpg) center / cover, rgb(77,77,77);border-color: rgb(40,40,40);min-height: 100%;min-width: 100%;" onload="uploadData()">
-<form name="data_form">
+<form name="data_form" style="margin-bottom: 5px;">
     <div class="container text-white" style="min-width: 90%; min-height: 100%;">
         <h1 class="text-center text-white">Data</h1>
 
@@ -100,6 +100,17 @@
         </div>
 
         <button class="btn btn-dark border rounded border-dark" type="button" onclick="addData()">Add</button>
+    </div>
+</form>
+<form name="token_form">
+    <div class="container text-white" style="min-width: 90%; min-height: 100%;">
+        <h1 class="text-left text-white">Token</h1>
+        <div class="form-group">
+            <label class="text-light" style="margin-right: 5px;">Token:</label>
+            <input class="form-control d-inline-block" type="password" style="width: 300px; min-width: 200px;" name="token"/>
+            <button class="btn btn-dark border rounded border-dark d-inline-block" type="button">Add</button>
+        </div>
+
     </div>
 </form>
 <script src="js/bootstrap.min.js"></script>
