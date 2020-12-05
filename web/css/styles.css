@@ -98,7 +98,7 @@ button:focus {
 
 
 .btn {
-    display: block;
+    display: flex;
     font-weight: 400;
     /*color: #212529;*/
     text-align: center;

@@ -15,17 +15,17 @@
 
         <div class="form-group text-left" style="margin-bottom: 0px;">
             <label class="text-light">Date begin:</label>
-            <input type="date" name="date_begin" style="margin-left: 45px;" id="date_begin" onchange="setMinDate();"/>
+            <input class="form-control d-inline-block" type="date" name="date_begin" style="margin-left: 45px; width: 50%;" id="date_begin" onchange="setMinDate();"/>
         </div>
 
         <div class="form-group">
             <label class="text-light">Date end:</label>
-            <input type="date" style="margin-left: 59px;" name="date_end" id="date_end" onchange="setMaxDate();"/>
+            <input class="form-control d-inline-block" type="date" style="margin-left: 59px; width: 50%;" name="date_end" id="date_end" onchange="setMaxDate();"/>
         </div>
 
         <div class="form-group">
             <label class="text-light">Loaded strategies:</label>
-            <select style="min-width: 159px;" name="stratSelect" id="stratSelect" onchange="changeStrategy()">
+            <select class="form-control d-inline-block" style="min-width: 159px; width: 50%;" name="stratSelect" id="stratSelect" onchange="changeStrategy()">
                 <option></option>
                 <option>Strategy 1</option>
                 <option>Strategy 2</option>
@@ -45,18 +45,18 @@
 
         <div class="form-group" style="margin-bottom: 0px;">
             <label class="text-light">Description:</label>
-            <input type="text" name="stratDescription" style="min-width: 300px;"/>
+            <input class="form-control d-inline-block" type="text" name="stratDescription" style="min-width: 300px; width: 75%;"/>
         </div>
 
-        <div class="form-group" style="margin: 0px;">
+        <div class="form-group" style="margin-bottom: 10px;">
             <label class="text-light">Name:</label>
-            <input type="text" name="stratName" style="min-width: 212px;margin-left: 38px;"/>
+            <input class="form-control d-inline-block" type="text" name="stratName" style="min-width: 212px;margin-left: 38px; width: 50%;"/>
         </div>
 
 
         <div style="margin-bottom: 5px; float: right;">
             <label class="text-light">Them:</label>
-            <select name="seletTheam" onchange="changeEditorStyle()">
+            <select class="rounded" name="seletTheam" onchange="changeEditorStyle()">
                 <optgroup label="Bright">
                     <option value="ace/theme/chrome">Chrome</option>
                     <option value="ace/theme/clouds">Clouds</option>
@@ -101,7 +101,7 @@
                 </optgroup>
             </select>
         </div>
-        <pre style="min-height: 590px;width: 100%;" placeholder="Strategy text..." name="stratText" id="editor"></pre>
+        <pre class="rounded" style="min-height: 590px;width: 100%;" placeholder="Strategy text..." name="stratText" id="editor"></pre>
 
         <script src="./ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
         <script>
@@ -114,23 +114,23 @@
 
         <div class="form-group">
             <label class="text-light border rounded border-dark btn-dark" style="margin-right: 5px;padding-left: 10px;padding-right: 10px;padding-top: 5px; padding-bottom: 5px;" for="inputFile-1">Choose file</label>
-            <input type="text" style="width: 60%;" name="fileName" placeholder="file name..." readonly/>
+            <input class="form-control d-inline-block" type="text" style="width: 60%;" name="fileName" placeholder="file name..." readonly/>
         </div>
 
         <div class="btn-group" style="display: flex;align-items: center;justify-content: center;">
             <input id="formCheck-1" class="custom-control-input d-none" type="radio" name="stratAction" value="load"/>
-            <label class="custom-control-label  text-light btn btn-dark border-light" for="formCheck-1" style="width: 25%;min-width: 80px;margin-bottom: 5px;">Add</label>
+            <label class="custom-control-label text-light btn btn-dark border-light" for="formCheck-1" style="width: 25%;min-width: 80px;margin-bottom: 5px; justify-content: center!important;">Add</label>
             <input id="formCheck-2" class="custom-control-input d-none" type="radio" name="stratAction" value="update"/>
-            <label class="custom-control-label  text-light btn btn-dark border-light" for="formCheck-2" style="width: 25%;min-width: 80px;margin-bottom: 5px;">Update</label>
+            <label class="custom-control-label  text-light btn btn-dark border-light" for="formCheck-2" style="width: 25%;min-width: 80px;margin-bottom: 5px; justify-content: center!important;">Update</label>
             <input id="formCheck-3" class="custom-control-input d-none" type="radio" name="stratAction" value="delete"/>
-            <label class="custom-control-label  text-light btn btn-dark border-light" for="formCheck-3" style="width: 25%;min-width: 80px;margin-bottom: 5px;">Delete</label>
+            <label class="custom-control-label  text-light btn btn-dark border-light" for="formCheck-3" style="width: 25%;min-width: 80px;margin-bottom: 5px; justify-content: center!important;">Delete</label>
             <input id="formCheck-4" class="custom-control-input d-none" type="radio" name="stratAction" value="test"/>
-            <label class="custom-control-label text-light btn btn-dark border-light" for="formCheck-4" style="width: 25%;min-width: 80px;margin-bottom: 5px;">Test</label>
+            <label class="custom-control-label text-light btn btn-dark border-light" for="formCheck-4" style="width: 25%;min-width: 80px;margin-bottom: 5px; justify-content: center!important;">Test</label>
         </div>
 
-        <div class="btn-group" role="group"></div>
-        <button class="btn btn-dark" type="button" style="margin-right: 40%;margin-left: 40%;margin-top: 11px; padding-right: 20px; padding-left: 20px" onclick="chooseAction()">Submit</button>
-
+        <div class="btn" style="width:100%; align-items: center; justify-content: center;">
+            <button class="btn btn-dark" type="button" style="margin-top: 11px; padding-right: 20px; padding-left: 20px" onclick="chooseAction()">Submit</button>
+        </div>
         <!-- На время тестирования -->
         <div class="form-group" style="margin-bottom: 0px;">
             <label class="text-light">Request address:</label>
@@ -142,8 +142,10 @@
 <div class="container d-inline-block float-left" style="width: 50%;min-width: 358px;">
     <form name="res_form">
         <h1 class="text-center text-light">Result</h1>
-        <textarea style="min-height: 200px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);" name="resultText" placeholder="Result..."></textarea>
-        <button class="btn btn-dark" type="button" style="margin-left: 80%; margin-bottom: 5px;" onclick="clearResults()">Clear</button>
+        <textarea class="form-control" style="min-height: 200px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);" name="resultText" placeholder="Result..."></textarea>
+        <div class="btn" style="width:100%; align-items: center; justify-content: center;">
+            <button class="btn btn-dark" type="button" style="margin-bottom: 5px;" onclick="clearResults()">Clear</button>
+        </div>
         <img width="100%" height="100%" src="./images/graph_result.png">
     </form>
 </div>
