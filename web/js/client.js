@@ -39,8 +39,19 @@ function clearResults() {
 
 /** Loading table's elements **/
 $(document).ready(function () {
-    $('#data_table').DataTable();
-    $('.dataTables_length').addClass('bs-select');
+    $('#data_table').DataTable({
+        columnDefs: [{
+            orderable: false,
+            className: 'select-checkbox select-checkbox-all',
+            targets: 0
+        }],
+        select: {
+            style: 'multi',
+            selector: 'td:first-child'
+        },
+        order: [[ 1, 'asc' ]]
+    });
+    //$('.dataTables_length').addClass('bs-select');
 });
 
 /** Changing style of editor **/
