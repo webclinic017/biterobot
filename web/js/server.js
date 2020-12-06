@@ -262,6 +262,11 @@ function addData () {
 
 }
 
+function setToken() {
+    document.cookie = "token=" + document.getElementById('token').value + '; samesite';
+}
+
+
 /******************************************************************
  ************************ dataOutput block ************************
  ******************************************************************/
