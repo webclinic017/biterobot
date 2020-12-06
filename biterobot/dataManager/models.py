@@ -32,6 +32,7 @@ class TinkoffAPI(models.Model):
     """
     Model for TinkoffAPI class. It is used for storing token and Tinkoff wrapper class
     """
+
     class Meta:
         managed = False
 
@@ -39,14 +40,25 @@ class TinkoffAPI(models.Model):
     tinkoffWrapper = None  # класс TinkoffAPI
 
 
-# TODO: еще одна модель на список загруженных данных
+class DataIntervalModel(models.Model):
+    """
+
+    """
+    instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)
+    beginDate = models.DateTimeField()
+    endDate = models.DateTimeField()
+    timeFrame = models.DateTimeField()  # интервал свечи (5 минут, 15 минут, день и т.д.)
+
 
 class CandleModel(models.Model):
+    # TODO: а здесь нужен FK на инструмент?
     instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)
-    interval = models.DateTimeField()
+    dataInteraval = models.ForeignKey(DataIntervalModel, on_delete=models.CASCADE)
+    # TODO: в timeframe должен быть стринг с выборами из переменных TinkoffAPI
+    timeFrame = models.DateTimeField()  # интервал свечи (5 минут, 15 минут, день и т.д.)
     o = models.FloatField()  # Открытие свечи
     c = models.FloatField()  # Закрытие свечи
     h = models.FloatField()  # Высший уровень свечи - хвост
     l = models.FloatField()  # Низший уровень свечи - хвост
     v = models.IntegerField()  # Объем торгов
-    candleTime = models.DateTimeField()
+    candleTime = models.DateTimeField()  # время начала свечи в формате datetime
