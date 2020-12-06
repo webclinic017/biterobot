@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" style="min-width: 100%; min-height: 100%;">
+<head>
+    <meta charset="UTF-8">
+    <title>Strategy editor</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/client.js"></script>
+    <script src="js/server.js"></script>
+</head>
+<body style="background: url(./images/bg_image.jpg) center / cover, rgb(77,77,77);border-color: rgb(40,40,40);min-height: 100%;min-width: 100%;" onload="uploadStrategies()">
+<div class="container d-inline-block float-left" style="width: 50%;min-width: 358px;">
+    <form name="req_form">
+        <h1 class="text-center text-light">Strategy editor</h1>
+
+        <div class="form-group text-left" style="margin-bottom: 0px;">
+            <label class="text-light">Date begin:</label>
+            <input class="form-control d-inline-block" type="date" name="date_begin" style="margin-left: 45px; width: 50%;" id="date_begin" onchange="setMinDate();"/>
+        </div>
+
+        <div class="form-group">
+            <label class="text-light">Date end:</label>
+            <input class="form-control d-inline-block" type="date" style="margin-left: 59px; width: 50%;" name="date_end" id="date_end" onchange="setMaxDate();"/>
+        </div>
+
+        <div class="form-group">
+            <label class="text-light">Loaded strategies:</label>
+            <select class="form-control d-inline-block" style="min-width: 159px; width: 50%;" name="stratSelect" id="stratSelect" onchange="changeStrategy()">
+                <option></option>
+                <option>Strategy 1</option>
+                <option>Strategy 2</option>
+                <option>Strategy 3</option>
+            </select>
+        </div>
+
+        <div class="form-group d-none">
+            <label class="text-light">Loaded description:</label>
+            <select style="min-width: 159px;" name="descriptionSelect" id="descriptionSelect">
+                <option></option>
+                <option>Description 1</option>
+                <option>Description 2</option>
+                <option>Description 3</option>
+            </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0px;">
+            <label class="text-light">Description:</label>
+            <input class="form-control d-inline-block" type="text" name="stratDescription" style="min-width: 300px; width: 75%;"/>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 10px;">
+            <label class="text-light">Name:</label>
+            <input class="form-control d-inline-block" type="text" name="stratName" style="min-width: 212px;margin-left: 38px; width: 50%;"/>
+        </div>
+
+
+        <div style="margin-bottom: 5px; float: right;">
+            <label class="text-light">Them:</label>
+            <select class="rounded" name="seletTheam" onchange="changeEditorStyle()">
+                <optgroup label="Bright">
+                    <option value="ace/theme/chrome">Chrome</option>
+                    <option value="ace/theme/clouds">Clouds</option>
+                    <option value="ace/theme/crimson_editor">Crimson Editor</option>
+                    <option value="ace/theme/dawn">Dawn</option>
+                    <option value="ace/theme/dreamweaver">Dreamweaver</option>
+                    <option value="ace/theme/eclipse">Eclipse</option>
+                    <option value="ace/theme/github">GitHub</option>
+                    <option value="ace/theme/iplastic">IPlastic</option>
+                    <option value="ace/theme/solarized_light">Solarized Light</option>
+                    <option value="ace/theme/textmate">TextMate</option>
+                    <option value="ace/theme/tomorrow">Tomorrow</option>
+                    <option value="ace/theme/xcode">Xcode</option>
+                    <option value="ace/theme/kuroir">Kuroir</option>
+                    <option value="ace/theme/katzenmilch">KatzenMilch</option>
+                    <option value="ace/theme/sqlserver">SQL Server</option>
+                </optgroup>
+                <optgroup label="Dark">
+                    <option value="ace/theme/ambiance">Ambiance</option>
+                    <option value="ace/theme/chaos">Chaos</option>
+                    <option value="ace/theme/clouds_midnight">Clouds Midnight</option>
+                    <option value="ace/theme/dracula">Dracula</option>
+                    <option value="ace/theme/cobalt">Cobalt</option>
+                    <option value="ace/theme/gruvbox">Gruvbox</option>
+                    <option value="ace/theme/gob">Green on Black</option>
+                    <option value="ace/theme/idle_fingers">idle Fingers</option>
+                    <option value="ace/theme/kr_theme">krTheme</option>
+                    <option value="ace/theme/merbivore">Merbivore</option>
+                    <option value="ace/theme/merbivore_soft">Merbivore Soft</option>
+                    <option value="ace/theme/mono_industrial">Mono Industrial</option>
+                    <option value="ace/theme/monokai">Monokai</option>
+                    <option value="ace/theme/nord_dark">Nord Dark</option>
+                    <option value="ace/theme/pastel_on_dark">Pastel on dark</option>
+                    <option value="ace/theme/solarized_dark">Solarized Dark</option>
+                    <option value="ace/theme/terminal">Terminal</option>
+                    <option selected value="ace/theme/tomorrow_night">Tomorrow Night</option>
+                    <option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option>
+                    <option value="ace/theme/tomorrow_night_bright">Tomorrow Night Bright</option>
+                    <option value="ace/theme/tomorrow_night_eighties">Tomorrow Night 80s</option>
+                    <option value="ace/theme/twilight">Twilight</option>
+                    <option value="ace/theme/vibrant_ink">Vibrant Ink</option>
+                </optgroup>
+            </select>
+        </div>
+        <pre class="rounded" style="min-height: 590px;width: 100%;" placeholder="Strategy text..." name="stratText" id="editor"></pre>
+
+        <script src="./ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script>
+            var editor = ace.edit("editor");
+            editor.setTheme(document.req_form.seletTheam.value);
+            editor.session.setMode("ace/mode/python");
+        </script>
+
+        <input class="d-none" id="inputFile-1" type="file" name="stratFile" style="width: 100%;margin-bottom: 15px;" onchange="loadStrategyInEditor()" accept=".py, .txt"/>
+
+        <div class="form-group">
+            <label class="text-light border rounded border-dark btn-dark" style="margin-right: 5px;padding-left: 10px;padding-right: 10px;padding-top: 5px; padding-bottom: 5px;" for="inputFile-1">Choose file</label>
+            <input class="form-control d-inline-block" type="text" style="width: 60%;" name="fileName" placeholder="file name..." readonly/>
+        </div>
+
+        <div class="btn-group" style="display: flex;align-items: center;justify-content: center;">
+            <input id="formCheck-1" class="custom-control-input d-none" type="radio" name="stratAction" value="load"/>
+            <label class="custom-control-label text-light btn btn-dark border-light" for="formCheck-1" style="width: 25%;min-width: 80px;margin-bottom: 5px; justify-content: center!important;">Add</label>
+            <input id="formCheck-2" class="custom-control-input d-none" type="radio" name="stratAction" value="update"/>
+            <label class="custom-control-label  text-light btn btn-dark border-light" for="formCheck-2" style="width: 25%;min-width: 80px;margin-bottom: 5px; justify-content: center!important;">Update</label>
+            <input id="formCheck-3" class="custom-control-input d-none" type="radio" name="stratAction" value="delete"/>
+            <label class="custom-control-label  text-light btn btn-dark border-light" for="formCheck-3" style="width: 25%;min-width: 80px;margin-bottom: 5px; justify-content: center!important;">Delete</label>
+            <input id="formCheck-4" class="custom-control-input d-none" type="radio" name="stratAction" value="test"/>
+            <label class="custom-control-label text-light btn btn-dark border-light" for="formCheck-4" style="width: 25%;min-width: 80px;margin-bottom: 5px; justify-content: center!important;">Test</label>
+        </div>
+
+        <div class="btn" style="width:100%; align-items: center; justify-content: center;">
+            <button class="btn btn-dark" type="button" style="margin-top: 11px; padding-right: 20px; padding-left: 20px" onclick="chooseAction()">Submit</button>
+        </div>
+        <!-- На время тестирования -->
+        <div class="form-group" style="margin-bottom: 0px;">
+            <label class="text-light">Request address:</label>
+            <input type="text" name="url_address" style="min-width: 300px; margin-top: 10px;"/>
+        </div>
+    </form>
+</div>
+
+<div class="container d-inline-block float-left" style="width: 50%;min-width: 358px;">
+    <form name="res_form">
+        <h1 class="text-center text-light">Result</h1>
+        <textarea class="form-control" style="min-height: 200px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);" name="resultText" placeholder="Result..."></textarea>
+        <div class="btn" style="width:100%; align-items: center; justify-content: center;">
+            <button class="btn btn-dark" type="button" style="margin-bottom: 5px;" onclick="clearResults()">Clear</button>
+        </div>
+        <img width="100%" height="100%" src="./images/graph_result.png">
+    </form>
+</div>
+<script src="js/bootstrap.min.js"></script>
+</body>
+</html>
