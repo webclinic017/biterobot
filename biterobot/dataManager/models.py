@@ -28,6 +28,17 @@ class InstrumentModel(models.Model):
         return self.name
 
 
+class TinkoffAPI(models.Model):
+    """
+    Model for TinkoffAPI class. It is used for storing token and Tinkoff wrapper class
+    """
+    class Meta:
+        managed = False
+
+    token = str
+    tinkoffWrapper = None  # класс TinkoffAPI
+
+
 # TODO: еще одна модель на список загруженных данных
 
 class CandleModel(models.Model):
