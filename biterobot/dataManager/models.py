@@ -50,7 +50,6 @@ class InstrumentModel(models.Model):
     def __str__(self):
         return self.name
 
-
 class TinkoffAPI(models.Model):
     """
     Model for TinkoffAPI class. It is used for storing token and Tinkoff wrapper class
@@ -60,18 +59,13 @@ class TinkoffAPI(models.Model):
         managed = False
 
     token = str
-    tinkoffWrapper = None  # класс TinkoffAPI
-
+    tinkoffWrapper = None  # Класс TinkoffAPI
 
 class DataIntervalModel(models.Model):
-    """
-
-    """
     instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)
     beginDate = models.DateTimeField()
     endDate = models.DateTimeField()
-    timeFrame = models.DateTimeField()  # интервал свечи (5 минут, 15 минут, день и т.д.)
-
+    timeFrame = models.DateTimeField()  # Интервал свечи (5 минут, 15 минут, день и т.д.)
 
 class CandleModel(models.Model):
     # TODO: а здесь нужен FK на инструмент?
@@ -84,4 +78,4 @@ class CandleModel(models.Model):
     h = models.FloatField()  # Высший уровень свечи - хвост
     l = models.FloatField()  # Низший уровень свечи - хвост
     v = models.IntegerField()  # Объем торгов
-    candleTime = models.DateTimeField()  # время начала свечи в формате datetime
+    candleTime = models.DateTimeField()  # Dремя начала свечи в формате datetime
