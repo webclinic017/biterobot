@@ -17,6 +17,10 @@ from .common import deleteFile
 def startPage(request):
     return render(request, 'strategyEditor.html')
 
+@csrf_exempt
+def iframeStrategyEditor(request):
+    return render(request, 'biterobot/strategyEditor.html')
+
 class StrategyView(APIView):
     def get(self, request):
         strategies = StrategyModel.objects.all()

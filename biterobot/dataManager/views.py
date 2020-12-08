@@ -9,7 +9,11 @@ from .serializers import InstrumentSerializerGET
 
 @csrf_exempt
 def startPage(request):
-    return render(request, 'data.html')
+    return render(request, 'DataEditor.html')
+
+@csrf_exempt
+def iframeDataEditor(request):
+    return render(request, 'biterobot/data.html')
 
 class InstrumentView(APIView):
     def get(self, request):
