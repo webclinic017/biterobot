@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from .common import checkInstrumentExists
+
 
 class InstrumentSerializerGET(serializers.Serializer):
     ticker = serializers.CharField(max_length=100)  # Сокращенное название инструмента
@@ -13,3 +15,7 @@ class InstrumentSerializerPOST(serializers.Serializer):
     toDate = serializers.DateTimeField()
     ticker = serializers.CharField(max_length=100)
     candleLength = serializers.CharField(max_length=15)
+
+    def create(self, validated_data):
+        validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
+        print(checkInstrumentExists('APPL'))

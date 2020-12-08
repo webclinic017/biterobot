@@ -4,7 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import InstrumentModel
-from .serializers import InstrumentSerializerGET
+from .serializers import InstrumentSerializerGET, InstrumentSerializerPOST
+from .common import checkInstrumentExists
 
 
 @csrf_exempt
@@ -19,7 +20,8 @@ class InstrumentView(APIView):
     def get(self, request):
         instruments = InstrumentModel.objects.all()
         serializer = InstrumentSerializerGET(instruments, many=True)
-
+        if len(checkInstrumentExists('APPL')) == 0:
+            print('NOOO neeed to aaadd')
         return Response(serializer.data)
 
     def post(self, request):
