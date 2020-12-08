@@ -6,14 +6,14 @@ from .models import DataIntervalModel
 
 class InstrumentSerializerGET(serializers.Serializer):
     ticker = serializers.CharField(max_length=100)  # Сокращенное название инструмента
-    dateBegin = serializers.DateTimeField()
-    dateEnd = serializers.DateTimeField()
+    dateBegin = serializers.DateField()
+    dateEnd = serializers.DateField()
     timeFrame = serializers.DateTimeField()  # Интервал свечи (5 минут, 15 минут, день и т.д.)
 
 class InstrumentSerializerPOST(serializers.Serializer):
     code = serializers.IntegerField()
-    frDate = serializers.DateTimeField()
-    toDate = serializers.DateTimeField()
+    frDate = serializers.DateField()
+    toDate = serializers.DateField()
     ticker = serializers.CharField(max_length=100)
     candleLength = serializers.CharField(max_length=15)
 
