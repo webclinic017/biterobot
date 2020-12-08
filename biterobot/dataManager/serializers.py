@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from .common import checkInstrumentExists
+from .common import dataHandler
+from .models import DataIntervalModel
 
 
 class InstrumentSerializerGET(serializers.Serializer):
@@ -18,4 +19,7 @@ class InstrumentSerializerPOST(serializers.Serializer):
 
     def create(self, validated_data):
         validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
-        print(checkInstrumentExists('APPL'))
+
+        dataHandler(token='', ticker=validated_data.pop('ticker'), dateBegin=validated_data.pop('frDate'), dateEnd=validated_data.pop('toDate'), candleLength=validated_data.pop('candleLength'))
+
+        return DataIntervalModel.objects.create(**validated_data)
