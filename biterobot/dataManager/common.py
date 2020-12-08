@@ -1,4 +1,4 @@
-from biterobot.dataManager.tinkoffAPI.tinkoffApi import *
+from .tinkoffAPI.tinkoffApi import *
 from .models import InstrumentModel, DataIntervalModel, CandleModel
 
 
