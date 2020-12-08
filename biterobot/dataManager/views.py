@@ -21,3 +21,5 @@ class InstrumentView(APIView):
         serializer = InstrumentSerializerGET(instruments, many=True)
 
         return Response(serializer.data)
+
+
