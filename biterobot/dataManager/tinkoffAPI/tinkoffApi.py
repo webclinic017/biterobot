@@ -165,19 +165,20 @@ class TinkoffApi(object):
             raise ValueError("Something bad happened in getInfoByTicker" + e.__str__())
 
 
-# EXAMPLE OF USE
-# Rules:
-# 1. Always use try/except
-# 2. Insert token before use
-# 3. Use asyncio.run to run the class methods
-dateFrom = {"year": 2018, "month": 2, "day": 1}  # init of dates
-dateTo = {"year": 2020, "month": 8, "day": 11}
-tinkoffApi = TinkoffApi('')  # Class creation ВСТАВИТЬ КЛЮЧ
-try:
-    candles = asyncio.run(tinkoffApi.getCandles("BBG000B9XRY4", dateFrom, dateTo, "DAY"))
-    for candle in candles:
-        print(candle)
-    # info = asyncio.run(tinkoffApi.getInfoByTicker("AAPL"))
-    # print(info)
-except Exception as e:
-    print(e)
+if __name__ == '__main__':
+    # EXAMPLE OF USE
+    # Rules:
+    # 1. Always use try/except
+    # 2. Insert token before use
+    # 3. Use asyncio.run to run the class methods
+    dateFrom = {"year": 2018, "month": 2, "day": 1}  # init of dates
+    dateTo = {"year": 2020, "month": 8, "day": 11}
+    tinkoffApi = TinkoffApi('')  # Class creation ВСТАВИТЬ КЛЮЧ
+    try:
+        candles = asyncio.run(tinkoffApi.getCandles("BBG000B9XRY4", dateFrom, dateTo, "DAY"))
+        for candle in candles:
+            print(candle)
+        info = asyncio.run(tinkoffApi.getInfoByTicker("AAPL"))
+        print(info)
+    except Exception as e:
+        print(e)
