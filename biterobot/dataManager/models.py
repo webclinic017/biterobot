@@ -1,17 +1,40 @@
 from django.db import models
 
-# TODO: Дописать типы
-# Stock, Currency, Bond, Etf
 
 TYPE_BOND = "BOND"
+TYPE_STOCK = "STOCK"
+TYPE_CURRENCY = "CURRENCY"
+TYPE_ETF = "ETF"
 
 TYPE_CHOICES = (
     ("Bond", TYPE_BOND),
+    ("Stock", TYPE_STOCK),
+    ("Currency", TYPE_CURRENCY),
+    ("ETF", TYPE_ETF),
 )
 
+CURRENCY_RUB = "RUB"
+CURRENCY_USD = "USD"
+CURRENCY_EUR = "EUR"
+CURRENCY_GBP = "GBP"
+CURRENCY_HKD = "HKD"
+CURRENCY_CHF = "CHF"
+CURRENCY_JPY = "JPY"
+CURRENCY_CNY = "CNY"
+CURRENCY_TRY = "TRY"
 
-# TODO: дописать типы и валюты
-# RUB, USD, EUR, GBP, HKD, CHF, JPY, CNY, TRY
+CURRENCY_CHOICES = (
+    ("RUB", CURRENCY_RUB),
+    ("USD", CURRENCY_USD),
+    ("EUR", CURRENCY_EUR),
+    ("GBP", CURRENCY_GBP),
+    ("HKD", CURRENCY_HKD),
+    ("CHF", CURRENCY_CHF),
+    ("JPY", CURRENCY_JPY),
+    ("CNY", CURRENCY_CNY),
+    ("TRY", CURRENCY_TRY),
+)
+
 
 class InstrumentModel(models.Model):
     name = models.CharField(max_length=200)
