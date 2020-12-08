@@ -11,8 +11,9 @@ def addInstrument(ticker: str, token: str):
     tinkoffApi = TinkoffApi(token=token)  # ТОКЕН СЮДА
     instrumentInfo = asyncio.run(tinkoffApi.getInfoByTicker(ticker=ticker))
 
+    # minQuantity = 1, тк тестовый запрос в Tinkoff дает None
     instrument = InstrumentModel(ticker=instrumentInfo.ticker, name=instrumentInfo.name, figi=instrumentInfo.figi, instrumentType=instrumentInfo.type.name, isin=instrumentInfo.isin,
-                                    minPriceIncrement=instrumentInfo.minPriceIncrement, lot=instrumentInfo.lot, minQuantity=instrumentInfo.minQuantity, currency=instrumentInfo.currency.name)
+                                    minPriceIncrement=instrumentInfo.minPriceIncrement, lot=instrumentInfo.lot, minQuantity=1, currency=instrumentInfo.currency.name)
     instrument.save()
 
 def addDateInterval(instrumentId: int, dateBegin: datetime, dateEnd: datetime, candleLength: str):
