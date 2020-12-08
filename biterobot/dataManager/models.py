@@ -65,12 +65,12 @@ class DataIntervalModel(models.Model):
     instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)
     dateBegin = models.DateTimeField()
     dateEnd = models.DateTimeField()
-    timeFrame = models.DateTimeField()  # Интервал свечи (5 минут, 15 минут, день и т.д.)
+    candleLength = models.CharField(max_length=15)  # Интервал свечи (5 минут, 15 минут, день и т.д.)
 
 class CandleModel(models.Model):
     instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)
     dataInterval = models.ForeignKey(DataIntervalModel, on_delete=models.CASCADE)
-    timeFrame = models.DateTimeField()  # Интервал свечи (5 минут, 15 минут, день и т.д.)
+    candleLength = models.CharField(max_length=15)  # Интервал свечи (5 минут, 15 минут, день и т.д.)
     o = models.FloatField()  # Открытие свечи
     c = models.FloatField()  # Закрытие свечи
     h = models.FloatField()  # Высший уровень свечи - хвост
