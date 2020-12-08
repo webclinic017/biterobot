@@ -68,14 +68,12 @@ class DataIntervalModel(models.Model):
     timeFrame = models.DateTimeField()  # Интервал свечи (5 минут, 15 минут, день и т.д.)
 
 class CandleModel(models.Model):
-    # TODO: а здесь нужен FK на инструмент?
     instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)
-    dataInteraval = models.ForeignKey(DataIntervalModel, on_delete=models.CASCADE)
-    # TODO: в timeframe должен быть стринг с выборами из переменных TinkoffAPI
-    timeFrame = models.DateTimeField()  # интервал свечи (5 минут, 15 минут, день и т.д.)
+    dataInterval = models.ForeignKey(DataIntervalModel, on_delete=models.CASCADE)
+    timeFrame = models.DateTimeField()  # Интервал свечи (5 минут, 15 минут, день и т.д.)
     o = models.FloatField()  # Открытие свечи
     c = models.FloatField()  # Закрытие свечи
     h = models.FloatField()  # Высший уровень свечи - хвост
     l = models.FloatField()  # Низший уровень свечи - хвост
     v = models.IntegerField()  # Объем торгов
-    candleTime = models.DateTimeField()  # Dремя начала свечи в формате datetime
+    candleTime = models.DateTimeField()  # Время начала свечи в формате datetime
