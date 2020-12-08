@@ -1,8 +1,10 @@
-#from .tinkoffAPI import tinkoffApi
+from .tinkoffAPI import tinkoffApi
 from .models import InstrumentModel
 
 
 def checkInstrumentExists(ticker: str):
-    return InstrumentModel.objects.filter(ticker=ticker)
+    if len(InstrumentModel.objects.filter(ticker=ticker)) == 0:
+        return False
+    return True
 
-checkInstrumentExists("APPL")
+

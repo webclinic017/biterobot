@@ -20,8 +20,7 @@ class InstrumentView(APIView):
     def get(self, request):
         instruments = InstrumentModel.objects.all()
         serializer = InstrumentSerializerGET(instruments, many=True)
-        if len(checkInstrumentExists('APPL')) == 0:
-            print('NOOO neeed to aaadd')
+
         return Response(serializer.data)
 
     def post(self, request):
