@@ -592,7 +592,7 @@ function sendData(blob) {
     })
         .then(res => {
             if (res.code == 200  || res.code == 201) {
-                uploadData();
+                //uploadData();
                 console.log('Data loaded');
             }  else if (res.status == 500) {
                 console.log(res.message);
