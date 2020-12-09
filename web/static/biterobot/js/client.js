@@ -51,7 +51,7 @@ $(document).ready(function () {
     editor = new $.fn.dataTable.Editor( {
         ajax: {
             remove: {
-                url: server_url + data_url + 'data/',
+                url: server_url + data_url + 'instruments',
                 type: 'DELETE'
             }
         },
@@ -65,10 +65,10 @@ $(document).ready(function () {
                 name: "candleLength"
             }, {
                 label: "Date begin",
-                name: "dtBegin"
+                name: "dateBegin"
             }, {
                 label: "Date end",
-                name: "dtEnd"
+                name: "dateEnd"
             }
         ]
     });
@@ -87,13 +87,13 @@ $(document).ready(function () {
         order: [[ 1, 'asc' ]],
 
         dom: "lfrtBip",
-        ajax: server_url + data_url + 'data/',
+        ajax: server_url + data_url + 'instruments/',
         columns: [
             {data: "checked"},
             {data: "ticker"},
             {data: "candleLength"},
-            {data: "dtBegin"},
-            {data: "dtEnd"}
+            {data: "dateBegin"},
+            {data: "dateEnd"}
         ],
         select: true,
         buttons: [

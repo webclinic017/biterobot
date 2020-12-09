@@ -1,8 +1,8 @@
-var server_url = 'http://127.0.0.1:8000/';
+//var server_url = 'http://127.0.0.1:8000/';
 var start_url = 'strategyManager/';
 var data_url = 'dataManager/';
 var test_url = 'testManager/';
-//var server_url = 'https://a51d6b62-1920-45e4-b298-e0c28a5e20f9.mock.pstmn.io/strategyManager/';
+var server_url = 'https://a51d6b62-1920-45e4-b298-e0c28a5e20f9.mock.pstmn.io/';
 
 /******************************************************************
  ************************ dataInput block *************************
@@ -586,7 +586,7 @@ function sendUploadingRequest (req_name) {
 
 /** Send request to load data **/
 function sendData(blob) {
-    fetch (server_url + data_url + 'data/', {
+    fetch (server_url + data_url + 'instruments/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
