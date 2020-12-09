@@ -26,6 +26,7 @@ class InstrumentView(APIView):
     def post(self, request):
         instrument = request.data
         serializer = InstrumentSerializerPOST(data=instrument)
-
+        if serializer.is_valid(raise_exception=False):
+            instrument_saved = serializer.save()
 
         return Response({"success": "Instrument '{}' created successfully"})

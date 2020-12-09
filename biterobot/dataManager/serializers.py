@@ -21,3 +21,5 @@ class InstrumentSerializerPOST(serializers.Serializer):
         validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
 
         dataHandler(token='', ticker=validated_data.pop('ticker'), dateBegin=validated_data.pop('frDate'), dateEnd=validated_data.pop('toDate'), candleLength=validated_data.pop('candleLength'))
+
+        return 0  # т.к. все данные в базу были уже записаны в dataHandler
