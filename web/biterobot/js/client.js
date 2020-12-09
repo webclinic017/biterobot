@@ -86,7 +86,7 @@ $(document).ready(function () {
         },
         order: [[ 1, 'asc' ]],
 
-        dom: "Bfrtip",
+        dom: "lfrtBip",
         ajax: server_url + 'data/',
         columns: [
             {data: "checked"},
