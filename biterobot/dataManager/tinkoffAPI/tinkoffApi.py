@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime
+from datetime import datetime, date
 from datetime import timedelta
 import pytz
 from tinkoff.investments import (
@@ -98,8 +98,8 @@ class TinkoffApi(object):
         '''
         # Reformat into datetime
         utc = pytz.UTC
-        dateFrom = datetime(dateFrom['year'], dateFrom['month'], dateFrom['day'])
-        dateTo = datetime(dateTo['year'], dateTo['month'], dateTo['day'])
+        dateFrom = date(dateFrom['year'], dateFrom['month'], dateFrom['day'])
+        dateTo = date(dateTo['year'], dateTo['month'], dateTo['day'])
         dateTo_loc = utc.localize(dateTo)
 
         # If criteria is met, we call the faster function
