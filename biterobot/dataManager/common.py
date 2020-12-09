@@ -16,8 +16,8 @@ def addInstrument(ticker: str, token: str):
                                     minPriceIncrement=instrumentInfo.minPriceIncrement, lot=instrumentInfo.lot, minQuantity=1, currency=instrumentInfo.currency.name)
     instrument.save()
 
-def addDateInterval(instrument: int, dateBegin: datetime, dateEnd: datetime, candleLength: str):
-    dateInterval = DataIntervalModel(instrument=instrument, dateBegin=dateBegin, dateEnd=dateEnd, candleLength=candleLength)
+def addDateInterval(ticker: str, instrument: int, dateBegin: datetime, dateEnd: datetime, candleLength: str):
+    dateInterval = DataIntervalModel(ticker=ticker, instrument=instrument, dateBegin=dateBegin, dateEnd=dateEnd, candleLength=candleLength)
     dateInterval.save()
 
 def addCandles(token: str, instrument: int, dateInterval: int, figi: str, dateFrom: datetime, dateTo: datetime, candleInterval: str):
@@ -35,8 +35,8 @@ def dataHandler(token: str, ticker: str, dateBegin: datetime, dateEnd: datetime,
     instrument = InstrumentModel.objects.get(ticker=ticker)
     figi = InstrumentModel.objects.get(ticker=ticker).figi
 
-    addDateInterval(instrument=instrument, dateBegin=dateBegin, dateEnd=dateEnd, candleLength=candleLength)
+    addDateInterval(ticker=ticker, instrument=instrument, dateBegin=dateBegin, dateEnd=dateEnd, candleLength=candleLength)
 
-    dateInterval = DataIntervalModel.objects.get(instrument=instrument)
+    dateInterval = DataIntervalModel.objects.get(ticker=ticker, dateBegin=dateBegin, dateEnd=dateEnd, candleLength=candleLength)
 
     addCandles(token=token, instrument=instrument, dateInterval=dateInterval, figi=figi, dateFrom=dateBegin, dateTo=dateEnd, candleInterval=candleLength)
