@@ -51,7 +51,7 @@ $(document).ready(function () {
     editor = new $.fn.dataTable.Editor( {
         ajax: {
             remove: {
-                url: server_url + 'data/',
+                url: server_url + data_url + 'data/',
                 type: 'DELETE'
             }
         },
@@ -87,7 +87,7 @@ $(document).ready(function () {
         order: [[ 1, 'asc' ]],
 
         dom: "lfrtBip",
-        ajax: server_url + 'data/',
+        ajax: server_url + data_url + 'data/',
         columns: [
             {data: "checked"},
             {data: "ticker"},
