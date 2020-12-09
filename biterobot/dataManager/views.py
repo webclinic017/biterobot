@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -30,3 +31,10 @@ class InstrumentView(APIView):
             instrument_saved = serializer.save()
 
         return Response({"success": "Instrument '{}' created successfully"})
+
+    def delete(self, request, pk):
+        print(pk)
+        instrument = get_object_or_404(DataIntervalModel.objects.all(), id=pk)
+        instrument.delete()
+
+        return Response({"message": "Data with id `{}` has been deleted.".format(pk)}, status=204)
