@@ -14,7 +14,7 @@ def startPage(request):
 
 @csrf_exempt
 def iframeDataEditor(request):
-    return render(request, 'biterobot/data.html')
+    return render(request, 'iframe_data.html')
 
 class InstrumentView(APIView):
     def get(self, request):

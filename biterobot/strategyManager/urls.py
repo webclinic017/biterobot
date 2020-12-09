@@ -13,5 +13,5 @@ urlpatterns = [
     path('strategies/', StrategyView.as_view()),
     path('strategies/<str:pk>/', StrategyView.as_view()),
     path('', startPage),
-    path('biterobot/strategyEditor.html', iframeStrategyEditor),
+    path('iframe_strategyEditor.html', iframeStrategyEditor),
 ]

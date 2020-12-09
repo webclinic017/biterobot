@@ -19,7 +19,7 @@ def startPage(request):
 
 @csrf_exempt
 def iframeStrategyEditor(request):
-    return render(request, 'biterobot/strategyEditor.html')
+    return render(request, 'iframe_strategyEditor.html')
 
 class StrategyView(APIView):
     def get(self, request):
