@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import InstrumentModel
+from .models import DataIntervalModel
 from .serializers import InstrumentSerializerGET, InstrumentSerializerPOST
 from .common import checkInstrumentExists
 
@@ -18,10 +18,10 @@ def iframeDataEditor(request):
 
 class InstrumentView(APIView):
     def get(self, request):
-        instruments = InstrumentModel.objects.all()
+        instruments = DataIntervalModel.objects.all()
         serializer = InstrumentSerializerGET(instruments, many=True)
 
-        return Response(serializer.data)
+        return Response({'data': serializer.data})
 
     def post(self, request):
         instrument = request.data
