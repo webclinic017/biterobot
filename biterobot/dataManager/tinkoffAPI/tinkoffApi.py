@@ -41,7 +41,7 @@ class TinkoffApi(object):
 
     async def getCandlesNew(self, figi, dateFrom, dateTo, candleInterval):
         '''
-        Function for getting full information about candles for date between "dateFrom" and "dateTo"
+        Function for g etting full information about candles for date between "dateFrom" and "dateTo"
         Runs faster than getCandlesHistorical but has restrictions with candleInterval:
             MONTH - < 10 years; WEEK - < 2 years; DAY - < 1 year; HOUR - < 8 days; MIN_* - < 1 day
         :param figi: String (e.g. "BBG000B9XRY4"). figi that you want candles for.
@@ -98,11 +98,12 @@ class TinkoffApi(object):
         '''
         # Reformat into datetime
         utc = pytz.UTC
-        dateFrom = datetime(dateFrom['year'], dateFrom['month'], dateFrom['day'])
-        dateTo = datetime(dateTo['year'], dateTo['month'], dateTo['day'])
+        dateFrom = datetime.strptime(str(dateFrom), '%Y-%m-%d')
+        dateTo = datetime.strptime(str(dateTo), '%Y-%m-%d')
         dateTo_loc = utc.localize(dateTo)
+        print(dateTo_loc)
 
-        # If criteria is met, we call the faster function
+        # If criteria is met, we call the f aster function
         if ((candleInterval == "MONTH") and ((dateTo - dateFrom) < (timedelta(days=3650)))) or (
                 (candleInterval == "WEEK") and ((dateTo - dateFrom) < (timedelta(days=730)))) or (
                 (candleInterval == "DAY") and ((dateTo - dateFrom) < (timedelta(days=365)))) or (
@@ -171,11 +172,11 @@ if __name__ == '__main__':
     # 1. Always use try/except
     # 2. Insert token before use
     # 3. Use asyncio.run to run the class methods
-    dateFrom = {"year": 2018, "month": 2, "day": 1}  # init of dates
-    dateTo = {"year": 2020, "month": 8, "day": 11}
+    dateFrom = "2020-7-11"  # init of dates
+    dateTo = "2020-7-15"
     tinkoffApi = TinkoffApi('')  # Class creation ВСТАВИТЬ КЛЮЧ
     try:
-        candles = asyncio.run(tinkoffApi.getCandles("BBG000B9XRY4", dateFrom, dateTo, "DAY"))
+        candles = asyncio.run(tinkoffApi.getCandles("BBG000B9XRY4", dateFrom, dateTo, "MIN_1"))
         for candle in candles:
             print(candle)
         info = asyncio.run(tinkoffApi.getInfoByTicker("AAPL"))

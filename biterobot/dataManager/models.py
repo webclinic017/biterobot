@@ -63,8 +63,8 @@ class TinkoffAPI(models.Model):
 
 class DataIntervalModel(models.Model):
     instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)
-    dateBegin = models.DateTimeField()
-    dateEnd = models.DateTimeField()
+    dateBegin = models.DateField()
+    dateEnd = models.DateField()
     candleLength = models.CharField(max_length=15)  # Интервал свечи (5 минут, 15 минут, день и т.д.)
     ticker = models.CharField(max_length=100)  # ВРЕМЕННО
 
