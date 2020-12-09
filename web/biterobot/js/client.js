@@ -38,8 +38,43 @@ function clearResults() {
 }
 
 /** Loading table's elements **/
+/*
 $(document).ready(function () {
-    $('#data_table').DataTable({
+
+    //$('.dataTables_length').addClass('bs-select');
+});*/
+
+var editor;
+
+$(document).ready(function () {
+
+    editor = new $.fn.dataTable.Editor( {
+        ajax: {
+            remove: {
+                url: server_url + 'data/',
+                type: 'DELETE'
+            }
+        },
+        table: '#data_table',
+        idSrc: 'id',
+        fields: [ {
+                label: "Ticker:",
+                name: "ticker"
+            }, {
+                label: "Candle length",
+                name: "candleLength"
+            }, {
+                label: "Date begin",
+                name: "dtBegin"
+            }, {
+                label: "Date end",
+                name: "dtEnd"
+            }
+        ]
+    });
+
+
+    $('#data_table').DataTable( {
         columnDefs: [{
             orderable: false,
             className: 'select-checkbox select-checkbox-all',
@@ -49,10 +84,26 @@ $(document).ready(function () {
             style: 'multi',
             selector: 'td:first-child'
         },
-        order: [[ 1, 'asc' ]]
+        order: [[ 1, 'asc' ]],
+
+        dom: "Bfrtip",
+        ajax: server_url + 'data/',
+        columns: [
+            {data: "checked"},
+            {data: "ticker"},
+            {data: "candleLength"},
+            {data: "dtBegin"},
+            {data: "dtEnd"}
+        ],
+        select: true,
+        buttons: [
+            {extend: "remove", editor: editor}
+        ]
+
     });
-    //$('.dataTables_length').addClass('bs-select');
+
 });
+
 
 /** Changing style of editor **/
 function changeEditorStyle() {
