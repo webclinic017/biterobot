@@ -8,6 +8,14 @@ var server_url = 'https://a51d6b62-1920-45e4-b298-e0c28a5e20f9.mock.pstmn.io/';
 /** Set user token for testing **/
 function setToken() {
     document.cookie = "token=" + document.getElementById('token').value + '; samesite';
+    alert(getCookie('token'));
+}
+
+function getCookie(name) {
+    let matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
 /** Restriction for dates **/
