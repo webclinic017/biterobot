@@ -1,10 +1,10 @@
-from django.urls import path, re_path
+from django.urls import path
 
-from .views import startPage, InstrumentView, iframeDataEditor
+from .views import startPage, InstrumentView
 
 
 urlpatterns = [
     path('', startPage),
     path('instruments/', InstrumentView.as_view()),
-    path('iframe_data.html', iframeDataEditor),
+    path('instruments/<int:pk>/$/', InstrumentView.as_view()),
 ]

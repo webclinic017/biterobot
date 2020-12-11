@@ -1,7 +1,7 @@
 from django.urls import path
 #from rest_framework.routers import DefaultRouter
 
-from .views import StrategyView, startPage, iframeStrategyEditor
+from .views import StrategyView, startPage
 
 
 #router = DefaultRouter()
@@ -13,5 +13,4 @@ urlpatterns = [
     path('strategies/', StrategyView.as_view()),
     path('strategies/<str:pk>/', StrategyView.as_view()),
     path('', startPage),
-    path('iframe_strategyEditor.html', iframeStrategyEditor),
 ]

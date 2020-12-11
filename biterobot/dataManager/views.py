@@ -6,16 +6,11 @@ from rest_framework.response import Response
 
 from .models import DataIntervalModel
 from .serializers import InstrumentSerializerGET, InstrumentSerializerPOST
-from .common import checkInstrumentExists
 
 
 @csrf_exempt
 def startPage(request):
     return render(request, 'DataEditor.html')
-
-@csrf_exempt
-def iframeDataEditor(request):
-    return render(request, 'iframe_data.html')
 
 class InstrumentView(APIView):
     def get(self, request):
