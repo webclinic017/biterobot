@@ -38,21 +38,27 @@ $(document).ready(function () {
 
 
     $('#archive_table').DataTable( {
-        columnDefs: [{
+        /*columnDefs: [{
             orderable: false,
-            className: 'select-checkbox select-checkbox-all',
+            //className: 'details-control',
             targets: 0
-        }],
-        select: {
+        }],*/
+        /*select: {
             style: 'multi',
             selector: 'td:first-child'
-        },
-        order: [[ 1, 'asc' ]],
+        },*/
+
 
         dom: "lfrtBip",
         ajax: server_url + strat_url + 'strategies/archive/',
         columns: [
-            {data: "checked"},
+            //{data: "checked"},
+            {
+                className: 'details-control',
+                orderable: false,
+                data: null,
+                defaultContent: ''
+            },
             {data: "name"},
             {data: "version"},
             {data: "dateTest"},
@@ -60,14 +66,35 @@ $(document).ready(function () {
             {data: "dateEnd"},
             {data: "graph"}
         ],
+        order: [[ 1, 'asc' ]],
         select: true,
         buttons: [
             {extend: "remove", editor: editor_strat}
-        ]
-
+        ],
+        rowCallback: function ( row, data, index ) {
+            $('td:first-child', row).attr('title', 'Click to edit');
+        }
     });
 
 });
+
+
+
+$('#archive_table tbody').on('click', 'td.details-control', function () {
+    var tr = $(this).parents('tr');
+    var row = $('#archive_table').DataTable().row( tr );
+    console.log('test');
+    if ( row.child.isShown() ) {
+        // This row is already open - close it
+        row.child.hide();
+        tr.removeClass('shown');
+    }
+    else {
+        // Open this row (the format() function would return the data to be shown)
+        row.child( format(row.data()) ).show();
+        tr.addClass('shown');
+    }
+} );
 
 
 /** Uploading strategy in editor**/
