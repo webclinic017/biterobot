@@ -89,33 +89,38 @@ function addData () {
     let todate = document.data_form.date_end.value;
     let ticker = document.data_form.ticker.value;
     let candleLength = document.data_form.candleLengthSelect.value;
-    if (candleLength !== '') {
-        if (frdate !== '' && todate !== '') {
-            if (ticker !== '') {
-                sendData(loadData(frdate, todate, ticker, candleLength));
+    if (getCookie('token') == undefined || getCookie('token') == '') {
+        alert('You need to add token firstly!')
+    } else {
+        if (candleLength !== '') {
+            if (frdate !== '' && todate !== '') {
+                if (ticker !== '') {
+                    sendData(loadData(frdate, todate, ticker, candleLength));
+                } else {
+                    console.log('Error: Ticker must be chosen');
+                    document.data_form.ticker.style.backgroundColor = "#ff3535";
+                    setTimeout(function () {
+                        document.data_form.ticker.style.backgroundColor = "white";
+                    },1000);
+                }
             } else {
-                console.log('Error: Ticker must be chosen');
-                document.data_form.ticker.style.backgroundColor = "#ff3535";
+                console.log('Error: Dates must be chosen');
+                document.data_form.date_begin.style.backgroundColor = "#ff3535";
+                document.data_form.date_end.style.backgroundColor = "#ff3535";
                 setTimeout(function () {
-                    document.data_form.ticker.style.backgroundColor = "white";
+                    document.data_form.date_begin.style.backgroundColor = "white";
+                    document.data_form.date_end.style.backgroundColor = "white";
                 },1000);
             }
         } else {
-            console.log('Error: Dates must be chosen');
-            document.data_form.date_begin.style.backgroundColor = "#ff3535";
-            document.data_form.date_end.style.backgroundColor = "#ff3535";
+            console.log('Error: Candle length not chosen');
+            document.data_form.candleLengthSelect.style.backgroundColor = "#ff3535";
             setTimeout(function () {
-                document.data_form.date_begin.style.backgroundColor = "white";
-                document.data_form.date_end.style.backgroundColor = "white";
+                document.data_form.candleLengthSelect.style.backgroundColor = "white";
             },1000);
         }
-    } else {
-        console.log('Error: Candle length not chosen');
-        document.data_form.candleLengthSelect.style.backgroundColor = "#ff3535";
-        setTimeout(function () {
-            document.data_form.candleLengthSelect.style.backgroundColor = "white";
-        },1000);
     }
+
 
 }
 

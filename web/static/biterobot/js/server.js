@@ -8,7 +8,6 @@ var test_url = 'testManager/';
 /** Set user token for testing **/
 function setToken() {
     document.cookie = "token=" + document.getElementById('token').value + '; samesite';
-    alert(getCookie('token'));
 }
 
 function getCookie(name) {
