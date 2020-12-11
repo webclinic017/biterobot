@@ -400,10 +400,10 @@ function sendLoadStrategyRequest(blob) {
         body: blob
     })
         .then(res => {
-            if (res.code == 200  || res.code == 201) {
+            if (res.status == 200  || res.status == 201) {
                 uploadStrategies();
                 writeString('Strategy uploaded');
-            } else if (res.code == 204) {
+            } else if (res.status == 204) {
                 writeString('Error: Content was not send');
             } else if (res.status == 500) {
                 writeString(res.message);
@@ -430,10 +430,10 @@ function sendUpdateStrategyRequest(blob, stat_name) {
         body: blob
     })
         .then(res => {
-            if (res.code == 200  || res.code == 201) {
+            if (res.status == 200  || res.status == 201) {
                 uploadStrategies();
                 writeString('Strategy updated');
-            } else if (res.code == 204) {
+            } else if (res.status == 204) {
                 uploadStrategies();
                 writeString('Error: Content was not send');
             } else if (res.status == 500) {
@@ -457,7 +457,7 @@ function sendDeleteStrategyRequest(stat_name) {
         method: 'DELETE'
     })
         .then(res => {
-            if (res.code == 200  || res.code == 201) {
+            if (res.status == 200  || res.status == 201) {
                 uploadStrategies();
                 return 'Strategy deleted';
             }  else if (res.status == 500) {

@@ -157,3 +157,34 @@ function updateDataTable(data) {
     });
 }
 
+/******************************************************************
+ ********************** messageBroker block ***********************
+ ******************************************************************/
+
+/** Send request to load data **/
+function sendData(blob) {
+    fetch (server_url + data_url + 'instruments/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: blob
+    })
+        .then(res => {
+            if (res.status == 200  || res.status == 201) {
+                //uploadData();
+                $('#data_table').DataTable().ajax.reload(null, false);
+                console.log('Data loaded');
+            }  else if (res.status == 500) {
+                console.log(res.message);
+            } else {
+                console.log(res);
+                let error = new Error(res.statusText);
+                error.response = res;
+                throw error;
+            }
+        })
+        .catch(e => {
+            console.log('Error (' + e.status + '): ' + e.message);
+        })
+}
