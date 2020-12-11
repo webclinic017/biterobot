@@ -1,5 +1,75 @@
 /*********************** For Strategies **************************/
 
+/** Loading table's elements and data**/
+var editor_strat;
+
+$(document).ready(function () {
+
+    editor_strat = new $.fn.dataTable.Editor( {
+        ajax: {
+            remove: {
+                url: server_url + strat_url + 'strategies/archive/_id_/',
+                type: 'DELETE'
+            }
+        },
+        table: '#archive_table',
+        idSrc: 'id',
+        fields: [ {
+            label: "Strategy name:",
+            name: "name"
+        }, {
+            label: "Version",
+            name: "version"
+        }, {
+            label: "Date start",
+            name: "dateStart"
+        }, {
+            label: "Date begin",
+            name: "dateBegin"
+        }, {
+            label: "Date end",
+            name: "dateEnd"
+        }, {
+            label: "Graph",
+            name: "graph"
+        }
+        ]
+    });
+
+
+    $('#archive_table').DataTable( {
+        columnDefs: [{
+            orderable: false,
+            className: 'select-checkbox select-checkbox-all',
+            targets: 0
+        }],
+        select: {
+            style: 'multi',
+            selector: 'td:first-child'
+        },
+        order: [[ 1, 'asc' ]],
+
+        dom: "lfrtBip",
+        ajax: server_url + strat_url + 'strategies/archive/',
+        columns: [
+            {data: "checked"},
+            {data: "name"},
+            {data: "version"},
+            {data: "dateTest"},
+            {data: "dateBegin"},
+            {data: "dateEnd"},
+            {data: "graph"}
+        ],
+        select: true,
+        buttons: [
+            {extend: "remove", editor: editor_strat}
+        ]
+
+    });
+
+});
+
+
 /** Uploading strategy in editor**/
 function loadStrategyInEditor() {
     let file = document.getElementById("inputFile-1").files[0];
@@ -392,7 +462,7 @@ function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
 /** Send request to load strategy **/
 function sendLoadStrategyRequest(blob) {
     writeString('Start uploading');
-    fetch (server_url + start_url + 'strategies/', {
+    fetch (server_url + strat_url + 'strategies/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -422,7 +492,7 @@ function sendLoadStrategyRequest(blob) {
 /** Send request to update strategy **/
 function sendUpdateStrategyRequest(blob, stat_name) {
     writeString('Start updating');
-    fetch (server_url + start_url +'strategies/' + stat_name, {
+    fetch (server_url + strat_url +'strategies/' + stat_name, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -453,7 +523,7 @@ function sendUpdateStrategyRequest(blob, stat_name) {
 /** Send request to delete strategy **/
 function sendDeleteStrategyRequest(stat_name) {
     writeString('Start deleting');
-    fetch (server_url + start_url + 'strategies/' + stat_name, {
+    fetch (server_url + strat_url + 'strategies/' + stat_name, {
         method: 'DELETE'
     })
         .then(res => {
@@ -476,7 +546,7 @@ function sendDeleteStrategyRequest(stat_name) {
 
 /** Send request to update data/strategies **/
 function sendUploadingRequest (req_name) {
-    fetch (server_url + start_url + req_name + '/', {
+    fetch (server_url + strat_url + req_name + '/', {
         method: 'GET'
     })
         .then(res => {
