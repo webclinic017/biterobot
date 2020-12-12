@@ -6,6 +6,8 @@ var editor;
 $(document).ready(function () {
 
     editor = new $.fn.dataTable.Editor( {
+        processing: false,
+        serverSide: false,
         ajax: {
             remove: {
                 url: server_url + data_url + 'instruments/_id_/',
@@ -13,21 +15,7 @@ $(document).ready(function () {
             }
         },
         table: '#data_table',
-        idSrc: 'id',
-        fields: [ {
-            label: "Ticker:",
-            name: "ticker"
-        }, {
-            label: "Candle length",
-            name: "candleLength"
-        }, {
-            label: "Date begin",
-            name: "dateBegin"
-        }, {
-            label: "Date end",
-            name: "dateEnd"
-        }
-        ]
+        idSrc: 'id'
     });
 
 

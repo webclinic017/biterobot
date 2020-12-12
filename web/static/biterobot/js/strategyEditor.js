@@ -8,7 +8,7 @@ $(document).ready(function () {
     editor_strat = new $.fn.dataTable.Editor( {
         ajax: {
             remove: {
-                url: server_url + strat_url + 'strategies/archive/_id_/',
+                url: server_url + test_url + 'strategies/archive/_id_/',
                 type: 'DELETE'
             }
         },
@@ -50,7 +50,7 @@ $(document).ready(function () {
 
 
         dom: "lfrtBip",
-        ajax: server_url + strat_url + 'strategies/archive/',
+        ajax: server_url + test_url + 'strategies/archive/',
         columns: [
             //{data: "checked"},
             {
@@ -76,6 +76,7 @@ $(document).ready(function () {
         }
     });
 
+    uploadStrategies();
 });
 
 
@@ -402,7 +403,6 @@ async function uploadStrategies() {
     sendUploadingRequest('strategies');
 }
 
-
 /******************************************************************
  ********************** messageBroker block ***********************
  ******************************************************************/
@@ -422,7 +422,7 @@ function testStep(code, req_id) {
 
 /** Send request to test strategy **/
 function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
-    fetch (document.req_form.url_address.value/*'/strategy/' + str*/, {
+    fetch (server_url + test_url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
