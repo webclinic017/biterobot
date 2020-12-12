@@ -41,7 +41,7 @@ class TinkoffApi(object):
 
     async def getCandlesNew(self, figi, dateFrom, dateTo, candleInterval):
         '''
-        Function for g etting full information about candles for date between "dateFrom" and "dateTo"
+        Function for getting full information about candles for date between "dateFrom" and "dateTo"
         Runs faster than getCandlesHistorical but has restrictions with candleInterval:
             MONTH - < 10 years; WEEK - < 2 years; DAY - < 1 year; HOUR - < 8 days; MIN_* - < 1 day
         :param figi: String (e.g. "BBG000B9XRY4"). figi that you want candles for.
@@ -101,9 +101,8 @@ class TinkoffApi(object):
         dateFrom = datetime.strptime(str(dateFrom), '%Y-%m-%d')
         dateTo = datetime.strptime(str(dateTo), '%Y-%m-%d')
         dateTo_loc = utc.localize(dateTo)
-        print(dateTo_loc)
 
-        # If criteria is met, we call the f aster function
+        # If criteria is met, we call the faster function
         if ((candleInterval == "MONTH") and ((dateTo - dateFrom) < (timedelta(days=3650)))) or (
                 (candleInterval == "WEEK") and ((dateTo - dateFrom) < (timedelta(days=730)))) or (
                 (candleInterval == "DAY") and ((dateTo - dateFrom) < (timedelta(days=365)))) or (
@@ -131,11 +130,9 @@ class TinkoffApi(object):
                     # if candles time is lower than dateTo, then add it to array
                     if candle.time < dateTo_loc:
                         candles.append(candle)
-                    # if candle time is higher, then close the session and return candles
-                    else:
-                        await client.close()
-                        return candles
-
+                # if candle time is higher, then close the session and return candles
+                await client.close()
+                return candles
             # Exception for wrong candleInterval input
             except TinkoffInvestmentsError as e:
                 raise TinkoffInvestmentsError(e)
@@ -166,20 +163,20 @@ class TinkoffApi(object):
             raise ValueError("Something bad happened in getInfoByTicker" + e.__str__())
 
 
-if __name__ == '__main__':
-    # EXAMPLE OF USE
-    # Rules:
-    # 1. Always use try/except
-    # 2. Insert token before use
-    # 3. Use asyncio.run to run the class methods
-    dateFrom = "2020-7-11"  # init of dates
-    dateTo = "2020-7-15"
-    tinkoffApi = TinkoffApi('')  # Class creation ВСТАВИТЬ КЛЮЧ
-    try:
-        candles = asyncio.run(tinkoffApi.getCandles("BBG000B9XRY4", dateFrom, dateTo, "MIN_1"))
-        for candle in candles:
-            print(candle)
-        info = asyncio.run(tinkoffApi.getInfoByTicker("AAPL"))
-        print(info)
-    except Exception as e:
-        print(e)
+# EXAMPLE OF USE
+# Rules:
+# 1. Always use try/except
+# 2. Insert token before use
+# 3. Use asyncio.run to run the class methods
+# dateFrom = "2020-7-11"  # init of dates
+# dateTo = "2020-7-15"
+#tinkoffApi = TinkoffApi(INSERT_TOKEN_HERE)  # Class creation
+#try:
+#    candles = asyncio.run(tinkoffApi.getCandles("BBG000B9XRY4", dateFrom, dateTo, "MIN_5"))
+#    for candle in candles:
+#        print(candle)
+#    info = asyncio.run(tinkoffApi.getInfoByTicker("AAPL"))
+#    print(info.type.name)
+#
+#except Exception as e:
+#    print(e)
