@@ -7,5 +7,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('strategyManager/', include('strategyManager.urls')),
     path('dataManager/', include('dataManager.urls')),
-    path('index.html/', indexPage)
+    path('testManager/', include('testManager.urls')),
+    path('index.html/', indexPage),
 ]
