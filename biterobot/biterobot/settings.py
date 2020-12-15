@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'strategyManager.apps.StrategymanagerConfig',
     'dataManager.apps.DatamanagerConfig',
+    'testManager.apps.TestmanagerConfig',
     'corsheaders',
 ]
 
