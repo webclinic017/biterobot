@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
+from .views import indexPage
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('strategies/', include('strategyManager.urls')),
+    path('strategyManager/', include('strategyManager.urls')),
+    path('dataManager/', include('dataManager.urls')),
+    path('testManager/', include('testManager.urls')),
+    path('index.html/', indexPage),
 ]

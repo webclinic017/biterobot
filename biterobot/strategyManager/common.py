@@ -1,5 +1,7 @@
 import base64
 from django.core.files.base import ContentFile
+import os
+
 
 def blobToFile(data: str):
     format, fileStr = data.split(';base64,')
@@ -10,6 +12,10 @@ def blobToFile(data: str):
 
     return base64_message
 
-def saveFile(data: str, filePath: str = 'C:\\Users\\uzer\PycharmProjects\\biterobot\\biterobot\strategyManager\strategies\\text.txt'):
+def saveFile(data: str, filePath: str = 'strategyManager/strategies/text.txt'):
     file = open(filePath, 'w')
     file.write(data)
+
+def deleteFile(filePath: str = 'strategies\\text.txt'):
+    path = os.path.join(os.path.abspath(os.path.dirname(__file__)), filePath)
+    os.remove(path)
