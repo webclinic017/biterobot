@@ -15,6 +15,7 @@ def startPage(request):
 class InstrumentView(APIView):
     def get(self, request):
         instruments = DataIntervalModel.objects.all()
+
         serializer = InstrumentSerializerGET(instruments, many=True)
 
         return Response({'data': serializer.data})
