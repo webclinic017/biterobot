@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from .common import testInit
+
 
 class TestSerializerGET(serializers.Serializer):
     name = serializers.CharField(max_length=200)
@@ -14,3 +16,10 @@ class TestSerializerPOST(serializers.Serializer):
     toDate = serializers.DateField()
     name = serializers.CharField(max_length=200)
     isNew = serializers.BooleanField()
+
+    def create(self, validated_data):
+        validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
+
+        testInit()
+
+        return 0  # т.к. все данные в базу были уже записаны в testInit

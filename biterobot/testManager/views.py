@@ -21,4 +21,7 @@ class TestView(APIView):
     def post(self, request):
         test = request.data
         serializer = TestSerializerPOST(data=test)
+        if serializer.is_valid(raise_exception=False):
+            test_saved = serializer.save()
 
+        return Response({"success": "Test '{}' created successfully"})
