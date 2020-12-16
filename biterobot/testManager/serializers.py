@@ -7,4 +7,10 @@ class TestSerializerGET(serializers.Serializer):
     dateEnd = serializers.DateField()
     instrument = serializers.IntegerField()  # Ссылка на id инструмента, потом поменять на name инструмента по ForeignKey
 
-
+class TestSerializerPOST(serializers.Serializer):
+    code = serializers.IntegerField()
+    id = serializers.CharField(max_length=1500)
+    frDate = serializers.DateField()
+    toDate = serializers.DateField()
+    name = serializers.CharField(max_length=200)
+    isNew = serializers.BooleanField()
