@@ -10,7 +10,7 @@ $(document).ready(function () {
         serverSide: false,
         ajax: {
             remove: {
-                url: server_url + data_url + 'instruments/_id_/',
+                url: '/' + data_url + 'instruments/_id_/',
                 type: 'DELETE'
             }
         },
@@ -32,7 +32,7 @@ $(document).ready(function () {
         order: [[ 1, 'asc' ]],
 
         dom: "lfrtBip",
-        ajax: server_url + data_url + 'instruments/',
+        ajax: '/' + data_url + 'instruments/',
         columns: [
             {data: "checked"},
             {data: "ticker"},
@@ -156,7 +156,7 @@ function updateDataTable(data) {
 
 /** Send request to load data **/
 function sendData(blob) {
-    fetch (server_url + data_url + 'instruments/', {
+    fetch ('/' + data_url + 'instruments/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

@@ -1,4 +1,4 @@
-var server_url = 'http://127.0.0.1:8000/';
+//var server_url = 'http://127.0.0.1:8000/';
 var strat_url = 'strategyManager/';
 var data_url = 'dataManager/';
 var test_url = 'testManager/'; //for testing

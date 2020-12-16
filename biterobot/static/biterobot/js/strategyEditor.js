@@ -8,7 +8,7 @@ $(document).ready(function () {
     editor_strat = new $.fn.dataTable.Editor( {
         ajax: {
             remove: {
-                url: server_url + test_url + 'strategies/archive/_id_/',
+                url: '/' + test_url + 'strategies/archive/_id_/',
                 type: 'DELETE'
             }
         },
@@ -50,7 +50,7 @@ $(document).ready(function () {
 
 
         dom: "lfrtBip",
-        ajax: server_url + test_url + 'strategies/archive/',
+        ajax: '/' + test_url + 'strategies/archive/',
         columns: [
             //{data: "checked"},
             {
@@ -422,7 +422,7 @@ function testStep(code, req_id) {
 
 /** Send request to test strategy **/
 function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
-    fetch (server_url + test_url, {
+    fetch ('/' + test_url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -489,7 +489,7 @@ function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
 /** Send request to load strategy **/
 function sendLoadStrategyRequest(blob) {
     writeString('Start uploading');
-    fetch (server_url + strat_url + 'strategies/', {
+    fetch ('/' + strat_url + 'strategies/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -519,7 +519,7 @@ function sendLoadStrategyRequest(blob) {
 /** Send request to update strategy **/
 function sendUpdateStrategyRequest(blob, stat_name) {
     writeString('Start updating');
-    fetch (server_url + strat_url +'strategies/' + stat_name, {
+    fetch ('/' + strat_url +'strategies/' + stat_name, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -550,7 +550,7 @@ function sendUpdateStrategyRequest(blob, stat_name) {
 /** Send request to delete strategy **/
 function sendDeleteStrategyRequest(stat_name) {
     writeString('Start deleting');
-    fetch (server_url + strat_url + 'strategies/' + stat_name, {
+    fetch ('/' + strat_url + 'strategies/' + stat_name, {
         method: 'DELETE'
     })
         .then(res => {
@@ -573,7 +573,7 @@ function sendDeleteStrategyRequest(stat_name) {
 
 /** Send request to update data/strategies **/
 function sendUploadingRequest (req_name) {
-    fetch (server_url + strat_url + req_name + '/', {
+    fetch ('/' + strat_url + req_name + '/', {
         method: 'GET'
     })
         .then(res => {
