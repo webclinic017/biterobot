@@ -20,6 +20,8 @@ class TestSerializerPOST(serializers.Serializer):
     def create(self, validated_data):
         validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
 
-        testInit()
+        strategyName = validated_data.pop('name')
+
+        testInit(f'../strategyManager/strategies/{strategyName}.py')
 
         return 0  # т.к. все данные в базу были уже записаны в testInit
