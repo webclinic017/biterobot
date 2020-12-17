@@ -9,6 +9,9 @@ def indexPage(request):
 def index(request):
     return redirect('index.html')
 
+def documentationPage(request):
+    return render(request, 'Documentation.html')
+
 def strategyManager(request):
     return redirect('strategyManager/')
 
