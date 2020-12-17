@@ -1,9 +1,52 @@
 import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
+import threading
 
 # Import the backtrader platform
+from typing import Union, Callable
+
 import backtrader as bt
+
+
+class Wrapper:
+    def __init__(self, strategy: bt.Strategy, data, startCash, commission, *args, **kwargs):
+        self.strategy: bt.Strategy = strategy
+        self.data = data
+        self.startCash = startCash
+        self.comission = commission
+        self.thread: Union[threading.Thread, None] = None
+        self.targetToRun: Callable
+
+        # init cerebro
+        self.cerebro: bt.Cerebro = bt.Cerebro()
+        # add strategy
+        self.cerebro.addstrategy(self.strategy)
+        # add data
+        self.cerebro.adddata(self.data)
+        # define start cash
+        cerebro.broker.setcash(self.startCash)
+        # Set the commission
+        cerebro.broker.setcommission(commission=self.comission)
+
+        # callable object to start test
+        self.targetToRun = cerebro.run
+
+    def run(self):
+        """Run backtest"""
+
+        # check if thread is already exists
+        if self.thread is None:
+            # create if so
+            self.thread = threading.Thread(target=self.targetToRun)
+        # run
+        self.thread.start()
+
+    def pause(self):
+        pass
+
+    def stop(self):
+        pass
 
 
 # Create a Stratey
