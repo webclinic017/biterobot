@@ -15,6 +15,7 @@ def startPage(request):
 class InstrumentView(APIView):
     def get(self, request):
         instruments = DataIntervalModel.objects.all()
+
         serializer = InstrumentSerializerGET(instruments, many=True)
 
         return Response({'data': serializer.data})
@@ -28,7 +29,6 @@ class InstrumentView(APIView):
         return Response({"success": "Instrument '{}' created successfully"})
 
     def delete(self, request, pk):
-        print(pk)
         instrument = get_object_or_404(DataIntervalModel.objects.all(), id=pk)
         instrument.delete()
 
