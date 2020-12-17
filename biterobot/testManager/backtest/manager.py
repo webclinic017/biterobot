@@ -1,7 +1,7 @@
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 from backtraderWrapper import Wrapper
 
-from testManager.backtest.const.taskStatus import STOPPED, RUNNING, PAUSED
+from testManager.backtest.const import taskStatus
 
 
 class BacktestManager:
@@ -28,17 +28,34 @@ class BacktestManager:
         self.tasks[taskId] = newTask
 
     def run(self, taskId: Any) -> None:
+        """Run task
+        :param taskId: id of the task"""
         pass
 
     def pause(self, taskId: Any) -> None:
+        """Pause task
+        :param taskId: id of the task"""
         pass
 
     def stop(self, taskId: Any) -> None:
+        """Stop task
+        :param taskId: id of the task"""
         pass
 
-    def getStatus(self, taskId: Any) -> [STOPPED, RUNNING, PAUSED]:
+    def getStatus(self, taskId: Any) -> [taskStatus.STOPPED,
+                                         taskStatus.RUNNING,
+                                         taskStatus.PAUSED,
+                                         taskStatus.CREATED,
+                                         taskStatus.DONE,
+                                         taskStatus.ERROR]:
+        """Get task status
+        :param taskId: id of the task
+        :return: status of the task"""
         pass
 
-    def getResult(self, taskId: Any) -> Any:
+    def getResult(self, taskId: Any) -> Tuple[Any, Any]:
+        """Get results
+        :param taskId: id of the task
+        :return: tuple of results - (output string, plot)"""
         pass
 
