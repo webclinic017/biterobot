@@ -4,16 +4,60 @@
 var editor_strat;
 var last_message = new Date();
 
+(function () {
+    var Editor = $.fn.dataTable.Editor;
+    Editor.display.details = $.extend(true, {}, Editor.models.displayController, {
+        init: function(editor_strat) {
+            Editor.display.lightbox.init(editor_strat);
+
+            return Editor.display.details;
+        },
+
+        open: function (editor_strat, append, callback) {
+            var table = $(editor_strat.s.table).DataTable();
+            var row = editor_strat.s.modifier;
+
+            Editor.display.details.close(editor_strat);
+
+            if (editor_strat.mode() === 'create') {
+                Editor.display.lightbox.open(editor_strat, append, callback);
+            } else {
+                table.row(row).child(append).show();
+
+                $(table.row(row).node()).addClass('shown');
+
+                if (callback) {
+                    callback();
+                }
+            }
+        },
+        close: function(editor_strat, callback) {
+            Editor.display.lightbox.close(editor_strat, callback);
+
+            var table = $(editor_strat.s.table).DataTable();
+
+            table.rows().every(function() {
+                if (this.child.isShown()) {
+                    this.child.hide();
+                    $(this.node()).removeClass('shown');
+                }
+            });
+
+            if (callback) {
+                callback();
+            }
+        }
+    });
+
+})();
+
 $(document).ready(function () {
 
     editor_strat = new $.fn.dataTable.Editor( {
-        ajax: {
-            remove: {
-                url: '/' + test_url + 'tests/_id_/',
-                type: 'DELETE'
-            }
-        },
+        ajax: '/' + test_url + 'tests/_id_/',
+
         table: '#archive_table',
+        display: "details",
         idSrc: 'id',
         fields: [ {
             label: "Strategy name:",
@@ -38,7 +82,7 @@ $(document).ready(function () {
     });
 
 
-    $('#archive_table').DataTable( {
+    var table = $('#archive_table').DataTable( {
         /*columnDefs: [{
             orderable: false,
             //className: 'details-control',
@@ -70,12 +114,44 @@ $(document).ready(function () {
         order: [[ 1, 'asc' ]],
         select: true,
         buttons: [
-            {extend: "remove", editor: editor_strat}
+            {extend: "create", editor: editor_strat}
         ],
         rowCallback: function ( row, data, index ) {
             $('td:first-child', row).attr('title', 'Click to edit');
         }
     });
+
+    $('#archive_table').on( 'click', 'td.details-control', function () {
+        var tr = this.parentNode;
+
+        if ( table.row(tr).child.isShown() ) {
+            editor_strat.close();
+        }
+        else {
+            editor_strat.edit(
+                tr,
+                'Edit row',
+                [
+                    {
+                        "className": "delete",
+                        "label": "Delete row",
+                        "fn": function () {
+                            // Close the edit display and delete the row immediately
+                            editor_strat.close();
+                            editor_strat.remove( tr, '', null, false );
+                            editor_strat.submit();
+                        }
+                    }, {
+                    "label": "Update row",
+                    "fn": function () {
+                        editor_strat.submit();
+                    }
+                }
+                ]
+            );
+        }
+    } );
+
 
     uploadStrategies();
 });
