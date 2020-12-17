@@ -8,6 +8,13 @@ var test_url = 'testManager/'; //for testing
 /** Set user token for testing **/
 function setToken() {
     document.cookie = "token=" + document.getElementById('token').value + '; samesite';
+
+    if (getCookie('token') !== undefined && getCookie('token') !== '') {
+        document.getElementById('token').style.backgroundColor = "#89ff7f";
+        document.getElementById('token').value = getCookie('token');
+    } else {
+        document.getElementById('token').style.backgroundColor = "white";
+    }
 }
 
 function getCookie(name) {
@@ -36,4 +43,11 @@ function setMaxDate () {
     } else {
         dtbegin.removeAttribute("max");
     }
+}
+
+function showEmptyField(field) {
+    field.style.backgroundColor = "#ff3535";
+    setTimeout(function () {
+        field.style.backgroundColor = "white";
+    },3000);
 }

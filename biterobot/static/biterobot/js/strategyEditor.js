@@ -2,13 +2,14 @@
 
 /** Loading table's elements and data**/
 var editor_strat;
+var last_message = new Date();
 
 $(document).ready(function () {
 
     editor_strat = new $.fn.dataTable.Editor( {
         ajax: {
             remove: {
-                url: '/' + test_url + 'strategies/archive/_id_/',
+                url: '/' + test_url + 'tests/_id_/',
                 type: 'DELETE'
             }
         },
@@ -50,7 +51,7 @@ $(document).ready(function () {
 
 
         dom: "lfrtBip",
-        ajax: '/' + test_url + 'strategies/archive/',
+        ajax: '/' + test_url + 'tests/',
         columns: [
             //{data: "checked"},
             {
@@ -158,10 +159,10 @@ function uuidv4() {
 
 
 /** Creating json for loading **/
-function loadStrategy(startName, stratFile, description) {
+function loadStrategy(stratName, stratFile, description) {
     let request = {
         code: 1101,
-        name: startName,
+        name: stratName,
         description: description,
         file: {
             name: document.req_form.stratFile.files[0].name,
@@ -176,12 +177,12 @@ function loadStrategy(startName, stratFile, description) {
 
 
 /** Creating json for updating **/
-function updateStrategy(startName, stratFile, description) {
+function updateStrategy(stratName, stratFile, description) {
     let request = {};
     if (description !== document.req_form.descriptionSelect.value && stratFile !== '') {
         request = {
             code: 1101,
-            name: startName,
+            name: stratName,
             description: description,
             file: {
                 name: document.req_form.stratFile.files[0].name,
@@ -191,13 +192,13 @@ function updateStrategy(startName, stratFile, description) {
     } else if (description !== document.req_form.descriptionSelect.value && stratFile == '') {
         request = {
             code: 1101,
-            name: startName,
+            name: stratName,
             description: description
         };
     } else if (description == document.req_form.descriptionSelect.value && stratFile !== '') {
         request = {
             code: 1101,
-            name: startName,
+            name: stratName,
             file: {
                 name: document.req_form.stratFile.files[0].name,
                 body: stratFile
@@ -214,18 +215,18 @@ function updateStrategy(startName, stratFile, description) {
 
 
 /** Creating json for testing **/
-function testStrategy(frdate, todate, stratSelect, startName, stratFile) {
+function testStrategy(frdate, todate, stratSelect, stratName, stratFile) {
     let req_id = uuidv4();
     console.log(uuidv4)
     if (frdate !== '' && todate !== '') {
         let request = {};
-        if (stratFile != null && (stratSelect == '' || startName !== stratSelect)) {
+        if (stratFile != null && (stratSelect == '' || stratName !== stratSelect)) {
             request = {
                 code: 1201,
                 id: req_id,
                 frDate: frdate,
                 toDate: todate,
-                name: startName,
+                name: stratName,
                 isNew: false,
                 file: {
                     name: document.req_form.stratFile.files[0].name,
@@ -263,14 +264,14 @@ async function chooseAction () {
     let desriptionSelect = document.req_form.descriptionSelect.value;
     let description = document.req_form.stratDescription.value;
     //let stratText = document.forma.textar.value;
-    let startName = document.req_form.stratName.value;
+    let stratName = document.req_form.stratName.value;
     let stratFile = document.req_form.stratFile.files[0];
     let action = document.req_form.stratAction.value;
 
     let strRes = '';
 
     if (action == 'load') { // Loading strategy
-        if (stratFile !== undefined) {
+        if (stratFile !== undefined && stratName !== '' && description !== '') {
             let reader = new FileReader();
 
             reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
@@ -278,40 +279,78 @@ async function chooseAction () {
             reader.onload = function() {
                 console.log(reader.result)
                 if (reader.result != null) {
-                    sendLoadStrategyRequest(loadStrategy(startName, reader.result, description));
+                    sendLoadStrategyRequest(loadStrategy(stratName, reader.result, description));
                 } else {
-                    writeString('Error: File is empty');
+                    writeString('Error: File is empty', new Date());
                 }
             };
         } else {
-            writeString('Error: File is empty');
+            if (stratFile == undefined) {
+                writeString('Error: File is empty', new Date());
+                showEmptyField(document.req_form.fileName);
+            }
+            if (stratName == '') {
+                writeString('Error: Strategy name is empty', new Date());
+                showEmptyField(document.req_form.stratName);
+            }
+            if (description == '') {
+                writeString('Error: Strategy description is empty', new Date());
+                showEmptyField(document.req_form.stratDescription);
+            }
         }
 
     } else if (action == 'update') { // Updating strategy
-        if (stratFile !== undefined) {
-            let reader = new FileReader();
+        if (stratSelect == stratName) {
+            if (stratFile !== undefined) {
+                let reader = new FileReader();
 
-            reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
+                reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
 
-            reader.onload = function() {
-                console.log(reader.result)
-                if (reader.result != null) {
-                    sendUpdateStrategyRequest(updateStrategy(stratSelect, reader.result, description), stratSelect);
+                reader.onload = function() {
+                    console.log(reader.result)
+
+                    if (reader.result != null) {
+                        sendUpdateStrategyRequest(updateStrategy(stratSelect, reader.result, description), stratSelect);
+                    } else {
+                        writeString('Error: File is empty', new Date());
+                        showEmptyField(document.req_form.fileName);
+                    }
+                };
+            } else if (description !== '' && stratFile == undefined) {
+                sendUpdateStrategyRequest(updateStrategy(stratSelect, '', description), stratSelect);
+            } else {
+                if (stratSelect == '') {
+                    writeString('Error: Choose strategy firstly', new Date());
+                    showEmptyField(document.req_form.stratSelect);
                 } else {
-                    writeString('Error: File is empty');
+                    writeString("Error: Description can't be empty", new Date());
+                    showEmptyField(document.req_form.stratDescription);
                 }
-            };
-        } else if (description !== '' && stratFile == undefined) {
-            sendUpdateStrategyRequest(updateStrategy(stratSelect, '', description), stratSelect);
-        } else {
-            writeString('Error: Choose strategy firstly');
-        }
 
+            }
+        } else {
+            if (stratSelect == '') {
+                writeString('Error: Choose strategy firstly', new Date());
+                showEmptyField(document.req_form.stratSelect);
+            } else {
+                writeString('Error: Incorrect strategy name',  new Date());
+                writeString('Strategy name should be the same with chosen strategy',  new Date());
+                showEmptyField(document.req_form.stratName);
+            }
+
+        }
     } else if (action == 'delete') { // Deleting strategy
         if (stratSelect !== '') {
-            sendDeleteStrategyRequest(stratSelect);
+            if (stratSelect == stratName) {
+                sendDeleteStrategyRequest(stratSelect);
+            } else {
+                writeString('Error: Incorrect strategy name',  new Date());
+                writeString('Strategy name should be the same with chosen strategy',  new Date());
+                showEmptyField(document.req_form.stratName);
+            }
         } else {
-            writeString('Error: Choose strategy');
+            writeString('Error: Choose strategy firstly');
+            showEmptyField(document.req_form.stratSelect);
         }
 
     } else if (action == 'test') { // Testing strategy
@@ -323,11 +362,11 @@ async function chooseAction () {
 
                 reader.onload = function () {
                     console.log(reader.result)
-                    strRes = testStrategy(frdate, todate, stratSelect, startName, reader.result);
+                    strRes = testStrategy(frdate, todate, stratSelect, stratName, reader.result);
                     workStrategyRequest(strRes, 1201, '', 0, 'validate');
                 };
             } else if (stratSelect !== '') {
-                strRes = testStrategy(frdate, todate, stratSelect, startName, '');
+                strRes = testStrategy(frdate, todate, stratSelect, stratName, '');
                 workStrategyRequest(strRes, 1202, '', 0, 'test');
             } else {
                 writeString('Error: No strategy to test');
@@ -343,7 +382,7 @@ async function chooseAction () {
         }
 
     } else {
-        writeString('Error: Choose action firstly');
+        writeString('Error: Choose action firstly', new Date());
     }
 
 }
@@ -354,12 +393,18 @@ async function chooseAction () {
  ******************************************************************/
 
 /** Write string in output **/
-function writeString(str) {
+function writeString(str, now) {
     let strRes = document.res_form.resultText.value;
+    //let now = new Date();
     if (strRes !== '') {
         strRes = strRes + '\n';
     }
-    strRes = strRes + 'BR:> ' + str;
+    if (now.getSeconds() == last_message.getSeconds()) {
+        strRes = strRes + str;
+    } else {
+        strRes = strRes + now.getHours() + ':' + now.getMinutes() + ':' +now.getSeconds() + ' BR> ' + str;
+        last_message = now;
+    }
     document.res_form.resultText.value = strRes;
 }
 
