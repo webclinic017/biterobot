@@ -10,7 +10,7 @@ $(document).ready(function () {
         serverSide: false,
         ajax: {
             remove: {
-                url: server_url + data_url + 'instruments/_id_/',
+                url: '/' + data_url + 'instruments/_id_/',
                 type: 'DELETE'
             }
         },
@@ -32,7 +32,7 @@ $(document).ready(function () {
         order: [[ 1, 'asc' ]],
 
         dom: "lfrtBip",
-        ajax: server_url + data_url + 'instruments/',
+        ajax: '/' + data_url + 'instruments/',
         columns: [
             {data: "checked"},
             {data: "ticker"},
@@ -47,6 +47,12 @@ $(document).ready(function () {
 
     });
 
+    if (getCookie('token') !== undefined && getCookie('token') !== '') {
+        document.getElementById('token').style.backgroundColor = "#89ff7f";
+        document.getElementById('token').value = getCookie('token');
+    } else {
+        document.getElementById('token').style.backgroundColor = "white";
+    }
 });
 
 
@@ -78,37 +84,24 @@ function addData () {
     let ticker = document.data_form.ticker.value;
     let candleLength = document.data_form.candleLengthSelect.value;
     if (getCookie('token') == undefined || getCookie('token') == '') {
-        alert('You need to add token firstly!')
+        alert('You need to set token firstly!')
     } else {
-        if (candleLength !== '') {
-            if (frdate !== '' && todate !== '') {
-                if (ticker !== '') {
-                    sendData(loadData(frdate, todate, ticker, candleLength));
-                } else {
-                    console.log('Error: Ticker must be chosen');
-                    document.data_form.ticker.style.backgroundColor = "#ff3535";
-                    setTimeout(function () {
-                        document.data_form.ticker.style.backgroundColor = "white";
-                    },1000);
-                }
-            } else {
-                console.log('Error: Dates must be chosen');
-                document.data_form.date_begin.style.backgroundColor = "#ff3535";
-                document.data_form.date_end.style.backgroundColor = "#ff3535";
-                setTimeout(function () {
-                    document.data_form.date_begin.style.backgroundColor = "white";
-                    document.data_form.date_end.style.backgroundColor = "white";
-                },1000);
-            }
+        if (frdate !== '' && todate !== '' && ticker !== '' && candleLength !== '') {
+            sendData(loadData(frdate, todate, ticker, candleLength));
         } else {
-            console.log('Error: Candle length not chosen');
-            document.data_form.candleLengthSelect.style.backgroundColor = "#ff3535";
-            setTimeout(function () {
-                document.data_form.candleLengthSelect.style.backgroundColor = "white";
-            },1000);
+            if (ticker == '') {
+                showEmptyField(document.data_form.ticker);
+            }
+            if (frdate == '' || todate == '') {
+                showEmptyField(document.data_form.date_begin);
+                showEmptyField(document.data_form.date_end);
+            }
+            if (candleLength == '') {
+                showEmptyField(document.data_form.candleLengthSelect);
+            }
         }
-    }
 
+    }
 
 }
 
@@ -156,7 +149,7 @@ function updateDataTable(data) {
 
 /** Send request to load data **/
 function sendData(blob) {
-    fetch (server_url + data_url + 'instruments/', {
+    fetch ('/' + data_url + 'instruments/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
