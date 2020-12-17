@@ -215,7 +215,7 @@ function updateStrategy(stratName, stratFile, description) {
 
 
 /** Creating json for testing **/
-function testStrategy(frdate, todate, stratSelect, stratName, stratFile) {
+function testStrategy(frdate, todate, stratSelect, stratName, stratFile, uuid) {
     let req_id = uuidv4();
     console.log(uuidv4)
     if (frdate !== '' && todate !== '') {
@@ -354,7 +354,7 @@ async function chooseAction () {
         }
 
     } else if (action == 'test') { // Testing strategy
-        if (frdate !== '' && todate !== '') {
+        if (frdate !== '' && todate !== '' && stratName !== '') {
             if (document.req_form.stratFile.files[0] !== undefined) {
                 let reader = new FileReader();
 
@@ -362,23 +362,28 @@ async function chooseAction () {
 
                 reader.onload = function () {
                     console.log(reader.result)
-                    strRes = testStrategy(frdate, todate, stratSelect, stratName, reader.result);
-                    workStrategyRequest(strRes, 1201, '', 0, 'validate');
+                    let uuid = uuidv4();
+                    strRes = testStrategy(frdate, todate, stratSelect, stratName, reader.result, uuid);
+                    workStrategyRequest(strRes, 1201, '', 0, uuid);
                 };
             } else if (stratSelect !== '') {
-                strRes = testStrategy(frdate, todate, stratSelect, stratName, '');
-                workStrategyRequest(strRes, 1202, '', 0, 'test');
+                let uuid = uuidv4();
+                strRes = testStrategy(frdate, todate, stratSelect, stratName, '', uuid);
+                workStrategyRequest(strRes, 1202, '', 0, uuid);
             } else {
-                writeString('Error: No strategy to test');
+                writeString('Error: Choose or upload strategy to start test', new Date());
             }
         } else {
-            writeString('Error: Date fields must be filled');
-            document.req_form.date_begin.style.backgroundColor = "#ff3535";
-            document.req_form.date_end.style.backgroundColor = "#ff3535";
-            setTimeout(function () {
-                document.req_form.date_begin.style.backgroundColor = "white";
-                document.req_form.date_end.style.backgroundColor = "white";
-            },1000);
+            if (stratName == '') {
+                showEmptyField(document.req_form.stratName);
+                writeString("Error: Strategy name can't be empty", new Date());
+                writeString("Choose or upload strategy to start test", new Date());
+            }
+            if (frdate == '' || todate == '') {
+                showEmptyField(document.req_form.date_begin);
+                showEmptyField(document.req_form.date_end);
+                writeString('Error: Dates fields must be filled', new Date());
+            }
         }
 
     } else {
@@ -466,6 +471,7 @@ function testStep(code, req_id) {
 
 
 /** Send request to test strategy **/
+/*
 function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
     fetch ('/' + test_url, {
         method: 'POST',
@@ -529,6 +535,42 @@ function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
         })
     return endConnetion;
 }
+*/
+
+
+/** Send request to test strategy **/
+function workStrategyRequest (blob, reqCode, session, endConnetion, uuid) {
+    fetch ('/' + test_url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: blob
+    })
+        .then(res => {
+            if (res.status >= 200 && res.status <= 300) {
+                writeString('Test started', new Date());
+            } else {
+                let error = new Error(res.statusText);
+                error.response = res;
+                throw error
+            }
+        })
+        /*.then(res => {
+            if (res.headers['Content-Type'] !== 'application/json') {
+                let error = new Error('Incorrect server response');
+                error.response = res;
+                throw error
+            }
+            return res;
+        })*/
+        .catch(e => {
+            writeString('Error: ' + e.message, new Date());
+            writeString(e.response, new Date());
+            endConnetion = 2;
+        })
+    return endConnetion;
+}
 
 
 /** Send request to load strategy **/
@@ -544,9 +586,9 @@ function sendLoadStrategyRequest(blob) {
         .then(res => {
             if (res.status == 200  || res.status == 201) {
                 uploadStrategies();
-                writeString('Strategy uploaded');
+                writeString('Strategy uploaded', new Date());
             } else if (res.status == 204) {
-                writeString('Error: Content was not send');
+                writeString('Error: Content was not send', new Date());
             } else if (res.status == 500) {
                 writeString(res.message);
             } else {
@@ -556,7 +598,7 @@ function sendLoadStrategyRequest(blob) {
             }
         })
         .catch(e => {
-            writeString('Error: ' + e.message);
+            writeString('Error: ' + e.message, new Date());
         })
 }
 
@@ -574,10 +616,10 @@ function sendUpdateStrategyRequest(blob, stat_name) {
         .then(res => {
             if (res.status == 200  || res.status == 201) {
                 uploadStrategies();
-                writeString('Strategy updated');
+                writeString('Strategy updated', new Date());
             } else if (res.status == 204) {
                 uploadStrategies();
-                writeString('Error: Content was not send');
+                writeString('Error: Content was not send', new Date());
             } else if (res.status == 500) {
                 writeString(res.message);
             } else {
@@ -587,7 +629,7 @@ function sendUpdateStrategyRequest(blob, stat_name) {
             }
         })
         .catch(e => {
-            writeString('Error: ' + e.message);
+            writeString('Error: ' + e.message, new Date());
         })
 }
 
@@ -601,9 +643,9 @@ function sendDeleteStrategyRequest(stat_name) {
         .then(res => {
             if (res.status == 200  || res.status == 201) {
                 uploadStrategies();
-                return 'Strategy deleted';
+                writeString('Strategy deleted', new Date());
             }  else if (res.status == 500) {
-                writeString(res.message);
+                writeString(res.message, new Date());
             } else {
                 let error = new Error(res.statusText);
                 error.response = res;
@@ -611,7 +653,7 @@ function sendDeleteStrategyRequest(stat_name) {
             }
         })
         .catch(e => {
-            writeString('Error: ' + e.message);
+            writeString('Error: ' + e.message, new Date());
         })
 }
 
@@ -645,14 +687,11 @@ function sendUploadingRequest (req_name) {
             if (req_name == 'strategies') {
                 updateStrategySelector(res);
                 console.log('Strategy updated');
-            } /*else if (req_name == 'data') {
-                updateDataTable(res);
-                console.log('Data updated');
-            }*/ else {
+            } else {
                 console.log('Error: Incorrect code');
             }
         })
         .catch(e => {
-            console.log('Error: ' + e.message);
+            console.log('Error: ' + e.message, new Date());
         })
 }
