@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import indexPage
+from .views import indexPage, index, dataManager, strategyManager, documentationPage
 
 
 urlpatterns = [
