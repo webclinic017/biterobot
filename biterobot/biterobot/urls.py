@@ -8,5 +8,9 @@ urlpatterns = [
     path('strategyManager/', include('strategyManager.urls')),
     path('dataManager/', include('dataManager.urls')),
     path('testManager/', include('testManager.urls')),
-    path('index.html/', indexPage),
+    path('', index),
+    path('index.html', indexPage),
+    path('Documentation.html', documentationPage),
+    path('strategyEditor.html', strategyManager),
+    path('DataEditor.html', dataManager),
 ]
