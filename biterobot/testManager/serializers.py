@@ -8,6 +8,7 @@ class TestSerializerGET(serializers.Serializer):
     dateBegin = serializers.DateField()
     dateEnd = serializers.DateField()
     instrument = serializers.IntegerField()  # Ссылка на id инструмента, потом поменять на name инструмента по ForeignKey
+    checked = serializers.CharField(max_length=1, default="")  # Это нужно для решения проблем на ФРОНТЕ
 
 class TestSerializerPOST(serializers.Serializer):
     code = serializers.IntegerField()
