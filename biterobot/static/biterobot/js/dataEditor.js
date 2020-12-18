@@ -20,13 +20,8 @@ $(document).ready(function () {
 
 
     $('#data_table').DataTable( {
-        columnDefs: [{
-            orderable: false,
-            className: 'select-checkbox select-checkbox-all',
-            targets: 0
-        }],
         select: {
-            style: 'multi',
+            style: 'os',
             selector: 'td:first-child'
         },
         order: [[ 1, 'asc' ]],
@@ -34,7 +29,14 @@ $(document).ready(function () {
         dom: "lfrtBip",
         ajax: '/' + data_url + 'instruments/',
         columns: [
-            {data: "checked"},
+            {
+                "className":      'select-checkbox select-checkbox-all',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": '',
+                targets: 0,
+                width: "15px"
+            },
             {data: "ticker"},
             {data: "candleLength"},
             {data: "dateBegin"},
