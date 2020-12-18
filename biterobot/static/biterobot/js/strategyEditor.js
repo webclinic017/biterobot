@@ -4,54 +4,8 @@
 
 var editor_strat;
 var last_message = new Date();
-/*
-(function () {
-    var Editor = $.fn.dataTable.Editor;
-    Editor.display.details = $.extend(true, {}, Editor.models.displayController, {
-        init: function(editor_strat) {
-            Editor.display.lightbox.init(editor_strat);
 
-            return Editor.display.details;
-        },
 
-        open: function (editor_strat, append, callback) {
-            var table = $(editor_strat.s.table).DataTable();
-            var row = editor_strat.s.modifier;
-
-            Editor.display.details.close(editor_strat);
-
-            if (editor_strat.mode() === 'create') {
-                Editor.display.lightbox.open(editor_strat, append, callback);
-            } else {
-                table.row(row).child(append).show();
-                console.log('test');
-                $(table.row(row).node()).addClass('shown');
-
-                if (callback) {
-                    callback();
-                }
-            }
-        },
-        close: function(editor_strat, callback) {
-            Editor.display.lightbox.close(editor_strat, callback);
-
-            var table = $(editor_strat.s.table).DataTable();
-
-            table.rows().every(function() {
-                if (this.child.isShown()) {
-                    this.child.hide();
-                    $(this.node()).removeClass('shown');
-                }
-            });
-
-            if (callback) {
-                callback();
-            }
-        }
-    });
-
-})();
-*/
 $(document).ready(function () {
     editor_strat = new $.fn.dataTable.Editor( {
         ajax: '/' + test_url + 'tests/_id_/',
@@ -170,90 +124,10 @@ $(document).ready(function () {
             });
         }
     });
-/*
-    var table = $('#archive_table').DataTable( {
-
-
-
-        dom: "lfrtBip",
-        ajax: 'https://a51d6b62-1920-45e4-b298-e0c28a5e20f9.mock.pstmn.io/' + test_url + 'tests/',
-        columns: [
-            //{data: "checked"},
-            {
-                className: 'details-control',
-                orderable: false,
-                data: null,
-                defaultContent: ''
-            },
-            {data: "name"},
-            {data: "version"},
-            {data: "dateTest"},
-            {data: "dateBegin"},
-            {data: "dateEnd"},
-            {data: "graph"}
-        ],
-        order: [[ 1, 'asc' ]],
-        select: true,
-        buttons: [
-        ],
-        rowCallback: function ( row, data, index ) {
-            $('td:first-child', row).attr('title', 'Click to edit');
-        }
-    });
-
-
-    $('#archive_table').on( 'click', 'td.details-control', function () {
-        var tr = this.parentNode;
-
-        if ( table.row(tr).child.isShown() ) {
-            editor_strat.close();
-        }
-        else {
-            editor_strat.open();
-            /*editor_strat.edit(
-                tr,*/
-                /*'Edit row',*/
-                /*[
-                    {
-                        "className": "delete",
-                        "label": "Delete row",
-                        "fn": function () {
-                            // Close the edit display and delete the row immediately
-                            editor_strat.close();
-                            editor_strat.remove( tr, '', null, false );
-                            editor_strat.submit();
-                        }
-                    }, {
-                    "label": "Update row",
-                    "fn": function () {
-                        editor_strat.submit();
-                    }
-                }
-                ]
-        }
-    } );*/
 
     uploadStrategies();
 });
 
-
-/*
-$('#archive_table tbody').on('click', 'td.details-control', function () {
-    var tr = $(this).parents('tr');
-    var row = $('#archive_table').DataTable().row( tr );
-    console.log('test');
-    if ( row.child.isShown() ) {
-        // This row is already open - close it
-        row.child.hide();
-        tr.removeClass('shown');
-    }
-    else {
-        // Open this row (the format() function would return the data to be shown)
-        row.child( format(row.data()) ).show();
-        tr.addClass('shown');
-    }
-} );
-*/
 
 /** Uploading strategy in editor**/
 function loadStrategyInEditor() {
