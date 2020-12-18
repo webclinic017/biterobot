@@ -1,9 +1,10 @@
 /*********************** For Strategies **************************/
 
 /** Loading table's elements and data**/
+
 var editor_strat;
 var last_message = new Date();
-
+/*
 (function () {
     var Editor = $.fn.dataTable.Editor;
     Editor.display.details = $.extend(true, {}, Editor.models.displayController, {
@@ -23,7 +24,7 @@ var last_message = new Date();
                 Editor.display.lightbox.open(editor_strat, append, callback);
             } else {
                 table.row(row).child(append).show();
-
+                console.log('test');
                 $(table.row(row).node()).addClass('shown');
 
                 if (callback) {
@@ -50,52 +51,132 @@ var last_message = new Date();
     });
 
 })();
-
+*/
 $(document).ready(function () {
-
     editor_strat = new $.fn.dataTable.Editor( {
         ajax: '/' + test_url + 'tests/_id_/',
-
         table: '#archive_table',
-        display: "details",
         idSrc: 'id',
         fields: [ {
-            label: "Strategy name:",
-            name: "name"
-        }, {
-            label: "Version",
-            name: "version"
-        }, {
-            label: "Date start",
-            name: "dateStart"
-        }, {
-            label: "Date begin",
-            name: "dateBegin"
-        }, {
-            label: "Date end",
-            name: "dateEnd"
-        }, {
-            label: "Graph",
-            name: "graph"
-        }
+                label: "Strategy name:",
+                name: "name"
+            }, {
+                label: "Version:",
+                name: "version"
+            }, {
+                label: "Date start:",
+                name: "dateStart"
+            }, {
+                label: "Date begin:",
+                name: "dateBegin"
+            }, {
+                label: "Date end:",
+                name: "dateEnd"
+            }, {
+                label: "files:",
+                name: "files[].id",
+                type: "uploadMany",
+                display: function (fileId, counter) {
+                    if (fileId !== null) {
+                        return fileId ?
+                            '<img src="'+ editor_strat.file( 'files', fileId ).web_path + '" style="width=50%; height=50%;"/>' :
+                            null;
+                    }
+                },
+                clearText: "Clear",
+            noFileText: 'No images'
+            }
         ]
     });
 
+    function format (d) {
+        var rows = '';
+        var i;
+
+        for (i = 0; i < (d.files.length); i++) {
+            console.log(editor_strat.file( 'files', id = d.files[i].id ).web_path);
+            rows = rows + '<tr>' +
+                '<img src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" style="width=50%; height=50%;"/>' +
+                '</tr>';
+        }
+        return ('<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
+            rows +
+            '</table>');
+    }
 
     var table = $('#archive_table').DataTable( {
-        /*columnDefs: [{
-            orderable: false,
-            //className: 'details-control',
-            targets: 0
-        }],*/
-        /*select: {
-            style: 'multi',
-            selector: 'td:first-child'
-        },*/
+        select: { style: 'single',
+            selector: 'td:not(:first-child)'
+        },
+        responsive: {
+            "details": {
+                "type": 'column',
+                "target": 'tr'
+            }
+        },
+        dom: "lfrtBip",
+        order: [ 1, 'asc' ],
+        ajax: '/' + test_url + 'tests/',
+        columns: [
+            {
+                "className":      'details-control',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": '',
+                "render": function () {
+                    return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                },
+                width: "15px"
+            },
+            {data: "name"},
+            {data: "version"},
+            {data: "dateTest"},
+            {data: "dateBegin"},
+            {data: "dateEnd"},
+            {
+                data: "files",
+                render: function ( d ) {
+                    return d.length ?
+                        d.length+' image(s)' :
+                        'No image';
+                },
+                title: "Image"
+            }
+        ],
+        select: true,
+        buttons: [],
+
+        initComplete: function() {
+            // Add event listener for opening and closing details
+            $('#archive_table').on('click', 'td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var tdi = tr.find("i.fa");
+                var row = table.row(tr);
+
+                if (row.child.isShown()) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                    tdi.first().removeClass('fa-minus-square');
+                    tdi.first().addClass('fa-plus-square');
+                }
+                else {
+                    // Open this row
+                    row.child(format(row.data())).show();
+                    tr.addClass('shown');
+                    tdi.first().removeClass('fa-plus-square');
+                    tdi.first().addClass('fa-minus-square');
+                }
+            });
+        }
+    });
+/*
+    var table = $('#archive_table').DataTable( {
+
 
 
         dom: "lfrtBip",
-        ajax: '/' + test_url + 'tests/',
+        ajax: 'https://a51d6b62-1920-45e4-b298-e0c28a5e20f9.mock.pstmn.io/' + test_url + 'tests/',
         columns: [
             //{data: "checked"},
             {
@@ -114,12 +195,12 @@ $(document).ready(function () {
         order: [[ 1, 'asc' ]],
         select: true,
         buttons: [
-            {extend: "create", editor: editor_strat}
         ],
         rowCallback: function ( row, data, index ) {
             $('td:first-child', row).attr('title', 'Click to edit');
         }
     });
+
 
     $('#archive_table').on( 'click', 'td.details-control', function () {
         var tr = this.parentNode;
@@ -128,10 +209,11 @@ $(document).ready(function () {
             editor_strat.close();
         }
         else {
-            editor_strat.edit(
-                tr,
-                'Edit row',
-                [
+            editor_strat.open();
+            /*editor_strat.edit(
+                tr,*/
+                /*'Edit row',*/
+                /*[
                     {
                         "className": "delete",
                         "label": "Delete row",
@@ -148,16 +230,14 @@ $(document).ready(function () {
                     }
                 }
                 ]
-            );
         }
-    } );
-
+    } );*/
 
     uploadStrategies();
 });
 
 
-
+/*
 $('#archive_table tbody').on('click', 'td.details-control', function () {
     var tr = $(this).parents('tr');
     var row = $('#archive_table').DataTable().row( tr );
@@ -173,7 +253,7 @@ $('#archive_table tbody').on('click', 'td.details-control', function () {
         tr.addClass('shown');
     }
 } );
-
+*/
 
 /** Uploading strategy in editor**/
 function loadStrategyInEditor() {
