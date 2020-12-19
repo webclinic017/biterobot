@@ -26,8 +26,8 @@ class TestSerializerPOST(serializers.Serializer):
     toDate = serializers.DateField()
     name = serializers.CharField(max_length=200)
     isNew = serializers.BooleanField()
-    ticker = serializers.CharField(max_length=100)
-    candleLength= serializers.CharField(max_length=15)
+    #   ticker = serializers.CharField(max_length=100)
+    #candleLength= serializers.CharField(max_length=15)
 
     def create(self, validated_data):
         validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
@@ -35,7 +35,7 @@ class TestSerializerPOST(serializers.Serializer):
         strategyName = validated_data.pop('name')
         taskId = validated_data.pop('id')
 
-        testInit(taskId=taskId, strategyPath=f'{settings.BASE_DIR}/strategyManager/strategies/{strategyName}.py', dateBegin=validated_data.pop('frDate'),
-                 dateEnd=validated_data.pop('toDate'), ticker=validated_data.pop('ticker'), candleLength=validated_data.pop('candleLength'))  # Передаем путь стратегии для старта тестирования
+        testInit(taskId=taskId, strategyPath=f'{settings.BASE_DIR}\strategyManager\strategies\{strategyName}.py', dateBegin=validated_data.pop('frDate'),
+                 dateEnd=validated_data.pop('toDate'), ticker='MOEX', candleLength='MIN_30')  # Передаем путь стратегии для старта тестирования
 
         return 0  # т.к. все данные в базу были уже записаны в common

@@ -24,10 +24,11 @@ def testInit(taskId, strategyPath, dateBegin, dateEnd, ticker, candleLength):
 def createDF(dateBegin, dateEnd, ticker, candleLength):
     dataInterval = DataIntervalModel.objects.filter(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
     dataIntervalId = dataInterval.values_list('id', flat=True)[0]
+    print(dataIntervalId)
+    candlesQuerySet = CandleModel.objects.filter(dataInterval_id=dataIntervalId)
+    print(candlesQuerySet)
+    for candle in candlesQuerySet:
+        print(candle.o)  # Вот так вытаскиваем пое объетка модели
 
-    candlesQuerySet = CandleModel.objects.filter(instrument_id=dataIntervalId)
-    for c in candlesQuerySet:
-        candle = c.values_list()[0]
-        #print(candle)
 
 
