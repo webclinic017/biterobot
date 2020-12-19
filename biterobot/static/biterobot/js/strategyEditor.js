@@ -157,7 +157,15 @@ $(window).resize(function () {
     }
 })
 
+function showEditor() {
+    document.getElementById('strategy-editor-add').removeAttribute("class");
+    document.getElementById('strategy-editor-add-button').setAttribute("class", 'd-none');
+}
 
+function hideEditor() {
+    document.getElementById('strategy-editor-add').setAttribute("class", 'd-none');
+    document.getElementById('strategy-editor-add-button').setAttribute("class", 'btn btn-dark');
+}
 
 /** Uploading strategy in editor**/
 function loadStrategyInEditor() {

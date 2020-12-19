@@ -147,78 +147,89 @@
                      </select>
                  </div>
 
-                 <div class="form-group">
-                     <label class="text-light">Description:</label>
-                     <input class="form-control d-inline-block" type="text" name="stratDescription" style="min-width: 300px; width: 75%;"/>
-                 </div>
-
-                 <div class="form-group" style="margin-bottom: 10px;">
-                     <label class="text-light">Name:</label>
-                     <input class="form-control d-inline-block" type="text" name="stratName" style="min-width: 212px;margin-left: 38px; width: 50%;"/>
-                 </div>
+                 <button class="btn btn-dark" type="button" style="padding-right: 20px; padding-left: 20px; margin-left: auto;
+                        margin-right: 0em;" id="strategy-editor-add-button" onclick="showEditor()">Add</button>
 
 
-                 <div style="margin-bottom: 5px; float: right;">
-                     <label class="text-light">Them:</label>
-                     <select class="rounded" name="seletTheam" onchange="changeEditorStyle()">
-                         <optgroup label="Bright">
-                             <option value="ace/theme/chrome">Chrome</option>
-                             <option value="ace/theme/clouds">Clouds</option>
-                             <option value="ace/theme/crimson_editor">Crimson Editor</option>
-                             <option value="ace/theme/dawn">Dawn</option>
-                             <option value="ace/theme/dreamweaver">Dreamweaver</option>
-                             <option value="ace/theme/eclipse">Eclipse</option>
-                             <option value="ace/theme/github">GitHub</option>
-                             <option value="ace/theme/iplastic">IPlastic</option>
-                             <option value="ace/theme/solarized_light">Solarized Light</option>
-                             <option value="ace/theme/textmate">TextMate</option>
-                             <option value="ace/theme/tomorrow">Tomorrow</option>
-                             <option value="ace/theme/xcode">Xcode</option>
-                             <option value="ace/theme/kuroir">Kuroir</option>
-                             <option value="ace/theme/katzenmilch">KatzenMilch</option>
-                             <option value="ace/theme/sqlserver">SQL Server</option>
-                         </optgroup>
-                         <optgroup label="Dark">
-                             <option value="ace/theme/ambiance">Ambiance</option>
-                             <option value="ace/theme/chaos">Chaos</option>
-                             <option value="ace/theme/clouds_midnight">Clouds Midnight</option>
-                             <option value="ace/theme/dracula">Dracula</option>
-                             <option value="ace/theme/cobalt">Cobalt</option>
-                             <option value="ace/theme/gruvbox">Gruvbox</option>
-                             <option value="ace/theme/gob">Green on Black</option>
-                             <option value="ace/theme/idle_fingers">idle Fingers</option>
-                             <option value="ace/theme/kr_theme">krTheme</option>
-                             <option value="ace/theme/merbivore">Merbivore</option>
-                             <option value="ace/theme/merbivore_soft">Merbivore Soft</option>
-                             <option value="ace/theme/mono_industrial">Mono Industrial</option>
-                             <option value="ace/theme/monokai">Monokai</option>
-                             <option value="ace/theme/nord_dark">Nord Dark</option>
-                             <option value="ace/theme/pastel_on_dark">Pastel on dark</option>
-                             <option value="ace/theme/solarized_dark">Solarized Dark</option>
-                             <option value="ace/theme/terminal">Terminal</option>
-                             <option selected value="ace/theme/tomorrow_night">Tomorrow Night</option>
-                             <option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option>
-                             <option value="ace/theme/tomorrow_night_bright">Tomorrow Night Bright</option>
-                             <option value="ace/theme/tomorrow_night_eighties">Tomorrow Night 80s</option>
-                             <option value="ace/theme/twilight">Twilight</option>
-                             <option value="ace/theme/vibrant_ink">Vibrant Ink</option>
-                         </optgroup>
-                     </select>
-                 </div>
-                 <pre class="rounded" style="min-height: 590px;width: 100%;" placeholder="Strategy text..." name="stratText" id="editor"></pre>
+                 <div class="d-none" id="strategy-editor-add" style="border: 2px solid #e1edf6; padding: 4px; border-radius: 2%">
+                     <button class="btn-close" type="button" style="" onclick="hideEditor()"></button>
 
-                 <script src="../static/biterobot/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-                 <script>
-                     var editor = ace.edit("editor");
-                     editor.setTheme(document.req_form.seletTheam.value);
-                     editor.session.setMode("ace/mode/python");
-                 </script>
+                     <div class="form-group">
+                         <label class="text-light">Description:</label>
+                         <input class="form-control d-inline-block" type="text" name="stratDescription" style="min-width: 300px; width: 75%;"/>
+                     </div>
 
-                 <input class="d-none" id="inputFile-1" type="file" name="stratFile" style="width: 100%;margin-bottom: 15px;" onchange="loadStrategyInEditor()" accept=".py, .txt"/>
+                     <div class="form-group" style="margin-bottom: 10px;">
+                         <label class="text-light">Name:</label>
+                         <input class="form-control d-inline-block" type="text" name="stratName" style="min-width: 212px;margin-left: 38px; width: 50%;"/>
+                     </div>
 
-                 <div class="form-group">
-                     <label class="text-light border rounded border-dark btn-dark" style="margin-right: 5px;padding-left: 10px;padding-right: 10px;padding-top: 5px; padding-bottom: 5px;" for="inputFile-1">Choose file</label>
-                     <input class="form-control d-inline-block" type="text" style="width: 60%;" name="fileName" placeholder="file name..." readonly/>
+
+                     <div style="margin-bottom: 5px; float: right;">
+                         <label class="text-light">Them:</label>
+                         <select class="rounded" name="seletTheam" onchange="changeEditorStyle()">
+                             <optgroup label="Bright">
+                                 <option value="ace/theme/chrome">Chrome</option>
+                                 <option value="ace/theme/clouds">Clouds</option>
+                                 <option value="ace/theme/crimson_editor">Crimson Editor</option>
+                                 <option value="ace/theme/dawn">Dawn</option>
+                                 <option value="ace/theme/dreamweaver">Dreamweaver</option>
+                                 <option value="ace/theme/eclipse">Eclipse</option>
+                                 <option value="ace/theme/github">GitHub</option>
+                                 <option value="ace/theme/iplastic">IPlastic</option>
+                                 <option value="ace/theme/solarized_light">Solarized Light</option>
+                                 <option value="ace/theme/textmate">TextMate</option>
+                                 <option value="ace/theme/tomorrow">Tomorrow</option>
+                                 <option value="ace/theme/xcode">Xcode</option>
+                                 <option value="ace/theme/kuroir">Kuroir</option>
+                                 <option value="ace/theme/katzenmilch">KatzenMilch</option>
+                                 <option value="ace/theme/sqlserver">SQL Server</option>
+                             </optgroup>
+                             <optgroup label="Dark">
+                                 <option value="ace/theme/ambiance">Ambiance</option>
+                                 <option value="ace/theme/chaos">Chaos</option>
+                                 <option value="ace/theme/clouds_midnight">Clouds Midnight</option>
+                                 <option value="ace/theme/dracula">Dracula</option>
+                                 <option value="ace/theme/cobalt">Cobalt</option>
+                                 <option value="ace/theme/gruvbox">Gruvbox</option>
+                                 <option value="ace/theme/gob">Green on Black</option>
+                                 <option value="ace/theme/idle_fingers">idle Fingers</option>
+                                 <option value="ace/theme/kr_theme">krTheme</option>
+                                 <option value="ace/theme/merbivore">Merbivore</option>
+                                 <option value="ace/theme/merbivore_soft">Merbivore Soft</option>
+                                 <option value="ace/theme/mono_industrial">Mono Industrial</option>
+                                 <option value="ace/theme/monokai">Monokai</option>
+                                 <option value="ace/theme/nord_dark">Nord Dark</option>
+                                 <option value="ace/theme/pastel_on_dark">Pastel on dark</option>
+                                 <option value="ace/theme/solarized_dark">Solarized Dark</option>
+                                 <option value="ace/theme/terminal">Terminal</option>
+                                 <option selected value="ace/theme/tomorrow_night">Tomorrow Night</option>
+                                 <option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option>
+                                 <option value="ace/theme/tomorrow_night_bright">Tomorrow Night Bright</option>
+                                 <option value="ace/theme/tomorrow_night_eighties">Tomorrow Night 80s</option>
+                                 <option value="ace/theme/twilight">Twilight</option>
+                                 <option value="ace/theme/vibrant_ink">Vibrant Ink</option>
+                             </optgroup>
+                         </select>
+                     </div>
+                     <pre class="rounded" style="min-height: 590px;width: 100%;" placeholder="Strategy text..." name="stratText" id="editor"></pre>
+
+                     <script src="../static/biterobot/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+                     <script>
+                         var editor = ace.edit("editor");
+                         editor.setTheme(document.req_form.seletTheam.value);
+                         editor.session.setMode("ace/mode/python");
+                     </script>
+
+                     <input class="d-none" id="inputFile-1" type="file" name="stratFile" style="width: 100%;" onchange="loadStrategyInEditor()" accept=".py, .txt"/>
+
+                     <div class="form-group">
+                         <label class="text-light border rounded border-dark btn-dark" style="margin-right: 5px;padding: 5px;" for="inputFile-1">Choose file</label>
+                         <input class="form-control d-inline-block" type="text" style="width: 60%;" name="fileName" placeholder="file name..." readonly/>
+                     </div>
+
+                     <button class="btn btn-dark" type="button" style="padding-right: 20px; padding-left: 20px; margin-left: auto;
+                        margin-right: 0em;">Add</button>
                  </div>
 
                  <div class="btn-group" style="display: flex;align-items: center;justify-content: center;">
