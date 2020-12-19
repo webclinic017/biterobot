@@ -8,7 +8,7 @@ var last_message = new Date();
 
 $(document).ready(function () {
     editor_strat = new $.fn.dataTable.Editor( {
-        ajax: '/' + test_url + 'tests/_id_/',
+        ajax: server_url + test_url + 'tests/_id_/',
         table: '#archive_table',
         idSrc: 'id',
         fields: [ {
@@ -51,7 +51,8 @@ $(document).ready(function () {
             console.log(editor_strat.file( 'files', id = d.files[i].id ).web_path);
             rows = rows + '<tr>' +
                 '<img src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" style="width=50%; height=50%;"/>' +
-                '</tr>';
+                '</tr><tr>smth</tr>';
+
         }
         return ('<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
             rows +
@@ -70,7 +71,7 @@ $(document).ready(function () {
         },
         dom: "lfrtBip",
         order: [ 1, 'asc' ],
-        ajax: '/' + test_url + 'tests/',
+        ajax: server_url + test_url + 'tests/',
         columns: [
             {
                 "className":      'details-control',
@@ -98,6 +99,7 @@ $(document).ready(function () {
             }
         ],
         select: true,
+        scrollY: true,
         buttons: [],
 
         initComplete: function() {
@@ -126,7 +128,34 @@ $(document).ready(function () {
     });
 
     uploadStrategies();
+    if ($(window).width() <= 716) {
+        document.getElementById('strategy-editor-block').removeAttribute("style");
+        document.getElementById('strategy-editor-block').setAttribute("style", 'width: 100%');
+        document.getElementById('strategy-result-block').removeAttribute("style");
+        document.getElementById('strategy-result-block').setAttribute("style", 'width: 100%');
+    } else {
+        document.getElementById('strategy-editor-block').removeAttribute("style");
+        document.getElementById('strategy-editor-block').setAttribute("style", 'width: 50%');
+        document.getElementById('strategy-result-block').removeAttribute("style");
+        document.getElementById('strategy-result-block').setAttribute("style", 'width: 50%');
+    }
 });
+
+
+$(window).resize(function () {
+    if ($(window).width() <= 716) {
+        document.getElementById('strategy-editor-block').removeAttribute("style");
+        document.getElementById('strategy-editor-block').setAttribute("style", 'width: 100%');
+        document.getElementById('strategy-result-block').removeAttribute("style");
+        document.getElementById('strategy-result-block').setAttribute("style", 'width: 100%');
+    } else {
+        document.getElementById('strategy-editor-block').removeAttribute("style");
+        document.getElementById('strategy-editor-block').setAttribute("style", 'width: 50%');
+        document.getElementById('strategy-result-block').removeAttribute("style");
+        document.getElementById('strategy-result-block').setAttribute("style", 'width: 50%');
+    }
+})
+
 
 
 /** Uploading strategy in editor**/
@@ -379,7 +408,7 @@ async function chooseAction () {
                 showEmptyField(document.req_form.stratName);
             }
         } else {
-            writeString('Error: Choose strategy firstly');
+            writeString('Error: Choose strategy firstly', new Date());
             showEmptyField(document.req_form.stratSelect);
         }
 
@@ -434,7 +463,7 @@ function writeString(str, now) {
     if (strRes !== '') {
         strRes = strRes + '\n';
     }
-    if (now.getSeconds() == last_message.getSeconds()) {
+    if (now.getSeconds() === last_message.getSeconds()) {
         strRes = strRes + str;
     } else {
         strRes = strRes + now.getHours() + ':' + now.getMinutes() + ':' +now.getSeconds() + ' BR> ' + str;
@@ -501,76 +530,8 @@ function testStep(code, req_id) {
 
 
 /** Send request to test strategy **/
-/*
-function workStrategyRequest (blob, reqCode, session, endConnetion, str) {
-    fetch ('/' + test_url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: blob
-    })
-        .then(res => {
-            if (res.status >= 200 && res.status <= 300) {
-                return res;
-            } else {
-                let error = new Error(res.statusText);
-                error.response = res;
-                throw error
-            }
-        })
-        .then(res => {
-            if (res.headers['Content-Type'] !== 'application/json') {
-                let error = new Error('Incorrect server response');
-                error.response = res;
-                throw error
-            }
-            return res;
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.code == 2201) {
-                writeString('Strategy validated');
-                workStrategyRequest(testStep(1202, session), 1202, session, endConnetion, 'test');
-            } else if (data.code == 2202) {
-                writeString('Start test');
-                while (endConnetion == workStrategyRequest(testStep(1203, session), 1203, session, endConnetion, 'isredy') !== true) {
-                    setTimeout('', 5000);
-                };
-                if (endConnetion !== 2) {
-                    workStrategyRequest(testStep(1204, session), 1204, session, 0, 'result');
-                } else {
-                    return endConnetion;
-                }
-            } else if (data.code == 2203) {
-                return endConnetion;
-            } else if (data.code == 2213) {
-                writeString('Test finished');
-                return 1;
-            } else if (data.code == 2204) {
-                writeString('Results');
-                //getTestResults();
-            }else if (data.code == 4001) {
-                writeString('Error: ' + data.errMsg);
-                endConnetion = 2;
-            } else {
-                endConnetion = 2;
-                writeString('Error: Incorrect code');
-            }
-        })
-        .catch(e => {
-            writeString('Error: ' + e.message);
-            writeString(e.response);
-            endConnetion = 2;
-        })
-    return endConnetion;
-}
-*/
-
-
-/** Send request to test strategy **/
 function workStrategyRequest (blob, reqCode, session, endConnetion, uuid) {
-    fetch ('/' + test_url, {
+    fetch (server_url + test_url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -580,6 +541,7 @@ function workStrategyRequest (blob, reqCode, session, endConnetion, uuid) {
         .then(res => {
             if (res.status >= 200 && res.status <= 300) {
                 writeString('Test started', new Date());
+                isRedy();
             } else {
                 let error = new Error(res.statusText);
                 error.response = res;
@@ -587,7 +549,7 @@ function workStrategyRequest (blob, reqCode, session, endConnetion, uuid) {
             }
         })
         /*.then(res => {
-            if (res.headers['Content-Type'] !== 'application/json') {
+            if (res.headers.get('Content-Type') !== 'application/json') {
                 let error = new Error('Incorrect server response');
                 error.response = res;
                 throw error
@@ -606,7 +568,7 @@ function workStrategyRequest (blob, reqCode, session, endConnetion, uuid) {
 /** Send request to load strategy **/
 function sendLoadStrategyRequest(blob) {
     writeString('Start uploading');
-    fetch ('/' + strat_url + 'strategies/', {
+    fetch (server_url + strat_url + 'strategies/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -615,16 +577,27 @@ function sendLoadStrategyRequest(blob) {
     })
         .then(res => {
             if (res.status == 200  || res.status == 201) {
-                uploadStrategies();
-                writeString('Strategy uploaded', new Date());
+                return res;
             } else if (res.status == 204) {
                 writeString('Error: Content was not send', new Date());
             } else if (res.status == 500) {
-                writeString(res.message);
+                writeString(res.message, new Date());
             } else {
                 let error = new Error(res.statusText);
                 error.response = res;
                 throw error;
+            }
+        })
+        .then(res => {
+            return res.json();
+        })
+        .then(res => {
+            if (res.success == "true") {
+                writeString('Strategy uploaded', new Date());
+                uploadStrategies();
+            } else if (res.success == "false") {
+                writeString('Error: Validation error', new Date());
+                writeString('Check yor strategy text and retry', new Date());
             }
         })
         .catch(e => {
@@ -636,7 +609,7 @@ function sendLoadStrategyRequest(blob) {
 /** Send request to update strategy **/
 function sendUpdateStrategyRequest(blob, stat_name) {
     writeString('Start updating');
-    fetch ('/' + strat_url +'strategies/' + stat_name, {
+    fetch (server_url + strat_url +'strategies/' + stat_name, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -645,17 +618,28 @@ function sendUpdateStrategyRequest(blob, stat_name) {
     })
         .then(res => {
             if (res.status == 200  || res.status == 201) {
-                uploadStrategies();
-                writeString('Strategy updated', new Date());
+                return res;
             } else if (res.status == 204) {
                 uploadStrategies();
                 writeString('Error: Content was not send', new Date());
             } else if (res.status == 500) {
-                writeString(res.message);
+                writeString(res.message, new Date());
             } else {
                 let error = new Error(res.statusText);
                 error.response = res;
                 throw error;
+            }
+        })
+        .then(res => {
+            return res.json();
+        })
+        .then(res => {
+            if (res.success == "true") {
+                uploadStrategies();
+                writeString('Strategy updated', new Date());
+            } else if (res.success == "false") {
+                writeString('Error: Validation error', new Date());
+                writeString('Check yor strategy text and retry', new Date());
             }
         })
         .catch(e => {
@@ -667,7 +651,7 @@ function sendUpdateStrategyRequest(blob, stat_name) {
 /** Send request to delete strategy **/
 function sendDeleteStrategyRequest(stat_name) {
     writeString('Start deleting');
-    fetch ('/' + strat_url + 'strategies/' + stat_name, {
+    fetch (server_url + strat_url + 'strategies/' + stat_name, {
         method: 'DELETE'
     })
         .then(res => {
@@ -690,7 +674,7 @@ function sendDeleteStrategyRequest(stat_name) {
 
 /** Send request to update data/strategies **/
 function sendUploadingRequest (req_name) {
-    fetch ('/' + strat_url + req_name + '/', {
+    fetch (server_url + strat_url + req_name + '/', {
         method: 'GET'
     })
         .then(res => {
