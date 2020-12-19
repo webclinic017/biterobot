@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import TestModel
-from .serializers import TestSerializerGET, TestSerializerPOST
+from .serializers import TestSerializerGET, TestSerializerPOST, FilePathSerializer
 
 
 @csrf_exempt
@@ -15,8 +15,9 @@ class TestView(APIView):
     def get(self, request):
         tests = TestModel.objects.all()
         serializer = TestSerializerGET(tests, many=True)
+        serializerFilePath = FilePathSerializer(many=True)
 
-        return Response(serializer.data)
+        return Response([{'data': serializer.data}, {'files': serializerFilePath.data}])
 
     def post(self, request):
         test = request.data
