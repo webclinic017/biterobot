@@ -1,4 +1,5 @@
 import importlib.util
+import pandas as pd
 
 from .backtest import manager
 from dataManager.models import DataIntervalModel, CandleModel
@@ -12,23 +13,33 @@ def testInit(taskId, strategyPath, dateBegin, dateEnd, ticker, candleLength):
     spec.loader.exec_module(foo)
 
     # Получение данных Candle и перевод в DF
-    createDF(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
+    candleDF = createDF(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
 
     print("STRATEGY CLASS - ", foo.TestStrategy)  # Печать класса для теста работы
     print("TASK ID - ", taskId)
+    print("CANDLE_DF - ", candleDF)
 
     backtest = manager.BacktestManager()
 
-    backtest.createTask(taskId, foo.TestStrategy)
+    backtest.createTask(taskId, foo.TestStrategy, candleDF)
 
 def createDF(dateBegin, dateEnd, ticker, candleLength):
     dataInterval = DataIntervalModel.objects.filter(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
     dataIntervalId = dataInterval.values_list('id', flat=True)[0]
-    print(dataIntervalId)
     candlesQuerySet = CandleModel.objects.filter(dataInterval_id=dataIntervalId)
-    print(candlesQuerySet)
+
+    rowData = pd.DataFrame(columns=['datetime', 'open', 'high', 'low', 'close', 'volume', 'openinterest'])
     for candle in candlesQuerySet:
-        print(candle.o)  # Вот так вытаскиваем пое объетка модели
+        rowData = rowData.append({
+            'datetime': [candle.candleTime],
+            'open': [candle.o],
+            'high': [candle.h],
+            'low': [candle.l],
+            'close': [candle.c],
+            'volume': [candle.v],
+            'openinterest': [candle.v],
+        }, ignore_index=True)
 
+    #print(rowData)
 
-
+    return rowData
