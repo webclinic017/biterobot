@@ -1,6 +1,6 @@
 var server_url = '/';
-var strat_url = 'strategyManager/';
-var data_url = 'dataManager/';
+var strat_url = 'strategyManager/';//for strategies
+var data_url = 'dataManager/'; //for data
 var test_url = 'testManager/'; //for testing
 //var server_url = 'https://a51d6b62-1920-45e4-b298-e0c28a5e20f9.mock.pstmn.io/';
 

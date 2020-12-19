@@ -128,6 +128,7 @@ $(document).ready(function () {
     });
 
     uploadStrategies();
+
     if ($(window).width() <= 716) {
         document.getElementById('strategy-editor-block').removeAttribute("style");
         document.getElementById('strategy-editor-block').setAttribute("style", 'width: 100%');
