@@ -1,5 +1,5 @@
 from typing import Any, Dict, Tuple
-from backtraderWrapper import Wrapper
+from .backtraderWrapper import Wrapper
 
 from testManager.backtest.const import taskStatus
 

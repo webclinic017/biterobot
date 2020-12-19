@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .common import testInit
+from django.conf import settings
 
 
 class TestSerializerGET(serializers.Serializer):
@@ -22,7 +23,8 @@ class TestSerializerPOST(serializers.Serializer):
         validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
 
         strategyName = validated_data.pop('name')
+        taskId = validated_data.pop('id')
 
-        testInit(f'../strategyManager/strategies/{strategyName}.py')
+        testInit(strategyPath=f'{settings.BASE_DIR}/strategyManager/strategies/{strategyName}.py', taskId=taskId)  # Передаем путь стратегии для старта тестирования
 
-        return 0  # т.к. все данные в базу были уже записаны в testInit
+        return 0  # т.к. все данные в базу были уже записаны в common
