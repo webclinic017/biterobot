@@ -22,9 +22,12 @@ def testInit(taskId, strategyPath, dateBegin, dateEnd, ticker, candleLength):
     backtest.createTask(taskId, foo.TestStrategy)
 
 def createDF(dateBegin, dateEnd, ticker, candleLength):
-    dataIntervalId = DataIntervalModel.objects.filter(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
-    #print(dataIntervalId)
-    #instruments = DataIntervalModel.objects.filter(ticker="MOEX")
-    #print(instruments.values_list('instrument_id', flat=True))
+    dataInterval = DataIntervalModel.objects.filter(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
+    dataIntervalId = dataInterval.values_list('id', flat=True)[0]
+
+    candlesQuerySet = CandleModel.objects.filter(instrument_id=dataIntervalId)
+    for c in candlesQuerySet:
+        candle = c.values_list()[0]
+        #print(candle)
 
 
