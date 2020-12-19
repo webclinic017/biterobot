@@ -16,7 +16,7 @@ class TestView(APIView):
         tests = TestModel.objects.all()
         serializer = TestSerializerGET(tests, many=True)
 
-        return Response(serializer.data)
+        return Response([{'data': serializer.data}, {'files': serializer.data}])
 
     def post(self, request):
         test = request.data

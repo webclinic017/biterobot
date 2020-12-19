@@ -4,11 +4,16 @@ from .common import testInit
 from django.conf import settings
 
 
+class FileSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+
 class TestSerializerGET(serializers.Serializer):
     name = serializers.CharField(max_length=200)
+    dateTest = serializers.DateField()
     dateBegin = serializers.DateField()
     dateEnd = serializers.DateField()
     instrument = serializers.IntegerField()  # Ссылка на id инструмента, потом поменять на name инструмента по ForeignKey
+    files = FileSerializer()
     checked = serializers.CharField(max_length=1, default="")  # Это нужно для решения проблем на ФРОНТЕ
 
 class TestSerializerPOST(serializers.Serializer):
