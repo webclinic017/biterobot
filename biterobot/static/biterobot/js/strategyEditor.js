@@ -429,18 +429,7 @@ async function chooseAction () {
 
 /** Write string in output **/
 function writeString(str, now) {
-    let strRes = document.res_form.resultText.value;
-    //let now = new Date();
-    if (strRes !== '') {
-        strRes = strRes + '\n';
-    }
-    if (now.getSeconds() == last_message.getSeconds()) {
-        strRes = strRes + str;
-    } else {
-        strRes = strRes + now.getHours() + ':' + now.getMinutes() + ':' +now.getSeconds() + ' BR> ' + str;
-        last_message = now;
-    }
-    document.res_form.resultText.value = strRes;
+
 }
 
 
