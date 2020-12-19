@@ -16,6 +16,9 @@ class TestSerializerGET(serializers.Serializer):
     files = FileSerializer()
     checked = serializers.CharField(max_length=1, default="")  # Это нужно для решения проблем на ФРОНТЕ
 
+class FilePathSerializer(serializers.Serializer):
+    web_path = serializers.CharField(max_length=1000)
+
 class TestSerializerPOST(serializers.Serializer):
     code = serializers.IntegerField()
     id = serializers.CharField(max_length=1500)
