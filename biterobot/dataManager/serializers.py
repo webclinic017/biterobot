@@ -10,7 +10,7 @@ class InstrumentSerializerGET(serializers.Serializer):
     dateBegin = serializers.DateField()
     dateEnd = serializers.DateField()
     candleLength = serializers.CharField(max_length=15)  # Интервал свечи (5 минут, 15 минут, день и т.д.)
-    checked = ""  # Это нужно для решения проблем на ФРОНТЕ
+    checked = serializers.CharField(max_length=1, default="")  # Это нужно для решения проблем на ФРОНТЕ
 
 class InstrumentSerializerPOST(serializers.Serializer):
     code = serializers.IntegerField()
