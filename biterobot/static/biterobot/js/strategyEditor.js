@@ -2,12 +2,13 @@
 
 /** Loading table's elements and data**/
 
-var editor_strat;
-var editor_data;
+var editor_strat; // Editor for strategies
+var editor_data; // Editor for data
 var editor_strategy;
 var last_message = new Date();
 var data_id = '';
 var strategy_id = '';
+var strat_action = '';
 
 $(document).ready(function () {
     $('table.display').DataTable();
@@ -65,7 +66,7 @@ $(document).ready(function () {
                 type: 'DELETE'
             }
         },
-        table: '#startegy_table',
+        table: '#strategy_table',
         idSrc: 'id'
     });
 
@@ -211,6 +212,7 @@ $(document).ready(function () {
                 text: "Add",
                 className: 'btn-dark-control',
                 action: function () {
+                    setStrategyData('', '', 'add');
                     showEditor();
                 }
             },
@@ -224,6 +226,11 @@ $(document).ready(function () {
                         .edit( table.row( { selected: true } ).index(), false )
                         .set( 'salary', (editor.get( 'salary' )*1) + 250 )
                         .submit();*/
+                    let rowIdx = strategy_table.row( {selected: true } ).index();
+                    setStrategyData(strategy_table.cell( rowIdx, 1 ).data(),
+                                    strategy_table.cell( rowIdx, 3 ).data(),
+                                    'replace');
+                    //alert(cellData);
                     showEditor();
                 }
             },
@@ -237,12 +244,12 @@ $(document).ready(function () {
 
     $('#data_table').on('click', 'tr', function () {
         data_id = data_table.row(this).id();
-        alert('Clicked row id '+ data_id);
+        //alert('Clicked row id '+ data_id);
     });
 
     $('#strategy_table').on('click', 'tr', function () {
         strategy_id = strategy_table.row(this).id();
-        alert('Clicked row id '+ strategy_id);
+        //alert('Clicked row id '+ strategy_id);
     });
 
     uploadStrategies();
@@ -283,6 +290,19 @@ function showEditor() {
 function hideEditor() {
     document.getElementById('strategy-editor-add').setAttribute("class", 'd-none');
     document.getElementById('strategy-editor-add-button').setAttribute("class", 'btn btn-dark');
+}
+
+function setStrategyData(name, description, type) {
+    if (type == 'add') {
+        document.getElementById("stratName").value = name;
+        document.getElementById("stratName").removeAttribute("readonly");
+        document.getElementById("stratDescription").value = description;
+    } else if (type == 'replace') {
+        document.getElementById("stratName").value = name;
+        document.getElementById("stratName").setAttribute("readonly", "");
+        document.getElementById("stratDescription").value = description;
+    }
+
 }
 
 /** Uploading strategy in editor**/
