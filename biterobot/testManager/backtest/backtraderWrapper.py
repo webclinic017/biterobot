@@ -1,22 +1,45 @@
-import datetime  # For datetime objects
-import os.path  # To manage paths
-import sys  # To find out the script name (in argv[0])
-import threading
-
+import contextlib
+import io
+from multiprocessing import Process, Manager
 # Import the backtrader platform
-from typing import Union, Callable
+from typing import Union, Callable, Type
 
 import backtrader as bt
+from backtrader_plotting import Bokeh
+from pandas import DataFrame
+
+from testManager.backtest.const import taskStatus
+
+
+def runAndListen(cerebro: bt.Cerebro, result: dict, plotFilePath: str):
+    output = io.StringIO()
+    result['startCash'] = cerebro.broker.getvalue()
+    with contextlib.redirect_stdout(output):
+        cerebro.run()
+        b = Bokeh(style='bar', output_mode='save', filename=plotFilePath)
+        cerebro.plot(b)
+    output.seek(0)
+    result['endCash'] = cerebro.broker.getvalue()
+    result['output'] = output.getvalue()
+    output.close()
 
 
 class Wrapper:
-    def __init__(self, strategy: bt.Strategy, data, startCash, commission, *args, **kwargs):
-        self.strategy: bt.Strategy = strategy
-        self.data = data
-        self.startCash = startCash
-        self.comission = commission
-        self.thread: Union[threading.Thread, None] = None
+    def __init__(self, strategy: Type[bt.Strategy], data: DataFrame, plotFilePath: str,
+                 startCash: int = 1000, commission: float = 0):
+        # attributes for backtrader
+        self.strategy: Type[bt.Strategy] = strategy
+        self.data: bt.feeds.PandasData = bt.feeds.PandasDirectData(dataname=data)
+        self.startCash: int = startCash
+        self.comission: float = commission
+        self.plotFilePath: str = plotFilePath
+
+        # attributes for manage process
+        self.process: Union[Process, None] = None
+        self.manager: Manager = Manager()
+        self.result: dict = self.manager.dict()
         self.targetToRun: Callable
+        self.status = taskStatus.CREATED
 
         # init cerebro
         self.cerebro: bt.Cerebro = bt.Cerebro()
@@ -25,173 +48,55 @@ class Wrapper:
         # add data
         self.cerebro.adddata(self.data)
         # define start cash
-        cerebro.broker.setcash(self.startCash)
+        self.cerebro.broker.setcash(self.startCash)
         # Set the commission
-        cerebro.broker.setcommission(commission=self.comission)
-
-        # callable object to start test
-        self.targetToRun = cerebro.run
+        self.cerebro.broker.setcommission(commission=self.comission)
 
     def run(self):
         """Run backtest"""
 
         # check if thread is already exists
-        if self.thread is None:
+        if self.process is None:
             # create if so
-            self.thread = threading.Thread(target=self.targetToRun)
+            self.process = Process(target=runAndListen, args=(self.cerebro, self.result, self.plotFilePath))
         # run
-        self.thread.start()
+        self.process.start()
+        # change status
+        self.status = taskStatus.RUNNING
+
+    def getStatus(self):
+        """
+        Get status of backtest
+        :return: one of the taskStatus
+        """
+        # if task was started
+        if self.status == taskStatus.RUNNING:
+            # but process is not alive
+            if not self.process.is_alive():
+                # means it is finished
+                # if exitcode is 0
+                if self.process.exitcode == 0:
+                    # it is done correctly
+                    self.status = taskStatus.DONE
+                else:
+                    # else - some error occurred
+                    self.status = taskStatus.ERROR
+
+        # now we have proper status and can return it
+        return self.status
+
+    def getResult(self):
+        """
+        Get output from backtest testing
+        :return: result of backtesting
+        """
+        if self.getStatus() == taskStatus.DONE:
+            return self.result['startCash'], self.result['endCash'], self.result['output'], self.plotFilePath
+        else:
+            return None
 
     def pause(self):
         pass
 
     def stop(self):
         pass
-
-
-# Create a Stratey
-class TestStrategy(bt.Strategy):
-    params = (
-        ('maperiod', 15),
-    )
-
-    def log(self, txt, dt=None):
-        ''' Logging function fot this strategy'''
-        dt = dt or self.datas[0].datetime.date(0)
-        print('%s, %s' % (dt.isoformat(), txt))
-
-    def __init__(self):
-        # Keep a reference to the "close" line in the data[0] dataseries
-        self.dataclose = self.datas[0].close
-
-        # To keep track of pending orders and buy price/commission
-        self.order = None
-        self.buyprice = None
-        self.buycomm = None
-
-        # Add a MovingAverageSimple indicator
-        self.sma = bt.indicators.SimpleMovingAverage(
-            self.datas[0], period=self.params.maperiod)
-
-        # Indicators for the plotting show
-        bt.indicators.ExponentialMovingAverage(self.datas[0], period=25)
-        bt.indicators.WeightedMovingAverage(self.datas[0], period=25,
-                                            subplot=True)
-        bt.indicators.StochasticSlow(self.datas[0])
-        bt.indicators.MACDHisto(self.datas[0])
-        rsi = bt.indicators.RSI(self.datas[0])
-        bt.indicators.SmoothedMovingAverage(rsi, period=10)
-        bt.indicators.ATR(self.datas[0], plot=False)
-
-    def notify_order(self, order):
-        if order.status in [order.Submitted, order.Accepted]:
-            # Buy/Sell order submitted/accepted to/by broker - Nothing to do
-            return
-
-        # Check if an order has been completed
-        # Attention: broker could reject order if not enough cash
-        if order.status in [order.Completed]:
-            if order.isbuy():
-                self.log(
-                    'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
-                    (order.executed.price,
-                     order.executed.value,
-                     order.executed.comm))
-
-                self.buyprice = order.executed.price
-                self.buycomm = order.executed.comm
-            else:  # Sell
-                self.log('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
-                         (order.executed.price,
-                          order.executed.value,
-                          order.executed.comm))
-
-            self.bar_executed = len(self)
-
-        elif order.status in [order.Canceled, order.Margin, order.Rejected]:
-            self.log('Order Canceled/Margin/Rejected')
-
-        # Write down: no pending order
-        self.order = None
-
-    def notify_trade(self, trade):
-        if not trade.isclosed:
-            return
-
-        self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
-                 (trade.pnl, trade.pnlcomm))
-
-    def next(self):
-        # Simply log the closing price of the series from the reference
-        self.log('Close, %.2f' % self.dataclose[0])
-
-        # Check if an order is pending ... if yes, we cannot send a 2nd one
-        if self.order:
-            return
-
-        # Check if we are in the market
-        if not self.position:
-
-            # Not yet ... we MIGHT BUY if ...
-            if self.dataclose[0] > self.sma[0]:
-                # BUY, BUY, BUY!!! (with all possible default parameters)
-                self.log('BUY CREATE, %.2f' % self.dataclose[0])
-
-                # Keep track of the created order to avoid a 2nd order
-                self.order = self.buy()
-
-        else:
-
-            if self.dataclose[0] < self.sma[0]:
-                # SELL, SELL, SELL!!! (with all possible default parameters)
-                self.log('SELL CREATE, %.2f' % self.dataclose[0])
-
-                # Keep track of the created order to avoid a 2nd order
-                self.order = self.sell()
-
-
-if __name__ == '__main__':
-    # Create a cerebro entity
-    cerebro = bt.Cerebro()
-
-    # Add a strategy
-    cerebro.addstrategy(TestStrategy)
-
-    # Datas are in a subfolder of the samples. Need to find where the script is
-    # because it could have been called from anywhere
-    modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
-    datapath = os.path.join(modpath, 'orcl-1995-2014.txt')
-
-    # Create a Data Feed
-    data = bt.feeds.YahooFinanceCSVData(
-        dataname=datapath,
-        # Do not pass values before this date
-        fromdate=datetime.datetime(2000, 1, 1),
-        # Do not pass values before this date
-        todate=datetime.datetime(2000, 12, 31),
-        # Do not pass values after this date
-        reverse=False)
-
-    # Add the Data Feed to Cerebro
-    cerebro.adddata(data)
-
-    # Set our desired cash start
-    cerebro.broker.setcash(1000.0)
-
-    # Add a FixedSize sizer according to the stake
-    cerebro.addsizer(bt.sizers.FixedSize, stake=10)
-
-    # Set the commission
-    cerebro.broker.setcommission(commission=0.0)
-
-    # Print out the starting conditions
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-    # Run over everything
-    cerebro.run()
-
-    # Print out the final result
-    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-    # Plot the result
-    cerebro.plot()
