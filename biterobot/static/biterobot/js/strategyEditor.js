@@ -4,8 +4,10 @@
 
 var editor_strat;
 var editor_data;
+var editor_strategy;
 var last_message = new Date();
 var data_id = '';
+var strategy_id = '';
 
 $(document).ready(function () {
     $('table.display').DataTable();
@@ -51,6 +53,19 @@ $(document).ready(function () {
         serverSide: false,
         ajax:  server_url + data_url + 'instruments/_id_/',
         table: '#data_table',
+        idSrc: 'id'
+    });
+
+    editor_strategy = new $.fn.dataTable.Editor( {
+        processing: false,
+        serverSide: false,
+        ajax:  {
+            remove: {
+                url: server_url + strat_url + 'strategies/_id_/',
+                type: 'DELETE'
+            }
+        },
+        table: '#startegy_table',
         idSrc: 'id'
     });
 
@@ -167,11 +182,68 @@ $(document).ready(function () {
         scrollY: true,
     });
 
+    var strategy_table = $('#strategy_table').DataTable( {
+        select: {
+            style: 'os',
+            selector: 'td:first-child'
+        },
+        order: [[ 1, 'asc' ]],
+
+        dom: "lfrtBip",
+        ajax: server_url + strat_url + 'strategies/',
+        rowId: 'id',
+        columns: [
+            {
+                "className":      'select-checkbox select-checkbox-all',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": '',
+                targets: 0,
+                width: "15px"
+            },
+            {data: "name"},
+            {data: "version"},
+            {data: "description"}
+        ],
+        select: true,
+        buttons: [
+            {
+                text: "Add",
+                className: 'btn-dark-control',
+                action: function () {
+                    showEditor();
+                }
+            },
+            {
+                extend: "selectedSingle",
+                text: "Replace",
+                className: 'btn-dark-control',
+                action: function ( /*e, dt, node, config*/ ) {
+                    // Immediately add `250` to the value of the salary and submit
+                    /*editor
+                        .edit( table.row( { selected: true } ).index(), false )
+                        .set( 'salary', (editor.get( 'salary' )*1) + 250 )
+                        .submit();*/
+                    showEditor();
+                }
+            },
+            {   extend: "remove",
+                className: 'btn-red-control',
+                editor: editor_strategy
+            }
+        ],
+        scrollY: true,
+    });
+
     $('#data_table').on('click', 'tr', function () {
         data_id = data_table.row(this).id();
         alert('Clicked row id '+ data_id);
     });
 
+    $('#strategy_table').on('click', 'tr', function () {
+        strategy_id = strategy_table.row(this).id();
+        alert('Clicked row id '+ strategy_id);
+    });
 
     uploadStrategies();
 

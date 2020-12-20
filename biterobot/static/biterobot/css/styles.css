@@ -1,3 +1,17 @@
+.btn-dark-control {
+    color: #fff!important;
+    background-color: #343a40!important;
+    border-color: #343a40!important;
+    border-radius: 4px!important;
+}
+
+.btn-red-control {
+    color: #fff!important;
+    background-color: #e00b0b !important;
+    border-color: #343a40 !important;
+    border-radius: 4px!important;
+}
+
 td.details-control {
     background: url(../images/details_open.png) no-repeat center center;
     cursor: pointer;
