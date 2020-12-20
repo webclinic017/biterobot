@@ -68,10 +68,10 @@ class BacktestManager:
         # get status
         return self.tasks[taskId].getStatus()
 
-    def getResult(self, taskId: Any) -> Tuple[Any, Any]:
+    def getResult(self, taskId: Any) -> Tuple[float, float, str, str]:
         """Get results
         :param taskId: id of the task
-        :return: tuple of results - (output string, plot)"""
+        :return: tuple of results - (start cash, end cash, output, plot filepath)"""
 
         # check if task is created
         if taskId not in self.tasks:
