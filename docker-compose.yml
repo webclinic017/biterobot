@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  biterobot:
+    build: .
+    container_name: biterobot
+    command: >
+      bash -c
+        "python3.7  manage.py makemigrations transcoder
+          python3.7  manage.py migrate transcoder
+            python3.7 manage.py runserver 0.0.0.0:80"
+    ports:
+      - "80:80"
+    logging:
+      options:
+        tag: "live-transcoder-python3"
