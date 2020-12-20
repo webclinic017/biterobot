@@ -3,10 +3,13 @@
 /** Loading table's elements and data**/
 
 var editor_strat;
+var editor_data;
 var last_message = new Date();
-
+var data_id = '';
 
 $(document).ready(function () {
+    $('table.display').DataTable();
+
     editor_strat = new $.fn.dataTable.Editor( {
         ajax: server_url + test_url + 'tests/_id_/',
         table: '#archive_table',
@@ -41,6 +44,14 @@ $(document).ready(function () {
             noFileText: 'No images'
             }
         ]
+    });
+
+    editor_data = new $.fn.dataTable.Editor( {
+        processing: false,
+        serverSide: false,
+        ajax:  server_url + data_url + 'instruments/_id_/',
+        table: '#data_table',
+        idSrc: 'id'
     });
 
     function format (d) {
@@ -126,6 +137,41 @@ $(document).ready(function () {
             });
         }
     });
+
+    var data_table = $('#data_table').DataTable( {
+        select: {
+            style: 'os',
+            selector: 'td:first-child'
+        },
+        order: [[ 1, 'asc' ]],
+
+        dom: "lfrtBip",
+        ajax: server_url + data_url + 'instruments/',
+        rowId: 'id',
+        columns: [
+            {
+                "className":      'select-checkbox select-checkbox-all',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": '',
+                targets: 0,
+                width: "15px"
+            },
+            {data: "ticker"},
+            {data: "candleLength"},
+            {data: "dateBegin"},
+            {data: "dateEnd"}
+        ],
+        select: true,
+        buttons: [],
+        scrollY: true,
+    });
+
+    $('#data_table').on('click', 'tr', function () {
+        data_id = data_table.row(this).id();
+        alert('Clicked row id '+ data_id);
+    });
+
 
     uploadStrategies();
 
