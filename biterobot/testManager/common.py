@@ -1,8 +1,14 @@
 import importlib.util
+from time import sleep
+
 import pandas as pd
+from django.conf import settings
+
 
 from .backtest import manager
 from dataManager.models import DataIntervalModel, CandleModel
+
+from .backtest.tools import checkStrategy
 
 
 def testInit(taskId, strategyPath, dateBegin, dateEnd, ticker, candleLength):
@@ -21,7 +27,16 @@ def testInit(taskId, strategyPath, dateBegin, dateEnd, ticker, candleLength):
 
     backtest = manager.BacktestManager()
 
-    backtest.createTask(taskId, foo.TestStrategy, candleDF)
+    backtest.createTask(taskId=taskId, strategy=foo.TestStrategy, data=candleDF, plotFilePath=f'{settings.BASE_DIR}\\testManager\\resultGraphs\graph.html')
+
+    print(checkStrategy(foo.TestStrategy))
+
+    print(backtest.getStatus(taskId=taskId))
+    backtest.run(taskId=taskId)
+    print(backtest.getStatus(taskId=taskId))
+    sleep(5)
+    print(backtest.getStatus(taskId=taskId))
+    print(backtest.getResult(taskId=taskId))
 
 def createDF(dateBegin, dateEnd, ticker, candleLength):
     dataInterval = DataIntervalModel.objects.filter(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
@@ -31,7 +46,7 @@ def createDF(dateBegin, dateEnd, ticker, candleLength):
     rowData = pd.DataFrame(columns=['datetime', 'open', 'high', 'low', 'close', 'volume', 'openinterest'])
     for candle in candlesQuerySet:
         rowData = rowData.append({
-            'datetime': [candle.candleTime],
+            'datetime': [pd.datetime.date(candle.candleTime)],
             'open': [candle.o],
             'high': [candle.h],
             'low': [candle.l],
@@ -40,6 +55,6 @@ def createDF(dateBegin, dateEnd, ticker, candleLength):
             'openinterest': [candle.v],
         }, ignore_index=True)
 
-    #print(rowData)
+    print(rowData)
 
     return rowData

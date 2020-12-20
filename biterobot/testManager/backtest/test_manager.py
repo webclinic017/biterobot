@@ -61,7 +61,7 @@ class TestStrategy2(bt.Strategy):
             return
 
         # Check if an order has been completed
-        # Attention: broker could reject order if not enough cash
+        # Attention: b  roker could reject order if not enough cash
         if order.status in [order.Completed]:
             if order.isbuy():
                 self.log(

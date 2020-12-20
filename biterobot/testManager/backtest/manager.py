@@ -3,7 +3,7 @@ from typing import Any, Dict, Tuple, Type
 from backtrader import Strategy
 from pandas import DataFrame
 
-from backtraderWrapper import Wrapper
+from .backtraderWrapper import Wrapper
 from testManager.backtest.const import taskStatus
 
 

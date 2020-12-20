@@ -10,4 +10,4 @@ class TestModel(models.Model):
     instrument = models.ForeignKey(InstrumentModel, on_delete=models.DO_NOTHING)
     strategyVersion = models.IntegerField()
     trades = models.CharField(max_length=10000)
-    plotPath = models.FilePathField(path="C:\\Users\\uzer\PycharmProjects\\biterobot\\biterobot\\testManager\\resultImages")
+    plotPath = models.FilePathField(path="C:\\Users\\uzer\PycharmProjects\\biterobot\\biterobot\\testManager\\resultGraphs")
