@@ -4,10 +4,19 @@ from .common import testInit
 from django.conf import settings
 
 
+class TestSerializerGET(serializers.Serializer):
+    uuid = serializers.CharField(max_length=1000)  # Уникальный id тестирования
+    name = serializers.CharField(max_length=200)  # Название стратегии + Test
+    version = serializers.IntegerField()  # Версия стратегии
+    dateTest = serializers.DateField()  # Дата проведения тестирования
+    dateBegin = serializers.DateField()  # Дата начала периода тестирования
+    dateEnd = serializers.DateField()  # Дата конца периода тестирования
+    file = serializers.FilePathField(path="C:\\Users\\uzer\PycharmProjects\\biterobot\\biterobot\\testManager\\resultGraphs")  # Пусть до графика тестирования
+
 class FileSerializer(serializers.Serializer):
     id = serializers.IntegerField()
 
-class TestSerializerGET(serializers.Serializer):
+class TestSerializerArchiveGET(serializers.Serializer):
     name = serializers.CharField(max_length=200)
     dateTest = serializers.DateField()
     dateBegin = serializers.DateField()
