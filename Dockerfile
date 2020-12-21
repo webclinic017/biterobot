@@ -1,6 +1,7 @@
 FROM python:3.8-buster
 
 ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
 
 RUN mkdir -p /home/biterobot/
 
@@ -18,5 +19,7 @@ RUN apt-get -y update \
 /tmp/* \
 /var/tmp/*
 
+RUN python3.8  manage.py makemigrations transcoder \
+&& python3.8  manage.py migrate transcoder \
+&& python3.8 manage.py runserver 0.0.0.0:8080
 
-EXPOSE 80/tcp
