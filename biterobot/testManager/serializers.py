@@ -13,17 +13,29 @@ class TestSerializerGET(serializers.Serializer):
     dateEnd = serializers.DateField()  # Дата конца периода тестирования
     file = serializers.FilePathField(path="C:\\Users\\uzer\PycharmProjects\\biterobot\\biterobot\\testManager\\resultGraphs")  # Пусть до графика тестирования
 
-class FileSerializer(serializers.Serializer):
+class FilesIdSerializer(serializers.Serializer):
     id = serializers.IntegerField()
 
+class AdditionalSerializer(serializers.Serializer):
+    web_path = serializers.CharField(max_length=1000)
+    startCash = serializers.FloatField()
+    endCash = serializers.FloatField()
+    resultData = serializers.CharField()
+
+class TestInfoSerializer(serializers.Serializer):
+    id = serializers.IntegerField()  # id записи в БД
+    name = serializers.CharField(max_length=200)  # Название стратегии + Test
+    version = serializers.IntegerField()  # Версия стратегии
+    dateTest = serializers.DateField()  # Дата проведения тестирования
+    dateBegin = serializers.DateField()  # Дата начала периода тестирования
+    dateEnd = serializers.DateField()  # Дата конца периода тестирования
+    files = serializers.ListField(child=FilesIdSerializer)
+
+class FileSerializer(serializers.Serializer):
+    files = serializers.ListField(child=AdditionalSerializer)
+
 class TestSerializerArchiveGET(serializers.Serializer):
-    name = serializers.CharField(max_length=200)
-    dateTest = serializers.DateField()
-    dateBegin = serializers.DateField()
-    dateEnd = serializers.DateField()
-    instrument = serializers.IntegerField()  # Ссылка на id инструмента, потом поменять на name инструмента по ForeignKey
-    files = FileSerializer()
-    checked = serializers.CharField(max_length=1, default="")  # Это нужно для решения проблем на ФРОНТЕ
+    pass
 
 class FilePathSerializer(serializers.Serializer):
     web_path = serializers.CharField(max_length=1000)
