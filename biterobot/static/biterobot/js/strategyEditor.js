@@ -213,6 +213,7 @@ $(document).ready(function () {
                 className: 'btn-dark-control',
                 action: function () {
                     setStrategyData('', '', 'add');
+                    strat_action = 'load';
                     showEditor();
                 }
             },
@@ -220,35 +221,47 @@ $(document).ready(function () {
                 extend: "selectedSingle",
                 text: "Replace",
                 className: 'btn-dark-control',
-                action: function ( /*e, dt, node, config*/ ) {
-                    // Immediately add `250` to the value of the salary and submit
-                    /*editor
-                        .edit( table.row( { selected: true } ).index(), false )
-                        .set( 'salary', (editor.get( 'salary' )*1) + 250 )
-                        .submit();*/
+                action: function () {
                     let rowIdx = strategy_table.row( {selected: true } ).index();
                     setStrategyData(strategy_table.cell( rowIdx, 1 ).data(),
                                     strategy_table.cell( rowIdx, 3 ).data(),
                                     'replace');
-                    //alert(cellData);
+                    strat_action = 'update';
                     showEditor();
                 }
             },
             {   extend: "remove",
                 className: 'btn-red-control',
                 editor: editor_strategy
+            },
+            {
+                extend: "selectedSingle",
+                text: "Test",
+                className: 'btn-dark-control',
+                action: function () {
+                    strat_action = 'test';
+                    chooseAction();
+                }
             }
         ],
         scrollY: true,
     });
 
     $('#data_table').on('click', 'tr', function () {
-        data_id = data_table.row(this).id();
+        if (data_id == data_table.row(this).id()) {
+            data_id = '';
+        } else {
+            data_id = data_table.row(this).id();
+        }
         //alert('Clicked row id '+ data_id);
     });
 
     $('#strategy_table').on('click', 'tr', function () {
-        strategy_id = strategy_table.row(this).id();
+        if (strategy_id == strategy_table.row(this).id()) {
+            strategy_id = '';
+        } else {
+            strategy_id = strategy_table.row(this).id();
+        }
         //alert('Clicked row id '+ strategy_id);
     });
 
@@ -367,7 +380,6 @@ function uuidv4() {
 /** Creating json for loading **/
 function loadStrategy(stratName, stratFile, description) {
     let request = {
-        code: 1101,
         name: stratName,
         description: description,
         file: {
@@ -383,35 +395,22 @@ function loadStrategy(stratName, stratFile, description) {
 
 
 /** Creating json for updating **/
-function updateStrategy(stratName, stratFile, description) {
+function updateStrategy(stratFile, description) {
     let request = {};
-    if (description !== document.req_form.descriptionSelect.value && stratFile !== '') {
+    if (stratFile !== '') {
         request = {
-            code: 1101,
-            name: stratName,
+            id: strategy_id,
             description: description,
             file: {
                 name: document.req_form.stratFile.files[0].name,
                 body: stratFile
             }
         };
-    } else if (description !== document.req_form.descriptionSelect.value && stratFile == '') {
-        request = {
-            code: 1101,
-            name: stratName,
-            description: description
-        };
-    } else if (description == document.req_form.descriptionSelect.value && stratFile !== '') {
-        request = {
-            code: 1101,
-            name: stratName,
-            file: {
-                name: document.req_form.stratFile.files[0].name,
-                body: stratFile
-            }
-        };
     } else {
-        return '';
+        request = {
+            id: strategy_id,
+            description: description
+        }
     }
 
     let json = JSON.stringify(request);
@@ -421,8 +420,8 @@ function updateStrategy(stratName, stratFile, description) {
 
 
 /** Creating json for testing **/
-function testStrategy(frdate, todate, stratSelect, stratName, stratFile, uuid) {
-    let req_id = uuidv4();
+function testStrategy(data, strategy, uuid) {
+    /*let req_id = uuidv4();
     console.log(uuidv4)
     if (frdate !== '' && todate !== '') {
         let request = {};
@@ -450,15 +449,19 @@ function testStrategy(frdate, todate, stratSelect, stratName, stratFile, uuid) {
             };
         } else {
             return 'Error: File is empty!!!'
+        }*/
+        let request = {
+            id: uuid,
+            id_data: data,
+            id_strat: strategy
         }
-
         let json = JSON.stringify(request);
         console.log(json)
         return (json);
         //sendRequest(json, 1201, req_id, false);
-    } else {
+    /*} else {
         return('Dates must be chosen!!!');
-    }
+    }*/
 }
 
 
@@ -466,13 +469,13 @@ function testStrategy(frdate, todate, stratSelect, stratName, stratFile, uuid) {
 async function chooseAction () {
     let frdate = document.req_form.date_begin.value;
     let todate = document.req_form.date_end.value;
-    let stratSelect = document.req_form.stratSelect.value;
-    let desriptionSelect = document.req_form.descriptionSelect.value;
+    //let stratSelect = document.req_form.stratSelect.value;
+    //let desriptionSelect = document.req_form.descriptionSelect.value;
     let description = document.req_form.stratDescription.value;
     //let stratText = document.forma.textar.value;
     let stratName = document.req_form.stratName.value;
     let stratFile = document.req_form.stratFile.files[0];
-    let action = document.req_form.stratAction.value;
+    //let action = document.req_form.stratAction.value;
 
     let strRes = '';
 
@@ -488,11 +491,12 @@ async function chooseAction () {
                     sendLoadStrategyRequest(loadStrategy(stratName, reader.result, description));
                 } else {
                     writeString('Error: File is empty', new Date());
+                    showEmptyField(document.req_form.fileName);
                 }
             };
         } else {
             if (stratFile == undefined) {
-                writeString('Error: File is empty', new Date());
+                writeString('Error: Choose file with strategy', new Date());
                 showEmptyField(document.req_form.fileName);
             }
             if (stratName == '') {
@@ -506,8 +510,8 @@ async function chooseAction () {
         }
 
     } else if (action == 'update') { // Updating strategy
-        if (stratSelect == stratName) {
-            if (stratFile !== undefined) {
+        if (strategy_id !== '') {
+            if (stratFile !== undefined && description !== '') {
                 let reader = new FileReader();
 
                 reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
@@ -516,36 +520,29 @@ async function chooseAction () {
                     console.log(reader.result)
 
                     if (reader.result != null) {
-                        sendUpdateStrategyRequest(updateStrategy(stratSelect, reader.result, description), stratSelect);
+                        sendUpdateStrategyRequest(updateStrategy(reader.result, description), strategy_id);
                     } else {
                         writeString('Error: File is empty', new Date());
                         showEmptyField(document.req_form.fileName);
                     }
                 };
             } else if (description !== '' && stratFile == undefined) {
-                sendUpdateStrategyRequest(updateStrategy(stratSelect, '', description), stratSelect);
+                sendUpdateStrategyRequest(updateStrategy('', description), strategy_id);
             } else {
-                if (stratSelect == '') {
-                    writeString('Error: Choose strategy firstly', new Date());
-                    showEmptyField(document.req_form.stratSelect);
-                } else {
+                if (description == '') {
                     writeString("Error: Description can't be empty", new Date());
                     showEmptyField(document.req_form.stratDescription);
                 }
-
+                if (document.req_form.fileName.value == '') {
+                    writeString('Error: Choose file to replace', new Date());
+                    showEmptyField(document.req_form.fileName);
+                }
             }
         } else {
-            if (stratSelect == '') {
-                writeString('Error: Choose strategy firstly', new Date());
-                showEmptyField(document.req_form.stratSelect);
-            } else {
-                writeString('Error: Incorrect strategy name',  new Date());
-                writeString('Strategy name should be the same with chosen strategy',  new Date());
-                showEmptyField(document.req_form.stratName);
-            }
-
+            writeString('Error: Choose strategy firstly', new Date());
         }
-    } else if (action == 'delete') { // Deleting strategy
+
+    } /*else if (action == 'delete') { // Deleting strategy
         if (stratSelect !== '') {
             if (stratSelect == stratName) {
                 sendDeleteStrategyRequest(stratSelect);
@@ -559,8 +556,14 @@ async function chooseAction () {
             showEmptyField(document.req_form.stratSelect);
         }
 
-    } else if (action == 'test') { // Testing strategy
-        if (frdate !== '' && todate !== '' && stratName !== '') {
+    }*/ else if (action == 'test') { // Testing strategy
+        if (data_id !== '') {
+            let uuid = uuidv4();
+            workStrategyRequest(testStrategy(data_id, strategy_id, uuid), uuid);
+        } else {
+            writeString('Error: Choose data to start test', new Date());
+        }
+        /*if (frdate !== '' && todate !== '' && stratName !== '') {
             if (document.req_form.stratFile.files[0] !== undefined) {
                 let reader = new FileReader();
 
@@ -590,7 +593,7 @@ async function chooseAction () {
                 showEmptyField(document.req_form.date_end);
                 writeString('Error: Dates fields must be filled', new Date());
             }
-        }
+        }*/
 
     } else {
         writeString('Error: Choose action firstly', new Date());
@@ -625,6 +628,7 @@ function writeString(str, now) {
  ******************************************************************/
 
 /** Update strategySelector **/
+/*
 function updateStrategySelector(strategies) {
     let strategyName = document.getElementById("stratSelect");
     let description = document.getElementById("descriptionSelect");
@@ -649,14 +653,15 @@ function updateStrategySelector(strategies) {
         description.add(option1);
     });
 }
-
+*/
 /******************************************************************
  ************************ pageLoader block ************************
  ******************************************************************/
 
 /** Uploading strategySelector **/
 async function uploadStrategies() {
-    sendUploadingRequest('strategies');
+    /*sendUploadingRequest('strategies');*/
+    $('#strategy_table').DataTable().ajax.reload(null, false);
 }
 
 /******************************************************************
@@ -677,8 +682,8 @@ function testStep(code, req_id) {
 
 
 /** Send request to test strategy **/
-function workStrategyRequest (blob, reqCode, session, endConnetion, uuid) {
-    fetch (server_url + test_url, {
+function workStrategyRequest (blob, uuid) {
+    fetch (server_url + test_url + uuid + '/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -706,9 +711,7 @@ function workStrategyRequest (blob, reqCode, session, endConnetion, uuid) {
         .catch(e => {
             writeString('Error: ' + e.message, new Date());
             writeString(e.response, new Date());
-            endConnetion = 2;
         })
-    return endConnetion;
 }
 
 
@@ -726,6 +729,7 @@ function sendLoadStrategyRequest(blob) {
             if (res.status == 200  || res.status == 201) {
                 return res;
             } else if (res.status == 204) {
+                uploadStrategies();
                 writeString('Error: Content was not send', new Date());
             } else if (res.status == 500) {
                 writeString(res.message, new Date());
@@ -754,9 +758,9 @@ function sendLoadStrategyRequest(blob) {
 
 
 /** Send request to update strategy **/
-function sendUpdateStrategyRequest(blob, stat_name) {
+function sendUpdateStrategyRequest(blob, strat_id) {
     writeString('Start updating');
-    fetch (server_url + strat_url +'strategies/' + stat_name, {
+    fetch (server_url + strat_url +'strategies/' + strat_id + '/', {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -796,6 +800,7 @@ function sendUpdateStrategyRequest(blob, stat_name) {
 
 
 /** Send request to delete strategy **/
+/*
 function sendDeleteStrategyRequest(stat_name) {
     writeString('Start deleting');
     fetch (server_url + strat_url + 'strategies/' + stat_name, {
@@ -817,9 +822,10 @@ function sendDeleteStrategyRequest(stat_name) {
             writeString('Error: ' + e.message, new Date());
         })
 }
-
+*/
 
 /** Send request to update data/strategies **/
+/*
 function sendUploadingRequest (req_name) {
     fetch (server_url + strat_url + req_name + '/', {
         method: 'GET'
@@ -833,14 +839,6 @@ function sendUploadingRequest (req_name) {
                 throw error
             }
         })
-        /*.then(res => {
-            if (res.headers['Content-Type'] !== 'application/json') {
-                let error = new Error('Incorrect server response');
-                error.response = res;
-                throw error
-            }
-            return res;
-        })*/
         .then(res => {
             return res.json();
         })
@@ -855,4 +853,4 @@ function sendUploadingRequest (req_name) {
         .catch(e => {
             console.log('Error: ' + e.message, new Date());
         })
-}
+}*/
