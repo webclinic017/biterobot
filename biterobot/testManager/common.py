@@ -10,7 +10,7 @@ from dataManager.models import DataIntervalModel, CandleModel
 from .backtest.tools import checkStrategy
 
 
-def testInit(taskId, strategyPath, dateBegin, dateEnd, ticker, candleLength):
+def testInit(taskId, strategyPath, strategyName, dateBegin, dateEnd, ticker, candleLength):
     # Получение класса стратегии
     spec = importlib.util.spec_from_file_location("Strategy",
                                                   strategyPath)
@@ -19,14 +19,18 @@ def testInit(taskId, strategyPath, dateBegin, dateEnd, ticker, candleLength):
 
     # Получение данных Candle и перевод в DF
     candleDF = createDF(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
+    # Генерация пути к графику из имени стратегии + Graph.html
+    graphPath = f'{settings.BASE_DIR}\\testManager\\resultGraphs\\{strategyName}Graph.html'
 
     print("STRATEGY CLASS - ", foo.Strategy)  # Печать класса для теста работы
     print("TASK ID - ", taskId)
     print("CANDLE_DF - ", candleDF)
+    print("GRAPH PATH - ", graphPath)
 
+    # Работа с backtest модулем
     backtest = manager.BacktestManager()
 
-    backtest.createTask(taskId=taskId, strategyFilePath=strategyPath, data=candleDF, plotFilePath=f'{settings.BASE_DIR}\\testManager\\resultGraphs\graph.html')
+    backtest.createTask(taskId=taskId, strategyFilePath=strategyPath, data=candleDF, plotFilePath=graphPath)
 
     print("TEST STRATEGY - ", checkStrategy(foo.Strategy))
 
@@ -36,6 +40,7 @@ def testInit(taskId, strategyPath, dateBegin, dateEnd, ticker, candleLength):
     sleep(15)
     print("STATUS 3 - ", backtest.getStatus(taskId=taskId))
     print("RESULT - ", backtest.getResult(taskId=taskId))
+    print("STATUS 4 - ", backtest.getStatus(taskId=taskId))
 
 def createDF(dateBegin, dateEnd, ticker, candleLength):
     dataInterval = DataIntervalModel.objects.filter(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)

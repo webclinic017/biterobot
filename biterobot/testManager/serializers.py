@@ -35,7 +35,7 @@ class TestSerializerPOST(serializers.Serializer):
         strategyName = validated_data.pop('name')
         taskId = validated_data.pop('id')
 
-        testInit(taskId=taskId, strategyPath=f'{settings.BASE_DIR}\strategyManager\strategies\{strategyName}.py', dateBegin=validated_data.pop('frDate'),
+        testInit(taskId=taskId, strategyPath=f'{settings.BASE_DIR}\strategyManager\strategies\{strategyName}.py', strategyName=strategyName, dateBegin=validated_data.pop('frDate'),
                  dateEnd=validated_data.pop('toDate'), ticker='MOEX', candleLength='MIN_30')  # Передаем путь стратегии для старта тестирования
 
         return 0  # т.к. все данные в базу были уже записаны в common
