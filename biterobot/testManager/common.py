@@ -27,7 +27,7 @@ def testInit(taskId, strategyPath, dateBegin, dateEnd, ticker, candleLength):
 
     backtest = manager.BacktestManager()
 
-    backtest.createTask(taskId=taskId, strategy=foo.TestStrategy, data=candleDF, plotFilePath=f'{settings.BASE_DIR}\\testManager\\resultGraphs\graph.html')
+    backtest.createTask(taskId=taskId, strategyFilePath=foo.TestStrategy, data=candleDF, plotFilePath=f'{settings.BASE_DIR}\\testManager\\resultGraphs\graph.html')
 
     print(checkStrategy(foo.TestStrategy))
 

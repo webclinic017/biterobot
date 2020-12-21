@@ -1,5 +1,7 @@
 import contextlib
+import importlib.util
 import io
+import sys
 from multiprocessing import Process, Manager
 # Import the backtrader platform
 from typing import Union, Callable, Type
@@ -11,24 +13,32 @@ from pandas import DataFrame
 from testManager.backtest.const import taskStatus
 
 
-def runAndListen(cerebro: bt.Cerebro, result: dict, plotFilePath: str):
+def runBacktestParallel(cerebro: bt.Cerebro, strategyFilePath: str, result: dict, plotFilePath: str):
+    spec = importlib.util.spec_from_file_location("strategy_module", strategyFilePath)
+    foo = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(foo)
+    sys.modules["strategy_module"] = foo
+    cerebro.addstrategy(foo.Strategy)
     output = io.StringIO()
-    result['startCash'] = cerebro.broker.getvalue()
+#    result['startCash'] = cerebro.broker.getvalue()
     with contextlib.redirect_stdout(output):
         cerebro.run()
-        b = Bokeh(style='bar', output_mode='save', filename=plotFilePath)
-        cerebro.plot(b)
+        # b = Bokeh(style='bar', output_mode='save', filename=plotFilePath)
+        # cerebro.plot(b)
     output.seek(0)
-    result['endCash'] = cerebro.broker.getvalue()
-    result['output'] = output.getvalue()
+    # result['endCash'] = cerebro.broker.getvalue()
+    # result['output'] = output.getvalue()
     output.close()
 
 
 class Wrapper:
-    def __init__(self, strategy: Type[bt.Strategy], data: DataFrame, plotFilePath: str,
+    def __init__(self, strategyFilePath: str, data: DataFrame, plotFilePath: str,
                  startCash: int = 1000, commission: float = 0):
         # attributes for backtrader
-        self.strategy: Type[bt.Strategy] = strategy
+        # spec = importlib.util.spec_from_file_location("strategy_module", strategyFilePath)
+        # foo = importlib.util.module_from_spec(spec)
+        # spec.loader.exec_module(foo)
+        self.strategyFilePath: str = strategyFilePath
         self.data: bt.feeds.PandasData = bt.feeds.PandasDirectData(dataname=data)
         self.startCash: int = startCash
         self.comission: float = commission
@@ -44,7 +54,7 @@ class Wrapper:
         # init cerebro
         self.cerebro: bt.Cerebro = bt.Cerebro()
         # add strategy
-        self.cerebro.addstrategy(self.strategy)
+        # self.cerebro.addstrategy(self.strategy)
         # add data
         self.cerebro.adddata(self.data)
         # define start cash
@@ -58,7 +68,8 @@ class Wrapper:
         # check if thread is already exists
         if self.process is None:
             # create if so
-            self.process = Process(target=runAndListen, args=(self.cerebro, self.result, self.plotFilePath))
+            self.process = Process(target=runBacktestParallel, args=(self.cerebro, self.strategyFilePath,
+                                                                     self.result, self.plotFilePath))
         # run
         self.process.start()
         # change status
@@ -100,3 +111,7 @@ class Wrapper:
 
     def stop(self):
         pass
+
+if __name__ == '__main__':
+    runBacktestParallel(None, "C:/Kethavel/Projects/BiteRobot/biterobot/testManager/backtest/tests/folder"
+                                   "/TestStrategy.py", None, None)
