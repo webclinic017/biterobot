@@ -14,7 +14,7 @@ $(document).ready(function () {
     $('table.display').DataTable();
 
     editor_strat = new $.fn.dataTable.Editor( {
-        ajax: server_url + test_url + 'tests/_id_/',
+        ajax: server_url + test_url + 'tests/' + strategy_id + '/',
         table: '#archive_table',
         idSrc: 'id',
         fields: [ {
@@ -98,7 +98,7 @@ $(document).ready(function () {
         },
         dom: "lfrtBip",
         order: [ 1, 'asc' ],
-        ajax: server_url + test_url + 'tests/',
+        ajax: /*server_url + test_url + 'tests/'*/'',
         columns: [
             {
                 "className":      'details-control',
@@ -228,6 +228,15 @@ $(document).ready(function () {
                                     'replace');
                     strat_action = 'update';
                     showEditor();
+                }
+            },
+            {
+                extend: "selectedSingle",
+                text: "View",
+                className: 'btn-dark-control',
+                action: function () {
+                    table.ajax.url(server_url + test_url + 'tests/' + strategy_id + '/').load();
+                    //$('#archive_table').DataTable().ajax.reload(null, false);
                 }
             },
             {   extend: "remove",

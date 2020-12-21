@@ -67,7 +67,6 @@ $(document).ready(function () {
 /** Creating json for data **/
 function loadData(frdate, todate, ticker, candle) {
     let request = {
-        code: 1301,
         token: getCookie('token'),
         frDate: frdate,
         toDate: todate,
