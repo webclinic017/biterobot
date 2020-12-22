@@ -11,8 +11,8 @@ publish:
   stage: publish
   script:
     - docker build -t $IMAGE_NAME .
-    - docker tag $IMAGE_NAME gcr.io/$GCP_PROJECT_ID/$IMAGE_NAME
+    - docker tag $IMAGE_NAME gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME
     - docker login -u _json_key -p "$GCLOUD_SERVICE_KEY" https://gcr.io
-    - docker push gcr.io/$GCP_PROJECT_ID/$IMAGE_NAME
+    - docker push gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME
 #  only:
 #    - master
