@@ -34,21 +34,23 @@ class StrategySerializerPOST(serializers.Serializer):
     def create(self, validated_data):
         fileInfo = validated_data.pop('file')
 
-        saveFile(data=blobToFile(fileInfo['body']), filePath=f'strategyManager/strategies/{fileInfo["name"]}')
+        saveFile(data=blobToFile(fileInfo['body']), filePath=f'strategyManager/strategies/{validated_data["name"]}.py')
 
-        validated_data.update({'filePath': f'/strategies/{fileInfo["name"]}'})
+        validated_data.update({'filePath': f'/strategies/{validated_data["name"]}.py'})
 
         return StrategyModel.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         fileInfo = validated_data.pop('file')
 
-        saveFile(blobToFile(fileInfo['body']), filePath=f'strategyManager/strategies/{fileInfo["name"]}')
+        saveFile(blobToFile(fileInfo['body']), filePath=f'strategyManager/strategies/{instance.name}.py')
 
-        validated_data.update({'filePath': f'/strategies/{fileInfo["name"]}'})
+        validated_data.update({'filePath': f'/strategies/{instance.name}.py'})
 
         instance.description = validated_data.get('description', instance.description)
         instance.filePath = validated_data.get('filePath', instance.filePath)
+
+        instance.version = instance.version + 1
 
         instance.save()
 

@@ -37,8 +37,6 @@ class StrategyView(APIView):
         saved_strategy = get_object_or_404(StrategyModel.objects.all(), id=pk)
         data = request.data
 
-        StrategyModel.objects.filter(id=data.pop('id')).update(version=F('version') + 1).save()
-
         serializer = StrategySerializerPOST(instance=saved_strategy, data=data, partial=True)
         if serializer.is_valid(raise_exception=True):
             strategy_saved = serializer.save()
@@ -50,6 +48,6 @@ class StrategyView(APIView):
         strategy = get_object_or_404(StrategyModel.objects.all(), id=pk)
         strategy.delete()
 
-        deleteFile(filePath=f'strategies\\{strategy.name}.py')
+        deleteFile(filePath=f'strategies/{strategy.name}.py')
 
         return Response({"message": "Strategy with name `{}` has been deleted.".format(pk)}, status=204)

@@ -11,7 +11,7 @@ from .serializers import TestSerializerGET, TestSerializerPOST, FilePathSerializ
 def startPage(request):
     return render(request, 'strategyEditor.html')
 
-class TestView(APIView):
+class CheckView(APIView):
     def get(self, request):
         pass
 
