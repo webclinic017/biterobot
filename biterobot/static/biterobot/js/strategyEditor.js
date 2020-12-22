@@ -75,10 +75,16 @@ $(document).ready(function () {
         var i;
 
         for (i = 0; i < (d.files.length); i++) {
-            console.log(editor_strat.file( 'files', id = d.files[i].id ).web_path);
+            //console.log(editor_strat.file( 'files', id = d.files[i].id ).web_path);
             rows = rows + '<tr>' +
-                '<img src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" style="width=50%; height=50%;"/>' +
-                '</tr><tr>smth</tr>';
+                '<iframe src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" height="550px" scrolling="auto"></iframe>' +
+                /*'<img src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" style="width=50%; height=50%;"/>' +*/
+                '</tr>' +
+                '<tr><h4>Start cash: ' + editor_strat.file( 'files', id = d.files[i].id ).startCash + '</h4></tr>' +
+                '<tr><h4>End cash: ' + editor_strat.file( 'files', id = d.files[i].id ).endCash + '</h4></tr>' +
+                '<tr>' +
+                '<textarea class="form-control" style="min-height: 150px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);">' + editor_strat.file( 'files', id = d.files[i].id ).resultData + '</textarea>' +
+            '</tr>';
 
         }
         return ('<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
@@ -119,10 +125,10 @@ $(document).ready(function () {
                 data: "files",
                 render: function ( d ) {
                     return d.length ?
-                        d.length+' image(s)' :
-                        'No image';
+                        d.length+' result(s)' :
+                        'No result';
                 },
-                title: "Image"
+                title: "Result"
             }
         ],
         select: true,
@@ -476,8 +482,8 @@ function testStrategy(data, strategy, uuid) {
 
 /** Choosing action **/
 async function chooseAction () {
-    let frdate = document.req_form.date_begin.value;
-    let todate = document.req_form.date_end.value;
+    //let frdate = document.req_form.date_begin.value;
+    //let todate = document.req_form.date_end.value;
     //let stratSelect = document.req_form.stratSelect.value;
     //let desriptionSelect = document.req_form.descriptionSelect.value;
     let description = document.req_form.stratDescription.value;
@@ -488,7 +494,7 @@ async function chooseAction () {
 
     let strRes = '';
 
-    if (action == 'load') { // Loading strategy
+    if (strat_action == 'load') { // Loading strategy
         if (stratFile !== undefined && stratName !== '' && description !== '') {
             let reader = new FileReader();
 
@@ -518,7 +524,7 @@ async function chooseAction () {
             }
         }
 
-    } else if (action == 'update') { // Updating strategy
+    } else if (strat_action == 'update') { // Updating strategy
         if (strategy_id !== '') {
             if (stratFile !== undefined && description !== '') {
                 let reader = new FileReader();
@@ -565,7 +571,7 @@ async function chooseAction () {
             showEmptyField(document.req_form.stratSelect);
         }
 
-    }*/ else if (action == 'test') { // Testing strategy
+    }*/ else if (strat_action == 'test') { // Testing strategy
         if (data_id !== '') {
             let uuid = uuidv4();
             workStrategyRequest(testStrategy(data_id, strategy_id, uuid), uuid);
@@ -690,9 +696,76 @@ function testStep(code, req_id) {
 }
 
 
+function getTestResult (uuid) {
+    fetch (server_url + test_url + 'testres/' + uuid + '/', {
+        method: 'GET'
+    })
+        .then(res => {
+            if (res.status >= 200 && res.status <= 300) {
+                return res;
+            } else {
+                let error = new Error(res.statusText);
+                error.response = res;
+                throw error
+            }
+        })
+        .then(res => {
+            return res.json();
+        })
+        .then(res => {
+            document.getElementById('result_graph_iframe').setAttribute("src", res.file);
+            writeString('Test finished!', new Date());
+            writeString('Results:', new Date());
+            writeString('Start cash: ' + res.startCash, new Date());
+            writeString('End cash: ' + res.endCash, new Date());
+            writeString(res.resultData, new Date());
+        })
+        .catch(e => {
+            writeString('Error: ' + e.message, new Date());
+        })
+}
+
+
+function getTestStatus (uuid) {
+    fetch (server_url + test_url + 'check/' + uuid + '/', {
+        method: 'GET'
+    })
+        .then(res => {
+            if (res.status >= 200 && res.status <= 300) {
+                return res;
+            } else {
+                let error = new Error(res.statusText);
+                error.response = res;
+                throw error
+            }
+        })
+        .then(res => {
+            return res.json();
+        })
+        .then(res => {
+            if (res.tstStatus !== 'DONE' && res.tstStatus !== 'ERROR') {
+                writeString('Status: ' + res.tstStatus, new Date());
+                setTimeout(getTestStatus(uuid), 3000);
+            } else if (res.tstStatus == 'DONE') {
+                writeString('Status: ' + res.tstStatus, new Date());
+                getTestResult(uuid);
+            } else if (res.tstStatus == 'ERROR') {
+                writeString('Status: ' + res.tstStatus, new Date());
+                writeString('Message: ' + res.message, new Date());
+            }
+        })
+        .catch(e => {
+            writeString('Error: ' + e.message, new Date());
+        })
+}
+
+
+
+
+
 /** Send request to test strategy **/
 function workStrategyRequest (blob, uuid) {
-    fetch (server_url + test_url + uuid + '/', {
+    fetch (server_url + test_url + 'tests/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -702,7 +775,7 @@ function workStrategyRequest (blob, uuid) {
         .then(res => {
             if (res.status >= 200 && res.status <= 300) {
                 writeString('Test started', new Date());
-                isRedy();
+                getTestStatus(uuid);
             } else {
                 let error = new Error(res.statusText);
                 error.response = res;
@@ -726,7 +799,7 @@ function workStrategyRequest (blob, uuid) {
 
 /** Send request to load strategy **/
 function sendLoadStrategyRequest(blob) {
-    writeString('Start uploading');
+    writeString('Start uploading', new Date());
     fetch (server_url + strat_url + 'strategies/', {
         method: 'POST',
         headers: {
@@ -768,7 +841,7 @@ function sendLoadStrategyRequest(blob) {
 
 /** Send request to update strategy **/
 function sendUpdateStrategyRequest(blob, strat_id) {
-    writeString('Start updating');
+    writeString('Start updating', new Date());
     fetch (server_url + strat_url +'strategies/' + strat_id + '/', {
         method: 'PUT',
         headers: {

@@ -112,8 +112,9 @@
 
 <section>
 
-     <div style="position: relative; overflow: hidden; padding-top: 2%;">
+     <div style="position: relative; overflow: hidden; padding-top: 2%;  background-color: #1c1c1c">
          <img src="../static/assets/images/mbr-3-1920x1280.jpg" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" alt="" class="hide">
+
 
          <div class="container d-inline-block float-left" style="width: 50%" id="strategy-editor-block">
              <form name="req_form">
@@ -265,7 +266,7 @@
                      </div>
 
                      <button class="btn btn-dark" type="button" style="padding-right: 20px; padding-left: 20px; margin-left: auto;
-                        margin-right: 0em;">Submit</button>
+                        margin-right: 0em;" onclick="chooseAction()">Submit</button>
                  </div>
 
                  <!--
@@ -307,10 +308,10 @@
 
                  <!--<img width="100%" height="100%" src="../static/biterobot/images/graph_result.png">-->
                  <h3 class="text-left text-white">Current results</h3>
-                 <div style="border-radius: 4px">
-                     <iframe src="plot.html" height="550px" scrolling="auto"></iframe>
-                 </div>
 
+                 <div style="border-radius: 4px">
+                     <iframe src="" height="550px" scrolling="auto" id="result_graph_iframe"></iframe>
+                 </div>
 
                  <textarea class="form-control" style="min-height: 200px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255); margin-top: 5px;" name="resultText" placeholder="Result..."></textarea>
                  <div class="btn" style="width:100%; align-items: center; justify-content: center;">
