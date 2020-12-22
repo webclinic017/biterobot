@@ -21,18 +21,17 @@ class FileSerializer(serializers.Serializer):
     body = serializers.CharField(max_length=65500)
 
 class StrategySerializerGET(serializers.Serializer):
+    id = serializers.IntegerField()
     name = serializers.CharField(max_length=200)
     version = serializers.IntegerField()
     description = serializers.CharField(max_length=1000)
 
 class StrategySerializerPOST(serializers.Serializer):
-    code = serializers.IntegerField()
     name = serializers.CharField(max_length=200)
     description = serializers.CharField(max_length=1000)
     file = FileSerializer()
 
     def create(self, validated_data):
-        validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
         fileInfo = validated_data.pop('file')
 
         saveFile(data=blobToFile(fileInfo['body']), filePath=f'strategyManager/strategies/{fileInfo["name"]}')
@@ -42,14 +41,12 @@ class StrategySerializerPOST(serializers.Serializer):
         return StrategyModel.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
         fileInfo = validated_data.pop('file')
 
         saveFile(blobToFile(fileInfo['body']), filePath=f'strategyManager/strategies/{fileInfo["name"]}')
 
         validated_data.update({'filePath': f'/strategies/{fileInfo["name"]}'})
 
-        instance.name = validated_data.get('name', instance.name)
         instance.description = validated_data.get('description', instance.description)
         instance.filePath = validated_data.get('filePath', instance.filePath)
 

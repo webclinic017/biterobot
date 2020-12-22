@@ -1,5 +1,7 @@
 import contextlib
+import importlib.util
 import io
+import sys
 from multiprocessing import Process, Manager
 # Import the backtrader platform
 from typing import Union, Callable, Type
@@ -11,28 +13,61 @@ from pandas import DataFrame
 from testManager.backtest.const import taskStatus
 
 
-def runAndListen(cerebro: bt.Cerebro, result: dict, plotFilePath: str):
+def runBacktestParallel(init: dict, result: dict) -> None:
+    """
+    Function to run backtest. Using with multiprocessing
+    :param init: dict with initial parameters
+    :param result: dict with results to return
+    :return: None
+    """
+    # load strategy type
+    spec = importlib.util.spec_from_file_location("strategy_module", init['strategyFilePath'])
+    strategy_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(strategy_module)
+    sys.modules["strategy_module"] = strategy_module
+
+    # create backtrader.cerebro
+    # init cerebro
+    cerebro = bt.Cerebro()
+    # add strategy
+    cerebro.addstrategy(strategy_module.Strategy)
+    # add data
+    cerebro.adddata(init['data'])
+    # define start cash
+    cerebro.broker.setcash(init['startCash'])
+    # Set the commission
+    cerebro.broker.setcommission(commission=init['comission'])
+
+    # define output to redirect stdout and return it
     output = io.StringIO()
+    # start portfolio value
     result['startCash'] = cerebro.broker.getvalue()
+    # redirect stdout
     with contextlib.redirect_stdout(output):
+        # run backtest
         cerebro.run()
-        b = Bokeh(style='bar', output_mode='save', filename=plotFilePath)
+        # create plot
+        b = Bokeh(style='bar', output_mode='save', filename=init['plotFilePath'])
         cerebro.plot(b)
-    output.seek(0)
+    # end portfolio value
     result['endCash'] = cerebro.broker.getvalue()
+    # go to beginning of the output
+    output.seek(0)
+    # save output
     result['output'] = output.getvalue()
     output.close()
 
 
 class Wrapper:
-    def __init__(self, strategy: Type[bt.Strategy], data: DataFrame, plotFilePath: str,
+    def __init__(self, strategyFilePath: str, data: DataFrame, plotFilePath: str,
                  startCash: int = 1000, commission: float = 0):
         # attributes for backtrader
-        self.strategy: Type[bt.Strategy] = strategy
-        self.data: bt.feeds.PandasData = bt.feeds.PandasDirectData(dataname=data)
-        self.startCash: int = startCash
-        self.comission: float = commission
-        self.plotFilePath: str = plotFilePath
+        self.init = dict()
+        self.init['strategyFilePath']: str = strategyFilePath
+        self.init['data']: bt.feeds.PandasData = bt.feeds.PandasDirectData(dataname=data)
+        self.init['startCash']: int = startCash
+        self.init['comission']: float = commission
+        self.init['plotFilePath']: str = plotFilePath
 
         # attributes for manage process
         self.process: Union[Process, None] = None
@@ -41,24 +76,13 @@ class Wrapper:
         self.targetToRun: Callable
         self.status = taskStatus.CREATED
 
-        # init cerebro
-        self.cerebro: bt.Cerebro = bt.Cerebro()
-        # add strategy
-        self.cerebro.addstrategy(self.strategy)
-        # add data
-        self.cerebro.adddata(self.data)
-        # define start cash
-        self.cerebro.broker.setcash(self.startCash)
-        # Set the commission
-        self.cerebro.broker.setcommission(commission=self.comission)
-
     def run(self):
         """Run backtest"""
 
         # check if thread is already exists
         if self.process is None:
             # create if so
-            self.process = Process(target=runAndListen, args=(self.cerebro, self.result, self.plotFilePath))
+            self.process = Process(target=runBacktestParallel, args=(self.init, self.result))
         # run
         self.process.start()
         # change status
@@ -91,7 +115,7 @@ class Wrapper:
         :return: result of backtesting
         """
         if self.getStatus() == taskStatus.DONE:
-            return self.result['startCash'], self.result['endCash'], self.result['output'], self.plotFilePath
+            return self.result['startCash'], self.result['endCash'], self.result['output'], self.init['plotFilePath']
         else:
             return None
 

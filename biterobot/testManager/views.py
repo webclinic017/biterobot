@@ -13,6 +13,11 @@ def startPage(request):
 
 class TestView(APIView):
     def get(self, request):
+        pass
+
+
+class TestArchiveView(APIView):
+    def get(self, request):
         tests = TestModel.objects.all()
         serializer = TestSerializerGET(tests, many=True)
         serializerFilePath = FilePathSerializer(many=True)
