@@ -19,7 +19,12 @@ RUN apt-get -y update \
 /tmp/* \
 /var/tmp/*
 
-RUN python3.8  manage.py makemigrations transcoder \
-&& python3.8  manage.py migrate transcoder \
-&& python3.8 manage.py runserver 0.0.0.0:8080
+EXPOSE 8080/tcp
 
+RUN python3.8  manage.py makemigrations \
+&& python3.8  manage.py migrate
+
+CMD ["python3.8", "manage.py", "runserver", "0.0.0.0:8080"]
+
+# docker build . -t biterobot
+# docker container run -p 8080:8080 -t biterobot
