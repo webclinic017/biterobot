@@ -3,7 +3,7 @@ from typing import Any, Dict, Tuple, Type
 from backtrader import Strategy
 from pandas import DataFrame
 
-from .backtraderWrapper import Wrapper
+from testManager.backtest.backtraderWrapper import Wrapper
 from testManager.backtest.const import taskStatus
 
 
@@ -14,12 +14,12 @@ class BacktestManager:
         # dictionary to store every backtrader wrapper that will do all the backtest job
         self.tasks: Dict[Any, Wrapper] = dict()
 
-    def createTask(self, taskId: Any, strategyFilePath: str, data: DataFrame, plotFilePath: str) -> None:
+    def createTask(self, taskId: Any, strategy: Type[Strategy], data: DataFrame, plotFilePath: str) -> None:
         """Create task for backtest
         :param plotFilePath: path to file where to store plot. will be created, if doesn't exist.
             will be overwritten otherwise
         :param data: data for backtest
-        :param strategyFilePath: file with strategy to test
+        :param strategy: strategy to test
         :parameter taskId: id of the new task
         :raise ValueError: in case of wrong taskId or any other parameter
         """
@@ -28,7 +28,7 @@ class BacktestManager:
             raise ValueError('task is already created')
 
         # create new task
-        newTask = Wrapper(strategyFilePath=strategyFilePath, data=data, plotFilePath=plotFilePath)
+        newTask = Wrapper(strategy=strategy, data=data, plotFilePath=plotFilePath)
         # store it
         self.tasks[taskId] = newTask
 
