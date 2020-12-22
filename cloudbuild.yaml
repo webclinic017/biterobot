@@ -7,4 +7,4 @@ steps:
     args: [ 'push', 'gcr.io/$PROJECT_ID/master']
     # deploy to Cloud Run
   - name: "gcr.io/cloud-builders/gcloud"
-    args: ['run', 'deploy', 'erp-ui', '--image', 'gcr.io/$PROJECT_ID/master', '--region', 'europe-west4', '--platform', 'managed', '--allow-unauthenticated']
+    args: ['run', 'deploy', 'biterobot', '--image', 'gcr.io/$PROJECT_ID/master', '--region', 'europe-west4', '--platform', 'managed', '--allow-unauthenticated']
