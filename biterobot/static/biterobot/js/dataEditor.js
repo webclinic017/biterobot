@@ -10,7 +10,7 @@ $(document).ready(function () {
         serverSide: false,
         ajax: {
             remove: {
-                url: '/' + data_url + 'instruments/_id_/',
+                url: server_url + data_url + 'instruments/_id_/',
                 type: 'DELETE'
             }
         },
@@ -27,7 +27,7 @@ $(document).ready(function () {
         order: [[ 1, 'asc' ]],
 
         dom: "lfrtBip",
-        ajax: '/' + data_url + 'instruments/',
+        ajax: server_url + data_url + 'instruments/',
         columns: [
             {
                 "className":      'select-checkbox select-checkbox-all',
@@ -55,6 +55,8 @@ $(document).ready(function () {
     } else {
         document.getElementById('token').style.backgroundColor = "white";
     }
+
+    sendGetTickers();
 });
 
 
@@ -65,7 +67,6 @@ $(document).ready(function () {
 /** Creating json for data **/
 function loadData(frdate, todate, ticker, candle) {
     let request = {
-        code: 1301,
         token: getCookie('token'),
         frDate: frdate,
         toDate: todate,
@@ -112,36 +113,15 @@ function addData () {
  ************************ pageUpdater block ***********************
  ******************************************************************/
 
-/** Update data **/
-function updateDataTable(data) {
-    let tabBody = document.data_form.dataTable.item(0);
+/** Update ticker list**/
+function updateTickerList(data) {
     let tickerList = document.getElementById("tickers");
     tickerList.innerHTML = '';
-    tabBody.innerHTML = '';
-    let option = document.createElement("option");
-    option.text = '';
-    tickerList.add(option);
     data.forEach((item) => {
-        let option = document.createElement("option");
+        /*let option = document.createElement("option");
         option.text = item.ticker;
-        tickerList.add(option);
-
-        let newRow = tabBody.insertRow();
-        let newCell = newRow.insertCell();
-        let newValue = document.createTextNode(item.ticker);
-        newCell.appendChild(newValue);
-
-        newCell = newRow.insertCell();
-        newValue = document.createTextNode(item.name);
-        newCell.appendChild(newValue);
-
-        newCell = newRow.insertCell();
-        newValue = document.createTextNode(item.dtBegin);
-        newCell.appendChild(newValue);
-
-        newCell = newRow.insertCell();
-        newValue = document.createTextNode(item.dtEnd);
-        newCell.appendChild(newValue);
+        tickerList.add(option);*/
+        $("#tickers").append($("<option>").text(item.ticker));
     });
 }
 
@@ -151,7 +131,7 @@ function updateDataTable(data) {
 
 /** Send request to load data **/
 function sendData(blob) {
-    fetch ('/' + data_url + 'instruments/', {
+    fetch (server_url + data_url + 'instruments/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -162,6 +142,7 @@ function sendData(blob) {
             if (res.status == 200  || res.status == 201) {
                 //uploadData();
                 $('#data_table').DataTable().ajax.reload(null, false);
+                sendGetTickers();
                 console.log('Data loaded');
             }  else if (res.status == 500) {
                 console.log(res.message);
@@ -174,5 +155,40 @@ function sendData(blob) {
         })
         .catch(e => {
             console.log('Error (' + e.status + '): ' + e.message);
+        })
+}
+
+
+/** Send request to load tickers**/
+function sendGetTickers() {
+    fetch (server_url + data_url + 'instruments/tickers', {
+        method: 'GET'
+    })
+        .then(res => {
+            if (res.status >= 200 && res.status <= 300) {
+                return res;
+            } else {
+                let error = new Error(res.statusText);
+                error.response = res;
+                throw error
+            }
+        })
+        /*.then(res => {
+            if (res.headers['Content-Type'] !== 'application/json') {
+                let error = new Error('Incorrect server response');
+                error.response = res;
+                throw error
+            }
+            return res;
+        })*/
+        .then(res => {
+            return res.json();
+        })
+        .then(res => {
+            updateTickerList(res);
+            console.log('Tickers updated');
+        })
+        .catch(e => {
+            console.log('Error: ' + e.message);
         })
 }

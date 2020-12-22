@@ -1,3 +1,17 @@
+.btn-dark-control {
+    color: #fff!important;
+    background-color: #343a40!important;
+    border-color: #343a40!important;
+    border-radius: 4px!important;
+}
+
+.btn-red-control {
+    color: #fff!important;
+    background-color: #e00b0b !important;
+    border-color: #343a40 !important;
+    border-radius: 4px!important;
+}
+
 td.details-control {
     background: url(../images/details_open.png) no-repeat center center;
     cursor: pointer;
@@ -38,6 +52,15 @@ input[type="radio"]:checked+label,
     background-color: #343a40!important;
 }
 
+.btn-close {
+    background-color: #a71d2a!important;
+    color: #fff;
+    margin-left: auto!important;
+    margin-right: 0em!important;
+    margin-bottom: 10px;
+    float: right;
+    padding: -10%;
+}
 
 .btn-dark:not(:disabled):not(.disabled).active:focus, .btn-dark:not(:disabled):not(.disabled):active:focus, .show > .btn-dark.dropdown-toggle:focus {
     box-shadow: 0 0 0 .2rem rgba(82,88,93,.5);
