@@ -17,5 +17,5 @@ publish:
     - gcloud auth activate-service-account --key-file gcloud-service-key.json
     - gcloud config set project $GCLOUD_PROJECT_ID
     - gcloud builds submit . --config=cloudbuild.yaml
-#  only:
-#    - master
+  only:
+    - master
