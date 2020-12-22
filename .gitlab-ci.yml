@@ -1,0 +1,21 @@
+image: docker:latest
+services:
+  - docker:dind
+variables:
+  DOCKER_DRIVER: overlay
+
+stages:
+  - publish
+
+publish:
+  stage: publish
+  image: google/cloud-sdk
+  services:
+    - docker:dind
+  script:
+    - echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json # Google Cloud service accounts
+    - gcloud auth activate-service-account --key-file gcloud-service-key.json
+    - gcloud config set project $GCLOUD_PROJECT_ID
+    - gcloud builds submit . --config=cloudbuild.yaml
+  only:
+    - master
