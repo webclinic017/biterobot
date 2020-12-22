@@ -19,7 +19,7 @@ def testInit(taskId, strategyPath, strategyName, version, dateBegin, dateEnd, ti
     # Получение данных Candle и перевод в DF
     candleDF = createDF(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
     # Генерация пути к графику из имени стратегии + Graph.html
-    graphPath = f'{settings.BASE_DIR}\\testManager\\resultGraphs\\{strategyName}Graph.html'
+    graphPath = f'{settings.BASE_DIR}/testManager/resultGraphs/{strategyName}Graph.html'
 
     print("STRATEGY CLASS - ", foo.Strategy)  # Печать класса для теста работы
     print("TASK ID - ", taskId)

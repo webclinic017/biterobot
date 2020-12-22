@@ -13,7 +13,7 @@ class StrategyModel(models.Model):
     name = models.CharField(max_length=200)
     version = models.IntegerField(default=1)
     description = models.CharField(max_length=1000)
-    filePath = models.FilePathField(path=f'{settings.BASE_DIR}\\strategyManager\\strategy')
+    filePath = models.FilePathField(path=f'{settings.BASE_DIR}/strategyManager/strategy')
     #strategyTest = models.ForeignKey()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="STOPPED")
 
