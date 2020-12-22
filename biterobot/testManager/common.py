@@ -6,6 +6,7 @@ import pandas as pd
 
 from .backtest import manager
 from dataManager.models import DataIntervalModel, CandleModel
+from testManager.models import TestModel
 from .backtest.tools import checkStrategy
 
 
@@ -18,28 +19,54 @@ def testInit(taskId, strategyPath, strategyName, version, dateBegin, dateEnd, ti
 
     # Получение данных Candle и перевод в DF
     candleDF = createDF(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
+
     # Генерация пути к графику из имени стратегии + Graph.html
     graphPath = f'{settings.BASE_DIR}/testManager/resultGraphs/{strategyName}Graph.html'
 
-    print("STRATEGY CLASS - ", foo.Strategy)  # Печать класса для теста работы
+    # Проверка временная
+    print("STRATEGY CLASS - ", foo.Strategy)
     print("TASK ID - ", taskId)
     print("CANDLE_DF - ", candleDF)
     print("GRAPH PATH - ", graphPath)
 
-    # Работа с backtest модулем
+    # Создание модели Теста
+    testModel = TestModel(name=strategyName, uuid=taskId, dateBegin=dateBegin, dateEnd=dateEnd,
+                            dateTest=datetime.today().strftime('%Y-%m-%d'), ticker=ticker, version=version)
+    testModel.save()
+    # t = TestModel.objects.get(uuid=taskId)
+    # t.startCash = 1000
+    # t.save()
+
+
+    # Работа с Backtest
     backtest = manager.BacktestManager()
 
     backtest.createTask(taskId=taskId, strategyFilePath=strategyPath, data=candleDF, plotFilePath=graphPath)
 
-    print("TEST STRATEGY - ", checkStrategy(foo.Strategy))
+    #print("TEST STRATEGY - ", checkStrategy(foo.Strategy))  # Перенсти в загрузку стратегии
 
-    print("STATUS 1 - ", backtest.getStatus(taskId=taskId))
+    testModel = TestModel.objects.get(uuid=taskId)
+    testModel.tstStatus = backtest.getStatus(taskId=taskId)
+    testModel.save()
+
     backtest.run(taskId=taskId)
-    print("STATUS 2 - ", backtest.getStatus(taskId=taskId))
-    sleep(15)
-    print("STATUS 3 - ", backtest.getStatus(taskId=taskId))
-    print("RESULT - ", backtest.getResult(taskId=taskId))
-    print("STATUS 4 - ", backtest.getStatus(taskId=taskId))
+
+    testModel = TestModel.objects.get(uuid=taskId)
+    testModel.tstStatus = backtest.getStatus(taskId=taskId)
+    testModel.save()
+
+    while backtest.getStatus(taskId=taskId) in ["CREATED", "RUNNING"]:
+        sleep(2)
+
+    testModel = TestModel.objects.get(uuid=taskId)
+    testModel.tstStatus = backtest.getStatus(taskId=taskId)
+    testModel.save()
+
+    if backtest.getStatus(taskId=taskId) == "DONE":
+        testModel = TestModel.objects.get(uuid=taskId)
+        testModel.resultData = backtest.getResult(taskId=taskId)
+        testModel.save()
+
 
 def createDF(dateBegin, dateEnd, ticker, candleLength):
     dataInterval = DataIntervalModel.objects.filter(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)

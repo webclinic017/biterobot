@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import TestModel
-from .serializers import TestSerializerGET, TestSerializerPOST, FilePathSerializer
+from .serializers import TestSerializerGET, TestSerializerPOST, FilePathSerializer, CheckSerializerGET
 
 
 @csrf_exempt
@@ -12,8 +12,12 @@ def startPage(request):
     return render(request, 'strategyEditor.html')
 
 class CheckView(APIView):
-    def get(self, request):
-        pass
+    def get(self, request, uuid):
+        testModel = TestModel.objects.get(uuid=uuid)
+        serializer = CheckSerializerGET(testModel)
+        print(serializer.data)
+
+        return Response(serializer.data)
 
 
 class TestArchiveView(APIView):
