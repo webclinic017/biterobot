@@ -9,10 +9,13 @@ stages:
 
 publish:
   stage: publish
+  image: google/cloud-sdk
+  services:
+    - docker:dind
   script:
-    - docker build -t $IMAGE_NAME .
-    - docker tag $IMAGE_NAME gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME
-    - docker login -u _json_key -p "$GCLOUD_SERVICE_KEY" https://gcr.io
-    - docker push gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME
+    - echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json # Google Cloud service accounts
+    - gcloud auth activate-service-account --key-file gcloud-service-key.json
+    - gcloud config set project $GCLOUD_PROJECT_ID
+    - gcloud builds submit . --config=cloudbuild.yaml
 #  only:
 #    - master
