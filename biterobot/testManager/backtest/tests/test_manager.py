@@ -29,6 +29,8 @@ class TestTestManager(unittest.TestCase):
         manager.createTask(taskId, TEST_STRATEGY_PATH, self.dataframe, PLOT_PATH)
         manager.run(1)
         manager.tasks[1].process.join()
+        print('Status has to be Done. Current status: {}'.format(manager.getStatus(1)))
         assert manager.getStatus(1) == taskStatus.DONE
+        print('Result has to be filled. Current result: {}'.format(manager.getResult(1)))
         assert manager.getResult(1) is not None
 
