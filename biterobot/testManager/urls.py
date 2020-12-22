@@ -1,10 +1,11 @@
 from django.urls import path
 
-from .views import startPage, TestView
+from .views import startPage, TestArchiveView, TestView
 
 
 urlpatterns = [
     #path('', startPage),
-    path('', TestView.as_view()),
-    path('tests/', TestView.as_view()),
+    path('', TestArchiveView.as_view()),
+    path('tests/', TestArchiveView.as_view()),
+    path('/check/<str:uuid>/', TestView.as_view())
 ]
