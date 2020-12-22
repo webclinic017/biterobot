@@ -6,11 +6,10 @@ import pandas as pd
 
 from .backtest import manager
 from dataManager.models import DataIntervalModel, CandleModel
-
 from .backtest.tools import checkStrategy
 
 
-def testInit(taskId, strategyPath, strategyName, dateBegin, dateEnd, ticker, candleLength):
+def testInit(taskId, strategyPath, strategyName, version, dateBegin, dateEnd, ticker, candleLength):
     # Получение класса стратегии
     spec = importlib.util.spec_from_file_location("Strategy",
                                                   strategyPath)
