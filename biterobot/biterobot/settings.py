@@ -28,7 +28,7 @@ SECRET_KEY = '*0!gfff6$_yvtsuaaey43bte77d*m(=-t9!+)x+(gb3a=fb8+5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['biterobot-smxpln76pq-ez.a.run.app', 'localhost', '127.0.0.1']
 
 
 # Application definition
