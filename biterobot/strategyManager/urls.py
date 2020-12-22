@@ -11,6 +11,6 @@ from .views import StrategyView, startPage
 
 urlpatterns = [
     path('strategies/', StrategyView.as_view()),
-    path('strategies/<str:pk>', StrategyView.as_view()),
+    path('strategies/<int:pk>/', StrategyView.as_view()),
     path('', startPage),
 ]

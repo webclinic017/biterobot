@@ -11,7 +11,7 @@ class TestSerializerGET(serializers.Serializer):
     dateTest = serializers.DateField()  # Дата проведения тестирования
     dateBegin = serializers.DateField()  # Дата начала периода тестирования
     dateEnd = serializers.DateField()  # Дата конца периода тестирования
-    file = serializers.FilePathField(path="C:\\Users\\uzer\PycharmProjects\\biterobot\\biterobot\\testManager\\resultGraphs")  # Пусть до графика тестирования
+    file = serializers.FilePathField(path=f'{settings.BASE_DIR}\\testManager\\resultGraphs')  # Пусть до графика тестирования
 
 class FilesIdSerializer(serializers.Serializer):
     id = serializers.IntegerField()
@@ -29,10 +29,10 @@ class TestInfoSerializer(serializers.Serializer):
     dateTest = serializers.DateField()  # Дата проведения тестирования
     dateBegin = serializers.DateField()  # Дата начала периода тестирования
     dateEnd = serializers.DateField()  # Дата конца периода тестирования
-    files = serializers.ListField(child=FilesIdSerializer)
+    files = serializers.ListField()
 
 class FileSerializer(serializers.Serializer):
-    files = serializers.ListField(child=AdditionalSerializer)
+    files = serializers.ListField()
 
 class TestSerializerArchiveGET(serializers.Serializer):
     pass

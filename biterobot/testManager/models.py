@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 from dataManager.models import InstrumentModel
 
@@ -14,4 +15,4 @@ class TestModel(models.Model):
     startCash = models.FloatField()  # Начальный кошелек
     endCash = models.FloatField()  # Конечный кошелек
     resultData = models.TextField()  # Данныые результата тестировани
-    plotPath = models.FilePathField(path="C:\\Users\\uzer\PycharmProjects\\biterobot\\biterobot\\testManager\\resultGraphs")  # Пусть до графика тестирования
+    plotPath = models.FilePathField(path=f'{settings.BASE_DIR}\\testManager\\resultGraphs')  # Пусть до графика тестирования
