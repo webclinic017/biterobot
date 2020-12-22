@@ -13,7 +13,6 @@ class InstrumentSerializerGET(serializers.Serializer):
     checked = serializers.CharField(max_length=1, default="")  # Это нужно для решения проблем на ФРОНТЕ
 
 class InstrumentSerializerPOST(serializers.Serializer):
-    code = serializers.IntegerField()
     frDate = serializers.DateField()
     toDate = serializers.DateField()
     ticker = serializers.CharField(max_length=100)
@@ -21,8 +20,9 @@ class InstrumentSerializerPOST(serializers.Serializer):
     token = serializers.CharField(max_length=200)
 
     def create(self, validated_data):
-        validated_data.pop('code')  # Пока не нужен, поэтому попаем в никуда
-
         dataHandler(token=validated_data.pop('token'), ticker=validated_data.pop('ticker'), dateBegin=validated_data.pop('frDate'), dateEnd=validated_data.pop('toDate'), candleLength=validated_data.pop('candleLength'))
 
         return 0  # т.к. все данные в базу были уже записаны в dataHandler
+
+class TickersSerializerGET(serializers.Serializer):
+    ticker = serializers.CharField(max_length=100)
