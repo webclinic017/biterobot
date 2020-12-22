@@ -13,5 +13,5 @@ publish:
     - docker build -t $IMAGE_NAME .
     - docker login -u _json_key -p "$GCLOUD_SERVICE_KEY" https://gcr.io
     - docker push gcr.io/$GCP_PROJECT_ID/$IMAGE_NAME:latest
-  only:
-    - master
+#  only:
+#    - master
