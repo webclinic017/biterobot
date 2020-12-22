@@ -18,7 +18,7 @@ from .common import blobToFile, saveFile
 
 class FileSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=200)
-    body = serializers.CharField(max_length=4000)
+    body = serializers.CharField(max_length=65500)
 
 class StrategySerializerGET(serializers.Serializer):
     name = serializers.CharField(max_length=200)
