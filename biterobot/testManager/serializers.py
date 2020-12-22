@@ -13,7 +13,7 @@ class TestSerializerGET(serializers.Serializer):
     dateTest = serializers.DateField()  # Дата проведения тестирования
     dateBegin = serializers.DateField()  # Дата начала периода тестирования
     dateEnd = serializers.DateField()  # Дата конца периода тестирования
-    file = serializers.FilePathField(path=f'{settings.BASE_DIR}\\testManager\\resultGraphs')  # Пусть до графика тестирования
+    file = serializers.FilePathField(path=f'{settings.BASE_DIR}/testManager/resultGraphs')  # Пусть до графика тестирования
 
 class FilesIdSerializer(serializers.Serializer):
     id = serializers.IntegerField()
@@ -64,7 +64,7 @@ class TestSerializerPOST(serializers.Serializer):
         dateBegin = data[0].dateBegin
         dateEnd = data[0].dateEnd
 
-        testInit(taskId=taskId, strategyPath=f'{settings.BASE_DIR}\strategyManager\strategies\{strategyName}.py', strategyName=strategyName,
+        testInit(taskId=taskId, strategyPath=f'{settings.BASE_DIR}/strategyManager/strategies/{strategyName}.py', strategyName=strategyName,
                     version=version, dateBegin=dateBegin, dateEnd=dateEnd,
                         ticker=ticker, candleLength=candleLength)  # Передаем путь стратегии для старта тестирования
 
