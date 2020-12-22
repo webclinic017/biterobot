@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.db.models import F
 
 from .models import StrategyModel
 from .common import blobToFile, saveFile
@@ -28,7 +27,6 @@ class StrategySerializerGET(serializers.Serializer):
     description = serializers.CharField(max_length=1000)
 
 class StrategySerializerPOST(serializers.Serializer):
-    id = serializers.IntegerField()
     name = serializers.CharField(max_length=200)
     description = serializers.CharField(max_length=1000)
     file = FileSerializer()
@@ -48,9 +46,6 @@ class StrategySerializerPOST(serializers.Serializer):
         saveFile(blobToFile(fileInfo['body']), filePath=f'strategyManager/strategies/{fileInfo["name"]}')
 
         validated_data.update({'filePath': f'/strategies/{fileInfo["name"]}'})
-
-        StrategyModel.objects.filter(id=validated_data.pop('id')).update(version=F('version')+1).save()
-
 
         instance.description = validated_data.get('description', instance.description)
         instance.filePath = validated_data.get('filePath', instance.filePath)

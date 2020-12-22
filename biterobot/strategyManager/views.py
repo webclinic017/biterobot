@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import F
 
 from .models import StrategyModel
 from .serializers import StrategySerializerGET, StrategySerializerPOST
@@ -35,6 +36,9 @@ class StrategyView(APIView):
     def put(self, request, pk):
         saved_strategy = get_object_or_404(StrategyModel.objects.all(), id=pk)
         data = request.data
+
+        StrategyModel.objects.filter(id=data.pop('id')).update(version=F('version') + 1).save()
+
         serializer = StrategySerializerPOST(instance=saved_strategy, data=data, partial=True)
         if serializer.is_valid(raise_exception=True):
             strategy_saved = serializer.save()
