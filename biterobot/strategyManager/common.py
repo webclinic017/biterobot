@@ -12,10 +12,10 @@ def blobToFile(data: str):
 
     return base64_message
 
-def saveFile(data: str, filePath: str = 'strategyManager/strategies/text.txt'):
+def saveFile(data: str, filePath: str):
     file = open(filePath, 'w')
     file.write(data)
 
-def deleteFile(filePath: str = 'strategies\\text.txt'):
+def deleteFile(filePath: str):
     path = os.path.join(os.path.abspath(os.path.dirname(__file__)), filePath)
     os.remove(path)
