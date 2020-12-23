@@ -13,6 +13,9 @@ class TestSerializerGET(serializers.Serializer):
     dateTest = serializers.DateField()  # Дата проведения тестирования
     dateBegin = serializers.DateField()  # Дата начала периода тестирования
     dateEnd = serializers.DateField()  # Дата конца периода тестирования
+    resultData = serializers.CharField()
+    startCash = serializers.FloatField()
+    endCash = serializers.FloatField()
     file = serializers.FilePathField(path=f'{settings.BASE_DIR}/testManager/resultGraphs')  # Путь до графика тестирования
 
 # Сериалайзер для CHECK status

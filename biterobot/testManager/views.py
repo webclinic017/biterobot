@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 from .models import TestModel
 from .serializers import TestSerializerGET, TestSerializerPOST, FilePathSerializer, CheckSerializerGET
+from django.conf import settings
 
 
 @csrf_exempt
@@ -45,4 +46,4 @@ class TestArchiveView(APIView):
 
 @csrf_exempt
 def graphView(request, graphName):
-    return render(request, 'C:\\Users\\uzer\PycharmProjects\\biterobotGit\\biterobot\\testManager\\resultGraphs\TestStrategySUPERGraph.html')
+    return render(request, f'{settings.BASE_DIR}/testManager/resultGraphs/{graphName}')
