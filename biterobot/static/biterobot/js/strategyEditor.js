@@ -30,42 +30,6 @@ var resul_request_data = {
     data: []
 };
 
-/*var resul_request_data = {
-    data: [
-        {
-            uuid: "12312413242",
-            num: 1
-        }
-    ]
-};*/
-
-/*var result_data = {
-   data: [
-        {
-            num: 1,
-            name: 'tst1',
-            version: '1',
-            timeStart: '11.12.2020',
-            dateBegin: '11.12.2020',
-            dateEnd: '11.12.2020',
-            status: 'DONE',
-            files: [
-                {id: 0}
-            ]
-        }
-    ],
-    files: {
-        files: [
-            {
-                web_path: "plot.html",
-                startCash: "1",
-                endCash: "2",
-                resultData: "hewruryfg3287ohroiwr8o74w21423er23rwqe"
-            }
-        ]
-    }
-};*/
-
 /** Init tables and editors **/
 $(document).ready(function () {
     $('table.display').DataTable();
@@ -605,7 +569,7 @@ function loadStrategy(stratName, stratFile, description) {
         name: stratName,
         description: description,
         file: {
-            name: document.req_form.stratFile.files[0].name,
+            name: stratName + '.py'/*document.req_form.stratFile.files[0].name*/,
             body: stratFile
         }
     };
@@ -617,12 +581,12 @@ function loadStrategy(stratName, stratFile, description) {
 
 
 /** Creating json for updating **/
-function updateStrategy(stratFile, description) {
+function updateStrategy(stratFile, description, stratName) {
     let request = {
             id: strategy_id,
             description: description,
             file: {
-                name: document.req_form.stratFile.files[0].name,
+                name: stratName + '.py'/*document.req_form.stratFile.files[0].name*/,
                 body: stratFile
             }
         };
@@ -650,10 +614,9 @@ function testStrategy(data, strategy, uuid) {
 async function chooseAction () {
     let description = document.req_form.stratDescription.value;
     let stratName = document.req_form.stratName.value;
-    let stratFile = document.req_form.stratFile.files[0];
-
+    let stratFile = new Blob([editor.getValue()], {type: 'text/plain'})/*document.req_form.stratFile.files[0];*/;
     if (strat_action == 'load') { // Loading strategy
-        if (stratFile !== undefined && stratName !== '' && description !== '') {
+        if (editor.getValue() !== '' && stratName !== '' && description !== '') {
             let reader = new FileReader();
 
             reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
@@ -668,7 +631,7 @@ async function chooseAction () {
                 }
             };
         } else {
-            if (stratFile == undefined) {
+            if (editor.getValue() !== '') {
                 writeString('Error: Choose file with strategy', new Date());
                 showEmptyField(document.req_form.fileName);
             }
@@ -684,7 +647,7 @@ async function chooseAction () {
 
     } else if (strat_action == 'update') { // Updating strategy
         if (strategy_id !== '') {
-            if (stratFile !== undefined && description !== '') {
+            if (editor.getValue() !== '' && description !== '') {
                 let reader = new FileReader();
 
                 reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
@@ -693,7 +656,7 @@ async function chooseAction () {
                     //console.log(reader.result)
 
                     if (reader.result != null) {
-                        sendUpdateStrategyRequest(updateStrategy(reader.result, description), strategy_id);
+                        sendUpdateStrategyRequest(updateStrategy(reader.result, description, stratName), strategy_id);
                     } else {
                         writeString('Error: File is empty', new Date());
                         showEmptyField(document.req_form.fileName);
@@ -704,7 +667,7 @@ async function chooseAction () {
                     writeString("Error: Description can't be empty", new Date());
                     showEmptyField(document.req_form.stratDescription);
                 }
-                if (document.req_form.fileName.value == '') {
+                if (editor.getValue() !== '') {
                     writeString('Error: Choose file to replace', new Date());
                     showEmptyField(document.req_form.fileName);
                 }
@@ -966,7 +929,9 @@ function sendLoadStrategyRequest(blob, stratName) {
                 uploadStrategies();
                 writeString('Error: Content was not send', new Date());
             } else if (res.status == 500) {
-                writeString(res.message, new Date());
+                writeString('Error: Validation error', new Date());
+                writeString('Check yor strategy and retry', new Date());
+                //writeString(res.message, new Date());
             } else {
                 let error = new Error(res.statusText);
                 error.response = res;
@@ -1012,7 +977,9 @@ function sendUpdateStrategyRequest(blob, strat_id) {
                 uploadStrategies();
                 writeString('Error: Content was not send', new Date());
             } else if (res.status == 500) {
-                writeString('There are some errors on the server side', new Date());
+                writeString('Error: Validation error', new Date());
+                writeString('Check yor strategy and retry', new Date());
+                //writeString('There are some errors on the server side', new Date());
                 //writeString(res.message, new Date());
             } else {
                 let error = new Error(res.statusText);
@@ -1030,7 +997,7 @@ function sendUpdateStrategyRequest(blob, strat_id) {
                 writeString('Strategy ' + stratName + ' updated', new Date());
             } else if (res.success == "false") {
                 writeString('Error: Validation error', new Date());
-                writeString('Check yor strategy text and retry', new Date());
+                writeString('Check yor strategy and retry', new Date());
             }
         })
         .catch(e => {

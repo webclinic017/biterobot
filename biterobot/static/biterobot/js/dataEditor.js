@@ -174,7 +174,7 @@ function sendData(blob) {
 
 /** Send request to load tickers**/
 function sendGetTickers() {
-    fetch (server_url + data_url + 'instruments/tickers/', {
+    fetch (server_url + data_url + 'instruments/tickers', {
         method: 'GET'
     })
         .then(res => {
