@@ -1,17 +1,23 @@
 /*********************** For Strategies **************************/
 
+/******************************************************************
+ ************************ pageUpdater block ***********************
+ ******************************************************************/
+
 /** Loading table's elements and data**/
 
-var editor_strat; // Editor for strategies
+var editor_strat; // Editor for archive results
 var editor_data; // Editor for data
-var editor_strategy;
-var editor_result;
+var editor_strategy; // Editor for strategies
+var editor_result; // Editor for current results
 
-var last_message = new Date();
-var data_id = '';
-var strategy_id = '';
-var strat_action = '';
+var last_message = new Date(); // Time of last message in console
 
+var data_id = ''; // row id in data_table
+var strategy_id = ''; // row id in strategy table
+var strat_action = ''; // action with strategy (add/replace/test)
+
+// json with current results data
 var result_data = {
     data: [],
     files: {
@@ -19,6 +25,7 @@ var result_data = {
     }
 };
 
+// structure to link uuid with row id in current result table
 var resul_request_data = {
     data: []
 };
@@ -59,9 +66,12 @@ var resul_request_data = {
     }
 };*/
 
+/** Init tables and editors **/
 $(document).ready(function () {
     $('table.display').DataTable();
+    $.fn.dataTable.ext.errMode = 'none';
 
+    /** Archive results table editor **/
     editor_strat = new $.fn.dataTable.Editor( {
         ajax: server_url + test_url + 'tests/' + strategy_id + '/',
         table: '#archive_table',
@@ -98,6 +108,7 @@ $(document).ready(function () {
         ]
     });
 
+    /** Data table editor **/
     editor_data = new $.fn.dataTable.Editor( {
         processing: false,
         serverSide: false,
@@ -106,6 +117,7 @@ $(document).ready(function () {
         idSrc: 'id'
     });
 
+    /** Strategy table editor **/
     editor_strategy = new $.fn.dataTable.Editor( {
         processing: false,
         serverSide: false,
@@ -119,20 +131,19 @@ $(document).ready(function () {
         idSrc: 'id'
     });
 
+    /** Child row for archive results table **/
     function format (d) {
         var rows = '';
         var i;
 
         for (i = 0; i < (d.files.length); i++) {
-            //console.log(editor_strat.file( 'files', id = d.files[i].id ).web_path);
             rows = rows + '<tr>' +
-                '<iframe src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" height="550px" scrolling="auto"></iframe>' +
-                /*'<img src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" style="width=50%; height=50%;"/>' +*/
+                    '<iframe src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" height="550px" scrolling="auto"></iframe>' +
                 '</tr>' +
                 '<tr><h4>Start cash: ' + editor_strat.file( 'files', id = d.files[i].id ).startCash + '</h4></tr>' +
                 '<tr><h4>End cash: ' + editor_strat.file( 'files', id = d.files[i].id ).endCash + '</h4></tr>' +
                 '<tr>' +
-                '<textarea class="form-control" style="min-height: 150px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);">' + editor_strat.file( 'files', id = d.files[i].id ).resultData + '</textarea>' +
+                    '<textarea class="form-control" style="min-height: 150px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);">' + editor_strat.file( 'files', id = d.files[i].id ).resultData + '</textarea>' +
                 '</tr>';
 
         }
@@ -141,6 +152,7 @@ $(document).ready(function () {
             '</table>');
     }
 
+    /** Current results table editor **/
     editor_result = new $.fn.dataTable.Editor( {
         data: result_data.data,
         table: '#results_table',
@@ -183,21 +195,20 @@ $(document).ready(function () {
         ]
     });
 
+    /** Child row for current results table **/
     function formatResult (d) {
         var rows = '';
         var i;
 
         for (i = 0; i < (d.files.length); i++) {
-            //console.log(editor_strat.file( 'files', id = d.files[i].id ).web_path);
             rows = rows + '<tr>' +
-                '<iframe src="'+ result_data.files.files[d.files[i].id].web_path + '" height="550px" scrolling="auto"></iframe>' +
-                /*'<img src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" style="width=50%; height=50%;"/>' +*/
+                    '<iframe src="'+ result_data.files.files[d.files[i].id].web_path + '" height="550px" scrolling="auto"></iframe>' +
                 '</tr>' +
                 '<tr><h4>Start cash: ' + result_data.files.files[d.files[i].id].startCash + '</h4></tr>' +
                 '<tr><h4>End cash: ' + result_data.files.files[d.files[i].id].endCash + '</h4></tr>' +
                 '<tr>' +
-                '<textarea class="form-control" style="min-height: 150px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);">' +
-                result_data.files.files[d.files[i].id].resultData + '</textarea>' +
+                    '<textarea class="form-control" style="min-height: 150px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);">' +
+                        result_data.files.files[d.files[i].id].resultData + '</textarea>' +
                 '</tr>';
 
         }
@@ -206,7 +217,7 @@ $(document).ready(function () {
             '</table>');
     }
 
-
+    /** Archive results table **/
     var table = $('#archive_table').DataTable( {
         select: { style: 'single',
             selector: 'td:not(:first-child)'
@@ -275,6 +286,7 @@ $(document).ready(function () {
         }
     });
 
+    /** Data table **/
     var data_table = $('#data_table').DataTable( {
         select: {
             style: 'os',
@@ -305,6 +317,7 @@ $(document).ready(function () {
 
     });
 
+    /** Strategy table **/
     var strategy_table = $('#strategy_table').DataTable( {
         select: {
             style: 'os',
@@ -378,7 +391,7 @@ $(document).ready(function () {
         ]
     });
 
-
+    /** Current results table **/
     var results_table = $('#results_table').DataTable( {
         select: { style: 'single',
             selector: 'td:not(:first-child)'
@@ -449,27 +462,32 @@ $(document).ready(function () {
         }
     });
 
-
+    /** Set row id of data table **/
     $('#data_table').on('click', 'tr', function () {
         if (data_id == data_table.row(this).id()) {
             data_id = '';
         } else {
             data_id = data_table.row(this).id();
         }
-        //alert('Clicked row id '+ data_id);
     });
 
+    /** Set row id of strategy table **/
     $('#strategy_table').on('click', 'tr', function () {
         if (strategy_id == strategy_table.row(this).id()) {
             strategy_id = '';
         } else {
             strategy_id = strategy_table.row(this).id();
+            if (strat_action == 'update') {
+                let rowIdx = strategy_table.row(this).index();
+                setStrategyData(strategy_table.cell( rowIdx, 1 ).data(),
+                    strategy_table.cell( rowIdx, 3 ).data(),
+                    'replace');
+            }
         }
-        //alert('Clicked row id '+ strategy_id);
     });
 
-    uploadStrategies();
-
+    //uploadStrategies();
+    /** Set blocks width **/
     if ($(window).width() <= 716) {
         document.getElementById('strategy-editor-block').removeAttribute("style");
         document.getElementById('strategy-editor-block').setAttribute("style", 'width: 100%');
@@ -484,6 +502,7 @@ $(document).ready(function () {
 });
 
 
+/** Change blocks width **/
 $(window).resize(function () {
     if ($(window).width() <= 716) {
         document.getElementById('strategy-editor-block').removeAttribute("style");
@@ -498,16 +517,22 @@ $(window).resize(function () {
     }
 })
 
+
+/** Show strategy editor **/
 function showEditor() {
     document.getElementById('strategy-editor-add').removeAttribute("class");
-    document.getElementById('strategy-editor-add-button').setAttribute("class", 'd-none');
+    //document.getElementById('strategy-editor-add-button').setAttribute("class", 'd-none');
 }
 
+
+/** Hide strategy editor **/
 function hideEditor() {
     document.getElementById('strategy-editor-add').setAttribute("class", 'd-none');
-    document.getElementById('strategy-editor-add-button').setAttribute("class", 'btn btn-dark');
+    //document.getElementById('strategy-editor-add-button').setAttribute("class", 'btn btn-dark');
 }
 
+
+/** Ste strategy name and description **/
 function setStrategyData(name, description, type) {
     if (type == 'add') {
         document.getElementById("stratName").value = name;
@@ -517,9 +542,11 @@ function setStrategyData(name, description, type) {
         document.getElementById("stratName").value = name;
         document.getElementById("stratName").setAttribute("readonly", "");
         document.getElementById("stratDescription").value = description;
+
     }
 
 }
+
 
 /** Uploading strategy in editor**/
 function loadStrategyInEditor() {
@@ -527,7 +554,6 @@ function loadStrategyInEditor() {
     if (file !== undefined) {
         let reader = new FileReader();
         reader.onload = function (e) {
-            //let textArea = document.getElementsByClassName("ace_text-input");
             editor.setValue(e.target.result.toString());
             console.log(editor.getValue());
         };
@@ -535,9 +561,7 @@ function loadStrategyInEditor() {
         reader.readAsText(file);
         let str = file.name;
         document.req_form.fileName.value = str;
-        if (str.indexOf('.txt',1) !== -1) {
-            document.req_form.stratName.value = str.slice(0, str.indexOf('.txt',1));
-        } else if (str.indexOf('.py',1) !== -1)  {
+        if (str.indexOf('.py',1) !== -1)  {
             document.req_form.stratName.value = str.slice(0, str.indexOf('.py',1));
         } else {}
     } else {
@@ -546,19 +570,12 @@ function loadStrategyInEditor() {
     }
 }
 
-/** Change strategy and description **/
-/*function changeStrategy() {
-    let strategyName = document.getElementById("stratSelect");
-    let description = document.getElementById("descriptionSelect");
-    let index = strategyName.selectedIndex;
-    document.req_form.stratName.value = strategyName.value;
-    document.req_form.stratDescription.value = description.options[index].value;
-}*/
 
 /** Clear result console **/
 function clearResults() {
     document.getElementById('console-res').value = '';
 }
+
 
 /** Changing style of editor **/
 function changeEditorStyle() {
@@ -571,7 +588,7 @@ function changeEditorStyle() {
  ************************ dataInput block *************************
  ******************************************************************/
 
-/** Id generation **/
+/** UUID generation **/
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -599,9 +616,7 @@ function loadStrategy(stratName, stratFile, description) {
 
 /** Creating json for updating **/
 function updateStrategy(stratFile, description) {
-    let request = {};
-    if (stratFile !== '') {
-        request = {
+    let request = {
             id: strategy_id,
             description: description,
             file: {
@@ -609,12 +624,7 @@ function updateStrategy(stratFile, description) {
                 body: stratFile
             }
         };
-    } else {
-        request = {
-            id: strategy_id,
-            description: description
-        }
-    }
+
 
     let json = JSON.stringify(request);
     console.log(json)
@@ -624,35 +634,6 @@ function updateStrategy(stratFile, description) {
 
 /** Creating json for testing **/
 function testStrategy(data, strategy, uuid) {
-    /*let req_id = uuidv4();
-    console.log(uuidv4)
-    if (frdate !== '' && todate !== '') {
-        let request = {};
-        if (stratFile != null && (stratSelect == '' || stratName !== stratSelect)) {
-            request = {
-                code: 1201,
-                id: req_id,
-                frDate: frdate,
-                toDate: todate,
-                name: stratName,
-                isNew: false,
-                file: {
-                    name: document.req_form.stratFile.files[0].name,
-                    body: stratFile
-                }
-            };
-        } else if (stratSelect !== '') {
-            request = {
-                code: 1201,
-                id: req_id,
-                frDate: frdate,
-                toDate: todate,
-                name: stratSelect,
-                isNew: true
-            };
-        } else {
-            return 'Error: File is empty!!!'
-        }*/
         let request = {
             id: uuid,
             id_data: data,
@@ -661,26 +642,14 @@ function testStrategy(data, strategy, uuid) {
         let json = JSON.stringify(request);
         console.log(json)
         return (json);
-        //sendRequest(json, 1201, req_id, false);
-    /*} else {
-        return('Dates must be chosen!!!');
-    }*/
 }
 
 
-/** Choosing action **/
+/** Choosing action for strategy**/
 async function chooseAction () {
-    //let frdate = document.req_form.date_begin.value;
-    //let todate = document.req_form.date_end.value;
-    //let stratSelect = document.req_form.stratSelect.value;
-    //let desriptionSelect = document.req_form.descriptionSelect.value;
     let description = document.req_form.stratDescription.value;
-    //let stratText = document.forma.textar.value;
     let stratName = document.req_form.stratName.value;
     let stratFile = document.req_form.stratFile.files[0];
-    //let action = document.req_form.stratAction.value;
-
-    let strRes = '';
 
     if (strat_action == 'load') { // Loading strategy
         if (stratFile !== undefined && stratName !== '' && description !== '') {
@@ -729,8 +698,6 @@ async function chooseAction () {
                         showEmptyField(document.req_form.fileName);
                     }
                 };
-            } else if (description !== '' && stratFile == undefined) {
-                sendUpdateStrategyRequest(updateStrategy('', description), strategy_id);
             } else {
                 if (description == '') {
                     writeString("Error: Description can't be empty", new Date());
@@ -745,59 +712,13 @@ async function chooseAction () {
             writeString('Error: Choose strategy firstly', new Date());
         }
 
-    } /*else if (action == 'delete') { // Deleting strategy
-        if (stratSelect !== '') {
-            if (stratSelect == stratName) {
-                sendDeleteStrategyRequest(stratSelect);
-            } else {
-                writeString('Error: Incorrect strategy name',  new Date());
-                writeString('Strategy name should be the same with chosen strategy',  new Date());
-                showEmptyField(document.req_form.stratName);
-            }
-        } else {
-            writeString('Error: Choose strategy firstly', new Date());
-            showEmptyField(document.req_form.stratSelect);
-        }
-
-    }*/ else if (strat_action == 'test') { // Testing strategy
+    } else if (strat_action == 'test') { // Testing strategy
         if (data_id !== '') {
             let uuid = uuidv4();
             workStrategyRequest(testStrategy(data_id, strategy_id, uuid), uuid);
         } else {
             writeString('Error: Choose data to start test', new Date());
         }
-        /*if (frdate !== '' && todate !== '' && stratName !== '') {
-            if (document.req_form.stratFile.files[0] !== undefined) {
-                let reader = new FileReader();
-
-                reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
-
-                reader.onload = function () {
-                    console.log(reader.result)
-                    let uuid = uuidv4();
-                    strRes = testStrategy(frdate, todate, stratSelect, stratName, reader.result, uuid);
-                    workStrategyRequest(strRes, 1201, '', 0, uuid);
-                };
-            } else if (stratSelect !== '') {
-                let uuid = uuidv4();
-                strRes = testStrategy(frdate, todate, stratSelect, stratName, '', uuid);
-                workStrategyRequest(strRes, 1202, '', 0, uuid);
-            } else {
-                writeString('Error: Choose or upload strategy to start test', new Date());
-            }
-        } else {
-            if (stratName == '') {
-                showEmptyField(document.req_form.stratName);
-                writeString("Error: Strategy name can't be empty", new Date());
-                writeString("Choose or upload strategy to start test", new Date());
-            }
-            if (frdate == '' || todate == '') {
-                showEmptyField(document.req_form.date_begin);
-                showEmptyField(document.req_form.date_end);
-                writeString('Error: Dates fields must be filled', new Date());
-            }
-        }*/
-
     } else {
         writeString('Error: Choose action firstly', new Date());
     }
@@ -809,7 +730,7 @@ async function chooseAction () {
  ************************ dataOutput block ************************
  ******************************************************************/
 
-/** Write string in output **/
+/** Write string in console **/
 function writeString(str, now) {
     let strRes = document.getElementById('console-res').value;
     //let now = new Date();
@@ -826,9 +747,7 @@ function writeString(str, now) {
 }
 
 
-/******************************************************************
- ************************ pageUpdater block ***********************
- ******************************************************************/
+
 
 /** Update strategySelector **/
 /*
