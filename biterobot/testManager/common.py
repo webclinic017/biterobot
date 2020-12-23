@@ -10,7 +10,7 @@ from testManager.models import TestModel
 from .backtest.tools import checkStrategy
 
 
-def testInit(taskId, strategyPath, strategyName, version, dateBegin, dateEnd, ticker, candleLength):
+def testInit(taskId, strategyId, strategyPath, strategyName, version, dateBegin, dateEnd, ticker, candleLength):
     # Получение класса стратегии
     spec = importlib.util.spec_from_file_location("Strategy",
                                                   strategyPath)
@@ -24,7 +24,7 @@ def testInit(taskId, strategyPath, strategyName, version, dateBegin, dateEnd, ti
     graphPath = f'{settings.BASE_DIR}/testManager/resultGraphs/{strategyName}Graph.html'
 
     # Создание модели Теста
-    testModel = TestModel(name=strategyName, uuid=taskId, dateBegin=dateBegin, dateEnd=dateEnd,
+    testModel = TestModel(strategyId =strategyId, name=strategyName, uuid=taskId, dateBegin=dateBegin, dateEnd=dateEnd,
                             dateTest=datetime.today().strftime('%Y-%m-%d'), ticker=ticker, version=version)
     testModel.save()
 

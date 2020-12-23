@@ -2,9 +2,10 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework_datatables_editor.viewsets import EditorModelMixin
 
 from .models import TestModel
-from .serializers import TestSerializerGET, TestSerializerPOST, FilePathSerializer, CheckSerializerGET
+from .serializers import TestSerializerGET, TestSerializerPOST, FilePathSerializer, CheckSerializerGET, TestSerializerArchiveGET
 from django.conf import settings
 
 
@@ -28,13 +29,13 @@ class TestView(APIView):
 
         return Response(serializer.data)
 
-class TestArchiveView(APIView):
-    def get(self, request):
-        tests = TestModel.objects.all()
-        serializer = TestSerializerGET(tests, many=True)
+class TestArchiveView(EditorModelMixin, APIView):
+    def get(self, request, id):
+        tests = TestModel.objects.filter(strategyId=id)
+        serializer = TestSerializerArchiveGET(tests, many=True)
         serializerFilePath = FilePathSerializer(many=True)
 
-        return Response([{'data': serializer.data}, {'files': serializerFilePath.data}])
+        return Response(serializer.data)
 
     def post(self, request):
         test = request.data
