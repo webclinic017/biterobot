@@ -7,6 +7,7 @@ from .backtest import manager
 
 class TestModel(models.Model):
     tstStatus = models.CharField(max_length=50)
+    strategyId = models.IntegerField()
     name = models.CharField(max_length=200)  # Название стратегии + Test
     uuid = models.CharField(max_length=1000)  # Уникальный id тестирования
     dateBegin = models.DateField()  # Дата начала периода тестирования

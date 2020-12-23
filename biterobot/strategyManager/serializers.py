@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import StrategyModel
-from .common import blobToFile, saveFile
+from .common import blobToFile, saveFile, check, deleteFile
 
 
 # class StrategySerializer(serializers.ModelSerializer):
@@ -35,6 +35,12 @@ class StrategySerializerPOST(serializers.Serializer):
         fileInfo = validated_data.pop('file')
 
         saveFile(data=blobToFile(fileInfo['body']), filePath=f'strategyManager/strategies/{validated_data["name"]}.py')
+
+        try:
+            check(strategyPath=f'strategyManager/strategies/{validated_data["name"]}.py')
+        except:
+            deleteFile(f'strategies/{validated_data["name"]}.py')
+            raise
 
         validated_data.update({'filePath': f'/strategies/{validated_data["name"]}.py'})
 
