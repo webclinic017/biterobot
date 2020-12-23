@@ -1,6 +1,10 @@
 import base64
 from django.core.files.base import ContentFile
 import os
+import importlib.util
+
+from testManager.backtest.tools import checkStrategy
+
 
 
 def blobToFile(data: str):
@@ -19,3 +23,13 @@ def saveFile(data: str, filePath: str):
 def deleteFile(filePath: str):
     path = os.path.join(os.path.abspath(os.path.dirname(__file__)), filePath)
     os.remove(path)
+
+def check(strategyPath):
+    # Получение класса стратегии
+    spec = importlib.util.spec_from_file_location("Strategy",
+                                                  strategyPath)
+    foo = importlib.util.module_from_spec(spec)
+
+    spec.loader.exec_module(foo)
+
+    return checkStrategy(foo.Strategy)
