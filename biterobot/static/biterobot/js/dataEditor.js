@@ -160,7 +160,7 @@ function sendData(blob) {
             }  else if (res.status == 500) {
                 showAddMessage('There are some problems with request! Check inserted data or token and try again.', false);
             } else {
-                console.log(res);
+                //console.log(res);
                 let error = new Error(res.statusText);
                 error.response = res;
                 throw error;
@@ -199,9 +199,10 @@ function sendGetTickers() {
         })
         .then(res => {
             updateTickerList(res);
-            console.log('Tickers updated');
+            //console.log('Tickers updated');
         })
         .catch(e => {
-            console.log('Error: ' + e.message);
+            //console.log('Error: ' + e.message);
+            null
         })
 }

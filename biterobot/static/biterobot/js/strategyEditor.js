@@ -555,7 +555,7 @@ function loadStrategyInEditor() {
         let reader = new FileReader();
         reader.onload = function (e) {
             editor.setValue(e.target.result.toString());
-            console.log(editor.getValue());
+            //console.log(editor.getValue());
         };
 
         reader.readAsText(file);
@@ -611,7 +611,7 @@ function loadStrategy(stratName, stratFile, description) {
     };
 
     let json = JSON.stringify(request);
-    console.log(json)
+    //console.log(json)
     return (json);
 }
 
@@ -628,7 +628,7 @@ function updateStrategy(stratFile, description) {
         };
 
     let json = JSON.stringify(request);
-    console.log(json)
+    //console.log(json)
     return (json);
 }
 
@@ -641,7 +641,7 @@ function testStrategy(data, strategy, uuid) {
             id_strat: strategy
         }
         let json = JSON.stringify(request);
-        console.log(json)
+        //console.log(json)
         return (json);
 }
 
@@ -659,7 +659,7 @@ async function chooseAction () {
             reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
 
             reader.onload = function() {
-                console.log(reader.result)
+                //console.log(reader.result)
                 if (reader.result != null) {
                     sendLoadStrategyRequest(loadStrategy(stratName, reader.result, description), stratName);
                 } else {
@@ -690,7 +690,7 @@ async function chooseAction () {
                 reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
 
                 reader.onload = function() {
-                    console.log(reader.result)
+                    //console.log(reader.result)
 
                     if (reader.result != null) {
                         sendUpdateStrategyRequest(updateStrategy(reader.result, description), strategy_id);
@@ -922,7 +922,7 @@ function workStrategyRequest (blob, uuid) {
                 };
                 result_data.files.files.push(files);
 
-                console.log(result_data.data);
+                //console.log(result_data.data);
 
                 $('#results_table').DataTable().clear();
                 $('#results_table').DataTable().rows.add(result_data.data).draw();
