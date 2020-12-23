@@ -5,10 +5,45 @@
 var editor_strat; // Editor for strategies
 var editor_data; // Editor for data
 var editor_strategy;
+var editor_result;
+
 var last_message = new Date();
 var data_id = '';
 var strategy_id = '';
 var strat_action = '';
+
+/*var result_data = {
+    data: [],
+    files: {
+        files: []
+    }
+};*/
+var result_data = {
+   data: [
+        {
+            num: '1',
+            name: 'tst1',
+            version: '1',
+            timeStart: '11.12.2020',
+            dateBegin: '11.12.2020',
+            dateEnd: '11.12.2020',
+            status: 'DONE',
+            files: [
+                {id: 0}
+            ]
+        }
+    ],
+    files: {
+        files: [
+            {
+                web_path: "plot.html",
+                startCash: "1",
+                endCash: "2",
+                resultData: "hewruryfg3287ohroiwr8o74w21423er23rwqe"
+            }
+        ]
+    }
+};
 
 $(document).ready(function () {
     $('table.display').DataTable();
@@ -44,7 +79,7 @@ $(document).ready(function () {
                     }
                 },
                 clearText: "Clear",
-            noFileText: 'No images'
+            noFileText: 'No results'
             }
         ]
     });
@@ -84,13 +119,79 @@ $(document).ready(function () {
                 '<tr><h4>End cash: ' + editor_strat.file( 'files', id = d.files[i].id ).endCash + '</h4></tr>' +
                 '<tr>' +
                 '<textarea class="form-control" style="min-height: 150px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);">' + editor_strat.file( 'files', id = d.files[i].id ).resultData + '</textarea>' +
-            '</tr>';
+                '</tr>';
 
         }
         return ('<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
             rows +
             '</table>');
     }
+
+    editor_result = new $.fn.dataTable.Editor( {
+        data: result_data.data,
+        table: '#results_table',
+        idSrc: 'id',
+        fields: [ {
+            label: "N:",
+            name: "num"
+        }, {
+            label: "Strategy name:",
+            name: "name"
+        }, {
+            label: "Version:",
+            name: "version"
+        }, {
+            label: "Time start:",
+            name: "timeStart"
+        }, {
+            label: "Date begin:",
+            name: "dateBegin"
+        }, {
+            label: "Date end:",
+            name: "dateEnd"
+        }, {
+            label: "Current status:",
+            name: "status"
+        }, {
+            label: "files:",
+            name: "files[].id",
+            type: "uploadMany",
+            display: function (fileId, counter) {
+                if (fileId !== null) {
+                    return fileId ?
+                        '<img src="'+ editor_result.file( 'files', fileId ).web_path + '" style="width=50%; height=50%;"/>' :
+                        null;
+                }
+            },
+            clearText: "Clear",
+            noFileText: 'No results'
+        }
+        ]
+    });
+
+    function formatResult (d) {
+        var rows = '';
+        var i;
+
+        for (i = 0; i < (d.files.length); i++) {
+            //console.log(editor_strat.file( 'files', id = d.files[i].id ).web_path);
+            rows = rows + '<tr>' +
+                '<iframe src="'+ result_data.files.files[d.files[i].id].web_path + '" height="550px" scrolling="auto"></iframe>' +
+                /*'<img src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" style="width=50%; height=50%;"/>' +*/
+                '</tr>' +
+                '<tr><h4>Start cash: ' + result_data.files.files[d.files[i].id].startCash + '</h4></tr>' +
+                '<tr><h4>End cash: ' + result_data.files.files[d.files[i].id].endCash + '</h4></tr>' +
+                '<tr>' +
+                '<textarea class="form-control" style="min-height: 150px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);">' +
+                result_data.files.files[d.files[i].id].resultData + '</textarea>' +
+                '</tr>';
+
+        }
+        return ('<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
+            rows +
+            '</table>');
+    }
+
 
     var table = $('#archive_table').DataTable( {
         select: { style: 'single',
@@ -185,8 +286,9 @@ $(document).ready(function () {
             {data: "dateEnd"}
         ],
         select: true,
-        buttons: [],
         scrollY: true,
+        buttons: []
+
     });
 
     var strategy_table = $('#strategy_table').DataTable( {
@@ -213,6 +315,7 @@ $(document).ready(function () {
             {data: "description"}
         ],
         select: true,
+        scrollY: true,
         buttons: [
             {
                 text: "Add",
@@ -258,9 +361,80 @@ $(document).ready(function () {
                     chooseAction();
                 }
             }
-        ],
-        scrollY: true,
+        ]
     });
+
+
+    var results_table = $('#results_table').DataTable( {
+        select: { style: 'single',
+            selector: 'td:not(:first-child)'
+        },
+        responsive: {
+            "details": {
+                "type": 'column',
+                "target": 'tr'
+            }
+        },
+        dom: "lfrtBip",
+        order: [ 1, 'asc' ],
+        data: result_data.data,
+        columns: [
+            {
+                "className":      'details-control',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": '',
+                "render": function () {
+                    return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                },
+                width: "15px"
+            },
+            {data: "num"},
+            {data: "name"},
+            {data: "version"},
+            {data: "timeStart"},
+            {data: "dateBegin"},
+            {data: "dateEnd"},
+            {data: "status"},
+            {
+                data: "files",
+                render: function ( d ) {
+                    return d.length ?
+                        d.length+' result(s)' :
+                        'No result';
+                },
+                title: "Result"
+            }
+        ],
+        select: true,
+        scrollY: true,
+        buttons: [],
+
+        initComplete: function() {
+            // Add event listener for opening and closing details
+            $('#results_table').on('click', 'td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var tdi = tr.find("i.fa");
+                var row = results_table.row(tr);
+
+                if (row.child.isShown()) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                    tdi.first().removeClass('fa-minus-square');
+                    tdi.first().addClass('fa-plus-square');
+                }
+                else {
+                    // Open this row
+                    row.child(formatResult(row.data())).show();
+                    tr.addClass('shown');
+                    tdi.first().removeClass('fa-plus-square');
+                    tdi.first().addClass('fa-minus-square');
+                }
+            });
+        }
+    });
+
 
     $('#data_table').on('click', 'tr', function () {
         if (data_id == data_table.row(this).id()) {
@@ -369,7 +543,7 @@ function changeStrategy() {
 
 /** Clear result console **/
 function clearResults() {
-    document.res_form.resultText.value = '';
+    document.getElementById('console-res').value = '';
 }
 
 /** Changing style of editor **/
@@ -623,7 +797,7 @@ async function chooseAction () {
 
 /** Write string in output **/
 function writeString(str, now) {
-    let strRes = document.res_form.resultText.value;
+    let strRes = document.getElementById('console-res').value;
     //let now = new Date();
     if (strRes !== '') {
         strRes = strRes + '\n';
@@ -634,7 +808,7 @@ function writeString(str, now) {
         strRes = strRes + now.getHours() + ':' + now.getMinutes() + ':' +now.getSeconds() + ' BR> ' + str;
         last_message = now;
     }
-    document.res_form.resultText.value = strRes;
+    document.getElementById('console-res').value = strRes;
 }
 
 

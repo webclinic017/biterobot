@@ -145,7 +145,7 @@ function sendData(blob) {
                 sendGetTickers();
                 console.log('Data loaded');
             }  else if (res.status == 500) {
-                console.log(res.message);
+                alert('There is some problems with request! Check inserted data or token and try again.');
             } else {
                 console.log(res);
                 let error = new Error(res.statusText);
@@ -154,7 +154,7 @@ function sendData(blob) {
             }
         })
         .catch(e => {
-            console.log('Error (' + e.status + '): ' + e.message);
+            alert('HTTP request error: ' + e.status);
         })
 }
 
