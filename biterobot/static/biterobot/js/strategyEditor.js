@@ -382,7 +382,7 @@ $(document).ready(function () {
             {
                 extend: "selectedSingle",
                 text: "Test",
-                className: 'btn-dark-control',
+                className: 'btn-green-control',
                 action: function () {
                     strat_action = 'test';
                     chooseAction();
