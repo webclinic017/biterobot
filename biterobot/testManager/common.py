@@ -45,7 +45,7 @@ def testInit(taskId, strategyId, strategyPath, strategyName, version, dateBegin,
     if backtest.getStatus(taskId=taskId) == "DONE":
         testModel = TestModel.objects.get(uuid=taskId)
         result = backtest.getResult(taskId=taskId)
-        testModel.resultData = result
+        testModel.resultData = result[2]
         testModel.startCash = result[0]
         testModel.endCash = result[1]
         testModel.file = f'/testManager/resultGraphs/{strategyName}_{taskId}Graph.html'
@@ -60,7 +60,7 @@ def createDF(dateBegin, dateEnd, ticker, candleLength):
     rowData = pd.DataFrame(columns=['datetime', 'open', 'high', 'low', 'close', 'volume', 'openinterest'])
     for candle in candlesQuerySet:
         rowData = rowData.append({
-            'datetime': datetime.strptime(str(pd.datetime.date(candle.candleTime)), '%Y-%m-%d'),
+            'datetime': candle.candleTime,
             'open': candle.o,
             'high': candle.h,
             'low': candle.l,
