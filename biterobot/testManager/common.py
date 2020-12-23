@@ -45,7 +45,7 @@ def testInit(taskId, strategyId, strategyPath, strategyName, version, dateBegin,
     if backtest.getStatus(taskId=taskId) == "DONE":
         testModel = TestModel.objects.get(uuid=taskId)
         result = backtest.getResult(taskId=taskId)
-        testModel.resultData = result
+        testModel.resultData = result[2]
         testModel.startCash = result[0]
         testModel.endCash = result[1]
         testModel.file = f'/testManager/resultGraphs/{strategyName}_{taskId}Graph.html'
