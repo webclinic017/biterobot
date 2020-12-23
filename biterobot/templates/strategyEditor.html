@@ -154,10 +154,9 @@
 
                  <div class="d-none" id="strategy-editor-add" style="border: 2px solid #e1edf6; padding: 4px; border-radius: 2%">
                      <button class="btn-close" type="button" style="" onclick="hideEditor()"></button>
-
                      <div class="form-group">
-                         <label class="text-light">Description:</label>
-                         <input class="form-control d-inline-block" type="text" name="stratDescription" style="min-width: 300px; width: 75%;" id="stratDescription"/>
+                         <label class="text-light border rounded border-dark btn-dark" style="margin-right: 5px;padding: 5px;" for="inputFile-1">Choose file</label>
+                         <input class="form-control d-inline-block" type="text" style="width: 60%;" name="fileName" placeholder="file name..." readonly/>
                      </div>
 
                      <div class="form-group" style="margin-bottom: 10px;">
@@ -165,6 +164,10 @@
                          <input class="form-control d-inline-block" type="text" name="stratName" style="min-width: 212px;margin-left: 38px; width: 50%;" id="stratName"/>
                      </div>
 
+                     <div class="form-group">
+                         <label class="text-light">Description:</label>
+                         <input class="form-control d-inline-block" type="text" name="stratDescription" style="min-width: 300px; width: 75%;" id="stratDescription"/>
+                     </div>
 
                      <div style="margin-bottom: 5px; float: right;">
                          <label class="text-light">Them:</label>
@@ -224,10 +227,7 @@
 
                      <input class="d-none" id="inputFile-1" type="file" name="stratFile" style="width: 100%;" onchange="loadStrategyInEditor()" accept=".py"/>
 
-                     <div class="form-group">
-                         <label class="text-light border rounded border-dark btn-dark" style="margin-right: 5px;padding: 5px;" for="inputFile-1">Choose file</label>
-                         <input class="form-control d-inline-block" type="text" style="width: 60%;" name="fileName" placeholder="file name..." readonly/>
-                     </div>
+
 
                      <button class="btn btn-dark" type="button" style="margin-left: auto;
                         margin-right: 0em;" onclick="chooseAction()">Submit</button>
@@ -249,7 +249,7 @@
                      <thead>
                      <tr>
                          <th></th>
-                         <th>Strategy name</th>
+                         <th>Test result name</th>
                          <th>Version</th>
                          <th>Date of test</th>
                          <th>Date begin</th>
