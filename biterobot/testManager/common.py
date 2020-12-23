@@ -13,7 +13,7 @@ def testInit(taskId, strategyId, strategyPath, strategyName, version, dateBegin,
     candleDF = createDF(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
 
     # Генерация пути к графику из имени стратегии + Graph.html
-    graphPath = f'{settings.BASE_DIR}/testManager/resultGraphs/{strategyName}Graph.html'
+    graphPath = f'{settings.BASE_DIR}/testManager/resultGraphs/{strategyName}_{taskId}Graph.html'
 
     # Создание модели Теста
     testModel = TestModel(strategyId =strategyId, name=strategyName, uuid=taskId, dateBegin=dateBegin, dateEnd=dateEnd,
@@ -48,7 +48,7 @@ def testInit(taskId, strategyId, strategyPath, strategyName, version, dateBegin,
         testModel.resultData = result
         testModel.startCash = result[0]
         testModel.endCash = result[1]
-        testModel.file = f'/testManager/resultGraphs/{strategyName}Graph.html'
+        testModel.file = f'/testManager/resultGraphs/{strategyName}_{taskId}Graph.html'
         testModel.save()
 
 
