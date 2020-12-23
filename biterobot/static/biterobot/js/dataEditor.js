@@ -118,11 +118,24 @@ function updateTickerList(data) {
     let tickerList = document.getElementById("tickers");
     tickerList.innerHTML = '';
     data.forEach((item) => {
-        /*let option = document.createElement("option");
-        option.text = item.ticker;
-        tickerList.add(option);*/
         $("#tickers").append($("<option>").text(item.ticker));
     });
+}
+
+/** Show message after sendData **/
+function showAddMessage(message, sucess) {
+    let field = document.getElementById('add_result_message');
+    if (sucess) {
+        message = '<div style="color: #1e7e34">' + message + '</div>';
+    } else {
+        message = '<div style="color: #a71d2a">' + message + '</div>'
+    }
+    field.innerHTML = message;
+    setTimeout(function () {
+        field.innerHTML = '';
+    },10000);
+
+
 }
 
 /******************************************************************
@@ -142,26 +155,26 @@ function sendData(blob) {
             if (res.status == 200  || res.status == 201) {
                 //uploadData();
                 $('#data_table').DataTable().ajax.reload(null, false);
+                showAddMessage('Data loaded', true);
                 sendGetTickers();
-                console.log('Data loaded');
             }  else if (res.status == 500) {
-                console.log(res.message);
+                showAddMessage('There are some problems with request! Check inserted data or token and try again.', false);
             } else {
-                console.log(res);
+                //console.log(res);
                 let error = new Error(res.statusText);
                 error.response = res;
                 throw error;
             }
         })
         .catch(e => {
-            console.log('Error (' + e.status + '): ' + e.message);
+            showAddMessage('HTTP request error: ' + e.status, false);
         })
 }
 
 
 /** Send request to load tickers**/
 function sendGetTickers() {
-    fetch (server_url + data_url + 'instruments/tickers', {
+    fetch (server_url + data_url + 'instruments/tickers/', {
         method: 'GET'
     })
         .then(res => {
@@ -186,9 +199,10 @@ function sendGetTickers() {
         })
         .then(res => {
             updateTickerList(res);
-            console.log('Tickers updated');
+            //console.log('Tickers updated');
         })
         .catch(e => {
-            console.log('Error: ' + e.message);
+            //console.log('Error: ' + e.message);
+            null
         })
 }

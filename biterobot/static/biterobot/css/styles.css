@@ -1,3 +1,11 @@
+.btn-green-control {
+    color: #fff!important;
+    background-color: #007902 !important;
+    border-color: #343a40 !important;
+    border-radius: 4px!important;
+
+}
+
 .btn-dark-control {
     color: #fff!important;
     background-color: #343a40!important;

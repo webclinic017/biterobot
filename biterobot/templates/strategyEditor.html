@@ -113,7 +113,7 @@
 <section>
 
      <div style="position: relative; overflow: hidden; padding-top: 2%;  background-color: #1c1c1c">
-         <img src="../static/assets/images/mbr-3-1920x1280.jpg" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" alt="" class="hide">
+         <!--<img src="../static/assets/images/mbr-3-1920x1280.jpg" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" alt="" class="hide">-->
 
 
          <div class="container d-inline-block float-left" style="width: 50%" id="strategy-editor-block">
@@ -122,7 +122,7 @@
 
                  <div class="container text-white" style="min-width: 90%; min-height: 100%;">
                      <h3 class="text-left text-white">Data</h3>
-                     <table class="table table-striped table-bordered text-white table-dark table-responsive-lg" id="data_table">
+                     <table class="table table-striped table-bordered text-white table-dark table-hover table-responsive-lg" id="data_table" style="width: 100%!important;">
                          <thead>
                          <tr>
                              <th></th>
@@ -139,7 +139,7 @@
 
                  <div class="container text-white" style="min-width: 90%; min-height: 100%;">
                      <h3 class="text-left text-white">Strategies</h3>
-                     <table class="table table-striped table-bordered text-white table-dark table-responsive-lg" id="strategy_table">
+                     <table class="table table-striped table-bordered text-white table-dark table-hover table-responsive-lg" id="strategy_table" style="width: 100%!important;">
                          <thead>
                          <tr>
                              <th></th>
@@ -258,17 +258,21 @@
                          editor.session.setMode("ace/mode/python");
                      </script>
 
-                     <input class="d-none" id="inputFile-1" type="file" name="stratFile" style="width: 100%;" onchange="loadStrategyInEditor()" accept=".py, .txt"/>
+                     <input class="d-none" id="inputFile-1" type="file" name="stratFile" style="width: 100%;" onchange="loadStrategyInEditor()" accept=".py"/>
 
                      <div class="form-group">
                          <label class="text-light border rounded border-dark btn-dark" style="margin-right: 5px;padding: 5px;" for="inputFile-1">Choose file</label>
                          <input class="form-control d-inline-block" type="text" style="width: 60%;" name="fileName" placeholder="file name..." readonly/>
                      </div>
 
-                     <button class="btn btn-dark" type="button" style="padding-right: 20px; padding-left: 20px; margin-left: auto;
+                     <button class="btn btn-dark" type="button" style="margin-left: auto;
                         margin-right: 0em;" onclick="chooseAction()">Submit</button>
                  </div>
 
+                 <textarea class="form-control" style="min-height: 200px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255); margin-top: 5px;" name="resultText" placeholder="BiteRobot is ready to work..." readonly id="console-res"></textarea>
+
+                     <button class="btn btn-dark" type="button" style="margin-top: 5px; padding-right: 20px; padding-left: 20px; margin-left: auto;
+                        margin-right: 0em;" onclick="clearResults()">Clear</button>
                  <!--
                  <div class="btn-group" style="display: flex;align-items: center;justify-content: center;">
                      <input id="formCheck-1" class="custom-control-input d-none" type="radio" name="stratAction" value="load"/>
@@ -292,7 +296,7 @@
              <form name="res_form">
                  <h1 class="text-center text-light">Result</h1>
                  <h3 class="text-left text-white">Archive results</h3>
-                 <table class="table table-striped table-bordered table-dark table-responsive-lg" id="archive_table">
+                 <table class="table table-striped table-bordered table-dark table-hover table-responsive-lg" id="archive_table" style="width: 100%!important;">
                      <thead>
                      <tr>
                          <th></th>
@@ -301,22 +305,32 @@
                          <th>Date of test</th>
                          <th>Date begin</th>
                          <th>Date end</th>
-                         <th>Image</th>
+                         <th>Result</th>
                      </tr>
                      </thead>
                  </table>
 
                  <!--<img width="100%" height="100%" src="../static/biterobot/images/graph_result.png">-->
                  <h3 class="text-left text-white">Current results</h3>
-
-                 <div style="border-radius: 4px">
+                 <table class="table table-striped table-bordered table-dark table-hover table-responsive-lg" id="results_table" style="width: 100%!important;">
+                     <thead>
+                     <tr>
+                         <th></th>
+                         <th>№</th>
+                         <th>Strategy name</th>
+                         <th>Version</th>
+                         <th>Time start</th>
+                         <th>Date begin</th>
+                         <th>Date end</th>
+                         <th>Current status</th>
+                         <th>Result</th>
+                     </tr>
+                     </thead>
+                 </table>
+                 <!--<div style="border-radius: 4px">
                      <iframe src="" height="550px" scrolling="auto" id="result_graph_iframe"></iframe>
-                 </div>
+                 </div>-->
 
-                 <textarea class="form-control" style="min-height: 200px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255); margin-top: 5px;" name="resultText" placeholder="Result..."></textarea>
-                 <div class="btn" style="width:100%; align-items: center; justify-content: center;">
-                     <button class="btn btn-dark" type="button" style="margin-bottom: 5px;" onclick="clearResults()">Clear</button>
-                 </div>
              </form>
          </div>
      </div>

@@ -1,18 +1,77 @@
 /*********************** For Strategies **************************/
 
+/******************************************************************
+ ************************ pageUpdater block ***********************
+ ******************************************************************/
+
 /** Loading table's elements and data**/
 
-var editor_strat; // Editor for strategies
+var editor_strat; // Editor for archive results
 var editor_data; // Editor for data
-var editor_strategy;
-var last_message = new Date();
-var data_id = '';
-var strategy_id = '';
-var strat_action = '';
+var editor_strategy; // Editor for strategies
+var editor_result; // Editor for current results
 
+var last_message = new Date(); // Time of last message in console
+
+var data_id = ''; // row id in data_table
+var strategy_id = ''; // row id in strategy table
+var strat_action = ''; // action with strategy (add/replace/test)
+
+// json with current results data
+var result_data = {
+    data: [],
+    files: {
+        files: []
+    }
+};
+
+// structure to link uuid with row id in current result table
+var resul_request_data = {
+    data: []
+};
+
+/*var resul_request_data = {
+    data: [
+        {
+            uuid: "12312413242",
+            num: 1
+        }
+    ]
+};*/
+
+/*var result_data = {
+   data: [
+        {
+            num: 1,
+            name: 'tst1',
+            version: '1',
+            timeStart: '11.12.2020',
+            dateBegin: '11.12.2020',
+            dateEnd: '11.12.2020',
+            status: 'DONE',
+            files: [
+                {id: 0}
+            ]
+        }
+    ],
+    files: {
+        files: [
+            {
+                web_path: "plot.html",
+                startCash: "1",
+                endCash: "2",
+                resultData: "hewruryfg3287ohroiwr8o74w21423er23rwqe"
+            }
+        ]
+    }
+};*/
+
+/** Init tables and editors **/
 $(document).ready(function () {
     $('table.display').DataTable();
+    $.fn.dataTable.ext.errMode = 'none';
 
+    /** Archive results table editor **/
     editor_strat = new $.fn.dataTable.Editor( {
         ajax: server_url + test_url + 'tests/' + strategy_id + '/',
         table: '#archive_table',
@@ -44,11 +103,12 @@ $(document).ready(function () {
                     }
                 },
                 clearText: "Clear",
-            noFileText: 'No images'
+            noFileText: 'No results'
             }
         ]
     });
 
+    /** Data table editor **/
     editor_data = new $.fn.dataTable.Editor( {
         processing: false,
         serverSide: false,
@@ -57,6 +117,7 @@ $(document).ready(function () {
         idSrc: 'id'
     });
 
+    /** Strategy table editor **/
     editor_strategy = new $.fn.dataTable.Editor( {
         processing: false,
         serverSide: false,
@@ -70,21 +131,20 @@ $(document).ready(function () {
         idSrc: 'id'
     });
 
+    /** Child row for archive results table **/
     function format (d) {
         var rows = '';
         var i;
 
         for (i = 0; i < (d.files.length); i++) {
-            //console.log(editor_strat.file( 'files', id = d.files[i].id ).web_path);
             rows = rows + '<tr>' +
-                '<iframe src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" height="550px" scrolling="auto"></iframe>' +
-                /*'<img src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" style="width=50%; height=50%;"/>' +*/
+                    '<iframe src="'+ editor_strat.file( 'files', id = d.files[i].id ).web_path + '" height="550px" scrolling="auto"></iframe>' +
                 '</tr>' +
                 '<tr><h4>Start cash: ' + editor_strat.file( 'files', id = d.files[i].id ).startCash + '</h4></tr>' +
                 '<tr><h4>End cash: ' + editor_strat.file( 'files', id = d.files[i].id ).endCash + '</h4></tr>' +
                 '<tr>' +
-                '<textarea class="form-control" style="min-height: 150px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);">' + editor_strat.file( 'files', id = d.files[i].id ).resultData + '</textarea>' +
-            '</tr>';
+                    '<textarea class="form-control" style="min-height: 150px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);">' + editor_strat.file( 'files', id = d.files[i].id ).resultData + '</textarea>' +
+                '</tr>';
 
         }
         return ('<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
@@ -92,6 +152,72 @@ $(document).ready(function () {
             '</table>');
     }
 
+    /** Current results table editor **/
+    editor_result = new $.fn.dataTable.Editor( {
+        data: result_data.data,
+        table: '#results_table',
+        idSrc: 'id',
+        fields: [ {
+            label: "N:",
+            name: "num"
+        }, {
+            label: "Strategy name:",
+            name: "name"
+        }, {
+            label: "Version:",
+            name: "version"
+        }, {
+            label: "Time start:",
+            name: "timeStart"
+        }, {
+            label: "Date begin:",
+            name: "dateBegin"
+        }, {
+            label: "Date end:",
+            name: "dateEnd"
+        }, {
+            label: "Current status:",
+            name: "status"
+        }, {
+            label: "files:",
+            name: "files[].id",
+            type: "uploadMany",
+            display: function (fileId, counter) {
+                if (fileId !== null) {
+                    return fileId ?
+                        '<img src="'+ editor_result.file( 'files', fileId ).web_path + '" style="width=50%; height=50%;"/>' :
+                        null;
+                }
+            },
+            clearText: "Clear",
+            noFileText: 'No results'
+        }
+        ]
+    });
+
+    /** Child row for current results table **/
+    function formatResult (d) {
+        var rows = '';
+        var i;
+
+        for (i = 0; i < (d.files.length); i++) {
+            rows = rows + '<tr>' +
+                    '<iframe src="'+ result_data.files.files[d.files[i].id].web_path + '" height="550px" scrolling="auto"></iframe>' +
+                '</tr>' +
+                '<tr><h4>Start cash: ' + result_data.files.files[d.files[i].id].startCash + '</h4></tr>' +
+                '<tr><h4>End cash: ' + result_data.files.files[d.files[i].id].endCash + '</h4></tr>' +
+                '<tr>' +
+                    '<textarea class="form-control" style="min-height: 150px;width: 100%;background: rgb(24,24,24);color: rgb(255,255,255);">' +
+                        result_data.files.files[d.files[i].id].resultData + '</textarea>' +
+                '</tr>';
+
+        }
+        return ('<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
+            rows +
+            '</table>');
+    }
+
+    /** Archive results table **/
     var table = $('#archive_table').DataTable( {
         select: { style: 'single',
             selector: 'td:not(:first-child)'
@@ -104,7 +230,7 @@ $(document).ready(function () {
         },
         dom: "lfrtBip",
         order: [ 1, 'asc' ],
-        ajax: /*server_url + test_url + 'tests/'*/'',
+        ajax: '',
         columns: [
             {
                 "className":      'details-control',
@@ -160,6 +286,7 @@ $(document).ready(function () {
         }
     });
 
+    /** Data table **/
     var data_table = $('#data_table').DataTable( {
         select: {
             style: 'os',
@@ -185,10 +312,12 @@ $(document).ready(function () {
             {data: "dateEnd"}
         ],
         select: true,
-        buttons: [],
         scrollY: true,
+        buttons: []
+
     });
 
+    /** Strategy table **/
     var strategy_table = $('#strategy_table').DataTable( {
         select: {
             style: 'os',
@@ -213,6 +342,7 @@ $(document).ready(function () {
             {data: "description"}
         ],
         select: true,
+        scrollY: true,
         buttons: [
             {
                 text: "Add",
@@ -252,36 +382,112 @@ $(document).ready(function () {
             {
                 extend: "selectedSingle",
                 text: "Test",
-                className: 'btn-dark-control',
+                className: 'btn-green-control',
                 action: function () {
                     strat_action = 'test';
                     chooseAction();
                 }
             }
-        ],
-        scrollY: true,
+        ]
     });
 
+    /** Current results table **/
+    var results_table = $('#results_table').DataTable( {
+        select: { style: 'single',
+            selector: 'td:not(:first-child)'
+        },
+        responsive: {
+            "details": {
+                "type": 'column',
+                "target": 'tr'
+            }
+        },
+        dom: "lfrtBip",
+        order: [ 1, 'asc' ],
+        data: result_data.data,
+        columns: [
+            {
+                "className":      'details-control',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": '',
+                "render": function () {
+                    return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                },
+                width: "15px"
+            },
+            {data: "num"},
+            {data: "name"},
+            {data: "version"},
+            {data: "timeStart"},
+            {data: "dateBegin"},
+            {data: "dateEnd"},
+            {data: "status"},
+            {
+                data: "files",
+                render: function ( d ) {
+                    return d.length ?
+                        d.length+' result(s)' :
+                        'No result';
+                },
+                title: "Result"
+            }
+        ],
+        select: true,
+        scrollY: true,
+        buttons: [],
+
+        initComplete: function() {
+            // Add event listener for opening and closing details
+            $('#results_table').on('click', 'td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var tdi = tr.find("i.fa");
+                var row = results_table.row(tr);
+
+                if (row.child.isShown()) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                    tdi.first().removeClass('fa-minus-square');
+                    tdi.first().addClass('fa-plus-square');
+                }
+                else {
+                    // Open this row
+                    row.child(formatResult(row.data())).show();
+                    tr.addClass('shown');
+                    tdi.first().removeClass('fa-plus-square');
+                    tdi.first().addClass('fa-minus-square');
+                }
+            });
+        }
+    });
+
+    /** Set row id of data table **/
     $('#data_table').on('click', 'tr', function () {
         if (data_id == data_table.row(this).id()) {
             data_id = '';
         } else {
             data_id = data_table.row(this).id();
         }
-        //alert('Clicked row id '+ data_id);
     });
 
+    /** Set row id of strategy table **/
     $('#strategy_table').on('click', 'tr', function () {
         if (strategy_id == strategy_table.row(this).id()) {
             strategy_id = '';
         } else {
             strategy_id = strategy_table.row(this).id();
+            if (strat_action == 'update') {
+                let rowIdx = strategy_table.row(this).index();
+                setStrategyData(strategy_table.cell( rowIdx, 1 ).data(),
+                    strategy_table.cell( rowIdx, 3 ).data(),
+                    'replace');
+            }
         }
-        //alert('Clicked row id '+ strategy_id);
     });
 
-    uploadStrategies();
-
+    //uploadStrategies();
+    /** Set blocks width **/
     if ($(window).width() <= 716) {
         document.getElementById('strategy-editor-block').removeAttribute("style");
         document.getElementById('strategy-editor-block').setAttribute("style", 'width: 100%');
@@ -296,6 +502,7 @@ $(document).ready(function () {
 });
 
 
+/** Change blocks width **/
 $(window).resize(function () {
     if ($(window).width() <= 716) {
         document.getElementById('strategy-editor-block').removeAttribute("style");
@@ -310,16 +517,22 @@ $(window).resize(function () {
     }
 })
 
+
+/** Show strategy editor **/
 function showEditor() {
     document.getElementById('strategy-editor-add').removeAttribute("class");
-    document.getElementById('strategy-editor-add-button').setAttribute("class", 'd-none');
+    //document.getElementById('strategy-editor-add-button').setAttribute("class", 'd-none');
 }
 
+
+/** Hide strategy editor **/
 function hideEditor() {
     document.getElementById('strategy-editor-add').setAttribute("class", 'd-none');
-    document.getElementById('strategy-editor-add-button').setAttribute("class", 'btn btn-dark');
+    //document.getElementById('strategy-editor-add-button').setAttribute("class", 'btn btn-dark');
 }
 
+
+/** Ste strategy name and description **/
 function setStrategyData(name, description, type) {
     if (type == 'add') {
         document.getElementById("stratName").value = name;
@@ -329,9 +542,11 @@ function setStrategyData(name, description, type) {
         document.getElementById("stratName").value = name;
         document.getElementById("stratName").setAttribute("readonly", "");
         document.getElementById("stratDescription").value = description;
+
     }
 
 }
+
 
 /** Uploading strategy in editor**/
 function loadStrategyInEditor() {
@@ -339,38 +554,30 @@ function loadStrategyInEditor() {
     if (file !== undefined) {
         let reader = new FileReader();
         reader.onload = function (e) {
-            //let textArea = document.getElementsByClassName("ace_text-input");
             editor.setValue(e.target.result.toString());
-            console.log(editor.getValue());
+            //console.log(editor.getValue());
         };
 
         reader.readAsText(file);
         let str = file.name;
         document.req_form.fileName.value = str;
-        if (str.indexOf('.txt',1) !== -1) {
-            document.req_form.stratName.value = str.slice(0, str.indexOf('.txt',1));
-        } else if (str.indexOf('.py',1) !== -1)  {
-            document.req_form.stratName.value = str.slice(0, str.indexOf('.py',1));
-        } else {}
+        if (strat_action == 'load') {
+            if (str.indexOf('.py',1) !== -1)  {
+                document.req_form.stratName.value = str.slice(0, str.indexOf('.py',1));
+            } else {}
+        }
     } else {
         editor.setValue('');
         document.req_form.fileName.value = '';
     }
 }
 
-/** Change strategy and description **/
-function changeStrategy() {
-    let strategyName = document.getElementById("stratSelect");
-    let description = document.getElementById("descriptionSelect");
-    let index = strategyName.selectedIndex;
-    document.req_form.stratName.value = strategyName.value;
-    document.req_form.stratDescription.value = description.options[index].value;
-}
 
 /** Clear result console **/
 function clearResults() {
-    document.res_form.resultText.value = '';
+    document.getElementById('console-res').value = '';
 }
+
 
 /** Changing style of editor **/
 function changeEditorStyle() {
@@ -383,7 +590,7 @@ function changeEditorStyle() {
  ************************ dataInput block *************************
  ******************************************************************/
 
-/** Id generation **/
+/** UUID generation **/
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -404,16 +611,14 @@ function loadStrategy(stratName, stratFile, description) {
     };
 
     let json = JSON.stringify(request);
-    console.log(json)
+    //console.log(json)
     return (json);
 }
 
 
 /** Creating json for updating **/
 function updateStrategy(stratFile, description) {
-    let request = {};
-    if (stratFile !== '') {
-        request = {
+    let request = {
             id: strategy_id,
             description: description,
             file: {
@@ -421,78 +626,31 @@ function updateStrategy(stratFile, description) {
                 body: stratFile
             }
         };
-    } else {
-        request = {
-            id: strategy_id,
-            description: description
-        }
-    }
 
     let json = JSON.stringify(request);
-    console.log(json)
+    //console.log(json)
     return (json);
 }
 
 
 /** Creating json for testing **/
 function testStrategy(data, strategy, uuid) {
-    /*let req_id = uuidv4();
-    console.log(uuidv4)
-    if (frdate !== '' && todate !== '') {
-        let request = {};
-        if (stratFile != null && (stratSelect == '' || stratName !== stratSelect)) {
-            request = {
-                code: 1201,
-                id: req_id,
-                frDate: frdate,
-                toDate: todate,
-                name: stratName,
-                isNew: false,
-                file: {
-                    name: document.req_form.stratFile.files[0].name,
-                    body: stratFile
-                }
-            };
-        } else if (stratSelect !== '') {
-            request = {
-                code: 1201,
-                id: req_id,
-                frDate: frdate,
-                toDate: todate,
-                name: stratSelect,
-                isNew: true
-            };
-        } else {
-            return 'Error: File is empty!!!'
-        }*/
         let request = {
             id: uuid,
             id_data: data,
             id_strat: strategy
         }
         let json = JSON.stringify(request);
-        console.log(json)
+        //console.log(json)
         return (json);
-        //sendRequest(json, 1201, req_id, false);
-    /*} else {
-        return('Dates must be chosen!!!');
-    }*/
 }
 
 
-/** Choosing action **/
+/** Choosing action for strategy**/
 async function chooseAction () {
-    //let frdate = document.req_form.date_begin.value;
-    //let todate = document.req_form.date_end.value;
-    //let stratSelect = document.req_form.stratSelect.value;
-    //let desriptionSelect = document.req_form.descriptionSelect.value;
     let description = document.req_form.stratDescription.value;
-    //let stratText = document.forma.textar.value;
     let stratName = document.req_form.stratName.value;
     let stratFile = document.req_form.stratFile.files[0];
-    //let action = document.req_form.stratAction.value;
-
-    let strRes = '';
 
     if (strat_action == 'load') { // Loading strategy
         if (stratFile !== undefined && stratName !== '' && description !== '') {
@@ -501,9 +659,9 @@ async function chooseAction () {
             reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
 
             reader.onload = function() {
-                console.log(reader.result)
+                //console.log(reader.result)
                 if (reader.result != null) {
-                    sendLoadStrategyRequest(loadStrategy(stratName, reader.result, description));
+                    sendLoadStrategyRequest(loadStrategy(stratName, reader.result, description), stratName);
                 } else {
                     writeString('Error: File is empty', new Date());
                     showEmptyField(document.req_form.fileName);
@@ -532,7 +690,7 @@ async function chooseAction () {
                 reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
 
                 reader.onload = function() {
-                    console.log(reader.result)
+                    //console.log(reader.result)
 
                     if (reader.result != null) {
                         sendUpdateStrategyRequest(updateStrategy(reader.result, description), strategy_id);
@@ -541,8 +699,6 @@ async function chooseAction () {
                         showEmptyField(document.req_form.fileName);
                     }
                 };
-            } else if (description !== '' && stratFile == undefined) {
-                sendUpdateStrategyRequest(updateStrategy('', description), strategy_id);
             } else {
                 if (description == '') {
                     writeString("Error: Description can't be empty", new Date());
@@ -557,59 +713,13 @@ async function chooseAction () {
             writeString('Error: Choose strategy firstly', new Date());
         }
 
-    } /*else if (action == 'delete') { // Deleting strategy
-        if (stratSelect !== '') {
-            if (stratSelect == stratName) {
-                sendDeleteStrategyRequest(stratSelect);
-            } else {
-                writeString('Error: Incorrect strategy name',  new Date());
-                writeString('Strategy name should be the same with chosen strategy',  new Date());
-                showEmptyField(document.req_form.stratName);
-            }
-        } else {
-            writeString('Error: Choose strategy firstly', new Date());
-            showEmptyField(document.req_form.stratSelect);
-        }
-
-    }*/ else if (strat_action == 'test') { // Testing strategy
+    } else if (strat_action == 'test') { // Testing strategy
         if (data_id !== '') {
             let uuid = uuidv4();
             workStrategyRequest(testStrategy(data_id, strategy_id, uuid), uuid);
         } else {
             writeString('Error: Choose data to start test', new Date());
         }
-        /*if (frdate !== '' && todate !== '' && stratName !== '') {
-            if (document.req_form.stratFile.files[0] !== undefined) {
-                let reader = new FileReader();
-
-                reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
-
-                reader.onload = function () {
-                    console.log(reader.result)
-                    let uuid = uuidv4();
-                    strRes = testStrategy(frdate, todate, stratSelect, stratName, reader.result, uuid);
-                    workStrategyRequest(strRes, 1201, '', 0, uuid);
-                };
-            } else if (stratSelect !== '') {
-                let uuid = uuidv4();
-                strRes = testStrategy(frdate, todate, stratSelect, stratName, '', uuid);
-                workStrategyRequest(strRes, 1202, '', 0, uuid);
-            } else {
-                writeString('Error: Choose or upload strategy to start test', new Date());
-            }
-        } else {
-            if (stratName == '') {
-                showEmptyField(document.req_form.stratName);
-                writeString("Error: Strategy name can't be empty", new Date());
-                writeString("Choose or upload strategy to start test", new Date());
-            }
-            if (frdate == '' || todate == '') {
-                showEmptyField(document.req_form.date_begin);
-                showEmptyField(document.req_form.date_end);
-                writeString('Error: Dates fields must be filled', new Date());
-            }
-        }*/
-
     } else {
         writeString('Error: Choose action firstly', new Date());
     }
@@ -621,9 +731,10 @@ async function chooseAction () {
  ************************ dataOutput block ************************
  ******************************************************************/
 
-/** Write string in output **/
+
+/** Write string in console **/
 function writeString(str, now) {
-    let strRes = document.res_form.resultText.value;
+    let strRes = document.getElementById('console-res').value;
     //let now = new Date();
     if (strRes !== '') {
         strRes = strRes + '\n';
@@ -634,68 +745,27 @@ function writeString(str, now) {
         strRes = strRes + now.getHours() + ':' + now.getMinutes() + ':' +now.getSeconds() + ' BR> ' + str;
         last_message = now;
     }
-    document.res_form.resultText.value = strRes;
+    document.getElementById('console-res').value = strRes;
 }
 
 
-/******************************************************************
- ************************ pageUpdater block ***********************
- ******************************************************************/
-
-/** Update strategySelector **/
-/*
-function updateStrategySelector(strategies) {
-    let strategyName = document.getElementById("stratSelect");
-    let description = document.getElementById("descriptionSelect");
-    console.log(strategyName.length);
-    strategyName.innerHTML = '';
-    description.innerHTML = '';
-    console.log(strategyName.length);
-    let option = document.createElement("option");
-    let option1 = document.createElement("option");
-    option.text = '';
-    option1.text = '';
-    strategyName.appendChild(option);
-    description.appendChild(option1);
-    console.log(strategyName.length);
-    strategies.forEach((item) => {
-        let option = document.createElement("option");
-        option.text = item.name;
-        strategyName.add(option);
-
-        let option1 = document.createElement("option");
-        option1.text = item.description;
-        description.add(option1);
-    });
-}
-*/
 /******************************************************************
  ************************ pageLoader block ************************
  ******************************************************************/
 
+
 /** Uploading strategySelector **/
 async function uploadStrategies() {
-    /*sendUploadingRequest('strategies');*/
     $('#strategy_table').DataTable().ajax.reload(null, false);
 }
+
 
 /******************************************************************
  ********************** messageBroker block ***********************
  ******************************************************************/
 
-/** Generating test steps **/
-function testStep(code, req_id) {
-    let request = {
-        code: code,
-        id: req_id
-    };
 
-    let json = JSON.stringify(request);
-    console.log(json)
-    return (json);
-}
-
-
+/** Send request to get results of test **/
 function getTestResult (uuid) {
     fetch (server_url + test_url + 'testres/' + uuid + '/', {
         method: 'GET'
@@ -705,6 +775,7 @@ function getTestResult (uuid) {
                 return res;
             } else {
                 let error = new Error(res.statusText);
+                writeString('HTTP response code: ' + res.status, new Date());
                 error.response = res;
                 throw error
             }
@@ -713,12 +784,31 @@ function getTestResult (uuid) {
             return res.json();
         })
         .then(res => {
-            document.getElementById('result_graph_iframe').setAttribute("src", res.file);
-            writeString('Test finished!', new Date());
-            writeString('Results:', new Date());
-            writeString('Start cash: ' + res.startCash, new Date());
-            writeString('End cash: ' + res.endCash, new Date());
-            writeString(res.resultData, new Date());
+            let i;
+            for (i = 0; i < (resul_request_data.data.length); i++) {
+                if (resul_request_data.data[i].uuid == uuid) {
+                    writeString('Test ' + resul_request_data.data[i].num + ' finished', new Date());
+                    let file = {
+                        id: i
+                    };
+                    result_data.data[i].files.push(file);
+                    //result_data.data[i].files[0].id = i;
+                    /*let files = {
+                        web_path: res.file,
+                        startCash: res.startCash,
+                        endCash: res.endCash,
+                        resultData: res.resultData
+                    };
+                    result_data.files.files.push(files);*/
+                    result_data.files.files[i].web_path = res.file;
+                    result_data.files.files[i].startCash = res.startCash;
+                    result_data.files.files[i].endCash = res.endCash;
+                    result_data.files.files[i].resultData = res.resultData;
+
+                    $('#results_table').DataTable().clear();
+                    $('#results_table').DataTable().rows.add(result_data.data).draw();
+                }
+            }
         })
         .catch(e => {
             writeString('Error: ' + e.message, new Date());
@@ -726,6 +816,7 @@ function getTestResult (uuid) {
 }
 
 
+/** Send check status request **/
 function getTestStatus (uuid) {
     fetch (server_url + test_url + 'check/' + uuid + '/', {
         method: 'GET'
@@ -735,6 +826,7 @@ function getTestStatus (uuid) {
                 return res;
             } else {
                 let error = new Error(res.statusText);
+                writeString('HTTP response code: ' + res.status, new Date());
                 error.response = res;
                 throw error
             }
@@ -744,14 +836,41 @@ function getTestStatus (uuid) {
         })
         .then(res => {
             if (res.tstStatus !== 'DONE' && res.tstStatus !== 'ERROR') {
-                writeString('Status: ' + res.tstStatus, new Date());
+                let i;
+                for (i = 0; i < (resul_request_data.data.length); i++) {
+                    if (resul_request_data.data[i].uuid == uuid) {
+                        writeString('Status of test ' + resul_request_data.data[i].num + ': ' + res.tstStatus, new Date());
+                        result_data.data[i].status = res.tstStatus;
+
+                        $('#results_table').DataTable().clear();
+                        $('#results_table').DataTable().rows.add(result_data.data).draw();
+                    }
+                }
                 setTimeout(getTestStatus(uuid), 3000);
             } else if (res.tstStatus == 'DONE') {
-                writeString('Status: ' + res.tstStatus, new Date());
+                let i;
+                for (i = 0; i < (resul_request_data.data.length); i++) {
+                    if (resul_request_data.data[i].uuid == uuid) {
+                        writeString('Status of test ' + resul_request_data.data[i].num + ': ' + res.tstStatus, new Date());
+                        result_data.data[i].status = res.tstStatus;
+
+                        $('#results_table').DataTable().clear();
+                        $('#results_table').DataTable().rows.add(result_data.data).draw();
+                    }
+                }
                 getTestResult(uuid);
             } else if (res.tstStatus == 'ERROR') {
-                writeString('Status: ' + res.tstStatus, new Date());
-                writeString('Message: ' + res.message, new Date());
+                let i;
+                for (i = 0; i < (resul_request_data.data.length); i++) {
+                    if (resul_request_data.data[i].uuid == uuid) {
+                        writeString('Status of test ' + resul_request_data.data[i].num + ': ' + res.tstStatus, new Date());
+                        writeString('Message: ' + res.message, new Date());
+                        result_data.data[i].status = res.tstStatus;
+
+                        $('#results_table').DataTable().clear();
+                        $('#results_table').DataTable().rows.add(result_data.data).draw();
+                    }
+                }
             }
         })
         .catch(e => {
@@ -760,11 +879,9 @@ function getTestStatus (uuid) {
 }
 
 
-
-
-
 /** Send request to test strategy **/
 function workStrategyRequest (blob, uuid) {
+    let timeStart = new Date();
     fetch (server_url + test_url + 'tests/', {
         method: 'POST',
         headers: {
@@ -774,10 +891,46 @@ function workStrategyRequest (blob, uuid) {
     })
         .then(res => {
             if (res.status >= 200 && res.status <= 300) {
-                writeString('Test started', new Date());
+                writeString('Test ' + (resul_request_data.data.length + 1) +' started', new Date());
+                let data_table = $('#data_table').DataTable();
+                let strategy_table = $('#strategy_table').DataTable();
+                let strat_rowIdx = strategy_table.row( {selected: true } ).index();
+                let data_rowIdx = data_table.row( {selected: true } ).index();
+
+                let req_data = {
+                    num: resul_request_data.data.length + 1,
+                    uuid: uuid
+                };
+                resul_request_data.data.push(req_data);
+                let data = {
+                    num:  resul_request_data.data.length,
+                    name: strategy_table.cell( strat_rowIdx, 1 ).data(),
+                    version: strategy_table.cell( strat_rowIdx, 2 ).data(),
+                    dateBegin: data_table.cell( data_rowIdx, 3 ).data(),
+                    dateEnd: data_table.cell( data_rowIdx, 4 ).data(),
+                    timeStart: timeStart.getHours() + ':' + timeStart.getMinutes() + ':' + timeStart.getSeconds(),
+                    status: '',
+                    files: []
+                };
+                result_data.data.push(data);
+
+                let files = {
+                    web_path: '',
+                    startCash: '',
+                    endCash: '',
+                    resultData: ''
+                };
+                result_data.files.files.push(files);
+
+                //console.log(result_data.data);
+
+                $('#results_table').DataTable().clear();
+                $('#results_table').DataTable().rows.add(result_data.data).draw();
+
                 getTestStatus(uuid);
             } else {
                 let error = new Error(res.statusText);
+                writeString('HTTP response code: ' + res.status, new Date());
                 error.response = res;
                 throw error
             }
@@ -792,14 +945,13 @@ function workStrategyRequest (blob, uuid) {
         })*/
         .catch(e => {
             writeString('Error: ' + e.message, new Date());
-            writeString(e.response, new Date());
         })
 }
 
 
 /** Send request to load strategy **/
-function sendLoadStrategyRequest(blob) {
-    writeString('Start uploading', new Date());
+function sendLoadStrategyRequest(blob, stratName) {
+    writeString('Start uploading strategy: ' + stratName, new Date());
     fetch (server_url + strat_url + 'strategies/', {
         method: 'POST',
         headers: {
@@ -818,6 +970,7 @@ function sendLoadStrategyRequest(blob) {
             } else {
                 let error = new Error(res.statusText);
                 error.response = res;
+                writeString('HTTP response code: ' + res.status, new Date());
                 throw error;
             }
         })
@@ -826,10 +979,10 @@ function sendLoadStrategyRequest(blob) {
         })
         .then(res => {
             if (res.success == "true") {
-                writeString('Strategy uploaded', new Date());
+                writeString('Strategy ' + stratName + ' uploaded', new Date());
                 uploadStrategies();
             } else if (res.success == "false") {
-                writeString('Error: Validation error', new Date());
+                writeString('Error: Validation error of ' + stratName, new Date());
                 writeString('Check yor strategy text and retry', new Date());
             }
         })
@@ -841,7 +994,10 @@ function sendLoadStrategyRequest(blob) {
 
 /** Send request to update strategy **/
 function sendUpdateStrategyRequest(blob, strat_id) {
-    writeString('Start updating', new Date());
+    let strategy_table = $('#strategy_table').DataTable();
+    let strat_rowIdx = strategy_table.row( {selected: true } ).index();
+    let stratName = strategy_table.cell( strat_rowIdx, 1 ).data();
+    writeString('Start updating strategy: ' + stratName, new Date());
     fetch (server_url + strat_url +'strategies/' + strat_id + '/', {
         method: 'PUT',
         headers: {
@@ -856,9 +1012,11 @@ function sendUpdateStrategyRequest(blob, strat_id) {
                 uploadStrategies();
                 writeString('Error: Content was not send', new Date());
             } else if (res.status == 500) {
-                writeString(res.message, new Date());
+                writeString('There are some errors on the server side', new Date());
+                //writeString(res.message, new Date());
             } else {
                 let error = new Error(res.statusText);
+                writeString('HTTP response code: ' + res.status, new Date());
                 error.response = res;
                 throw error;
             }
@@ -869,7 +1027,7 @@ function sendUpdateStrategyRequest(blob, strat_id) {
         .then(res => {
             if (res.success == "true") {
                 uploadStrategies();
-                writeString('Strategy updated', new Date());
+                writeString('Strategy ' + stratName + ' updated', new Date());
             } else if (res.success == "false") {
                 writeString('Error: Validation error', new Date());
                 writeString('Check yor strategy text and retry', new Date());
@@ -879,60 +1037,3 @@ function sendUpdateStrategyRequest(blob, strat_id) {
             writeString('Error: ' + e.message, new Date());
         })
 }
-
-
-/** Send request to delete strategy **/
-/*
-function sendDeleteStrategyRequest(stat_name) {
-    writeString('Start deleting');
-    fetch (server_url + strat_url + 'strategies/' + stat_name, {
-        method: 'DELETE'
-    })
-        .then(res => {
-            if (res.status == 200  || res.status == 201) {
-                uploadStrategies();
-                writeString('Strategy deleted', new Date());
-            }  else if (res.status == 500) {
-                writeString(res.message, new Date());
-            } else {
-                let error = new Error(res.statusText);
-                error.response = res;
-                throw error;
-            }
-        })
-        .catch(e => {
-            writeString('Error: ' + e.message, new Date());
-        })
-}
-*/
-
-/** Send request to update data/strategies **/
-/*
-function sendUploadingRequest (req_name) {
-    fetch (server_url + strat_url + req_name + '/', {
-        method: 'GET'
-    })
-        .then(res => {
-            if (res.status >= 200 && res.status <= 300) {
-                return res;
-            } else {
-                let error = new Error(res.statusText);
-                error.response = res;
-                throw error
-            }
-        })
-        .then(res => {
-            return res.json();
-        })
-        .then(res => {
-            if (req_name == 'strategies') {
-                updateStrategySelector(res);
-                console.log('Strategy updated');
-            } else {
-                console.log('Error: Incorrect code');
-            }
-        })
-        .catch(e => {
-            console.log('Error: ' + e.message, new Date());
-        })
-}*/
