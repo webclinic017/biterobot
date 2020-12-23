@@ -11,14 +11,21 @@ from .serializers import TestSerializerGET, TestSerializerPOST, FilePathSerializ
 def startPage(request):
     return render(request, 'strategyEditor.html')
 
+# Вьюшка для Check status
 class CheckView(APIView):
     def get(self, request, uuid):
         testModel = TestModel.objects.get(uuid=uuid)
         serializer = CheckSerializerGET(testModel)
-        print(serializer.data)
 
         return Response(serializer.data)
 
+# Вьюшка для результатов текущего теста
+class TestView(APIView):
+    def get(self, request, uuid):
+        testModel = TestModel.objects.get(uuid=uuid)
+        serializer = TestSerializerGET(testModel)
+
+        return Response(serializer.data)
 
 class TestArchiveView(APIView):
     def get(self, request):
@@ -35,3 +42,7 @@ class TestArchiveView(APIView):
             test_saved = serializer.save()
 
         return Response({"success": "Test '{}' created successfully"})
+
+@csrf_exempt
+def graphView(request, graphName):
+    return render(request, 'C:\\Users\\uzer\PycharmProjects\\biterobotGit\\biterobot\\testManager\\resultGraphs\TestStrategySUPERGraph.html')

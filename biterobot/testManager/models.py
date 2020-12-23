@@ -17,4 +17,4 @@ class TestModel(models.Model):
     startCash = models.FloatField(null=True)  # Начальный кошелек
     endCash = models.FloatField(null=True)  # Конечный кошелек
     resultData = models.TextField(null=True)  # Данныые результата тестировани
-    plotPath = models.FilePathField(path=f'{settings.BASE_DIR}/testManager/resultGraphs', null=True)  # Путь до графика тестирования
+    file = models.FilePathField(path=f'{settings.BASE_DIR}/testManager/resultGraphs', null=True)  # Путь до графика тестирования

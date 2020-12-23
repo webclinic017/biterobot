@@ -23,27 +23,17 @@ def testInit(taskId, strategyPath, strategyName, version, dateBegin, dateEnd, ti
     # Генерация пути к графику из имени стратегии + Graph.html
     graphPath = f'{settings.BASE_DIR}/testManager/resultGraphs/{strategyName}Graph.html'
 
-    # Проверка временная
-    print("STRATEGY CLASS - ", foo.Strategy)
-    print("TASK ID - ", taskId)
-    print("CANDLE_DF - ", candleDF)
-    print("GRAPH PATH - ", graphPath)
-
     # Создание модели Теста
     testModel = TestModel(name=strategyName, uuid=taskId, dateBegin=dateBegin, dateEnd=dateEnd,
                             dateTest=datetime.today().strftime('%Y-%m-%d'), ticker=ticker, version=version)
     testModel.save()
-    # t = TestModel.objects.get(uuid=taskId)
-    # t.startCash = 1000
-    # t.save()
-
 
     # Работа с Backtest
     backtest = manager.BacktestManager()
 
     backtest.createTask(taskId=taskId, strategyFilePath=strategyPath, data=candleDF, plotFilePath=graphPath)
 
-    #print("TEST STRATEGY - ", checkStrategy(foo.Strategy))  # Перенсти в загрузку стратегии
+    #print("TEST STRATEGY - ", checkStrategy(foo.Strategy))  # Перенести в загрузку стратегии
 
     testModel = TestModel.objects.get(uuid=taskId)
     testModel.tstStatus = backtest.getStatus(taskId=taskId)
@@ -65,6 +55,7 @@ def testInit(taskId, strategyPath, strategyName, version, dateBegin, dateEnd, ti
     if backtest.getStatus(taskId=taskId) == "DONE":
         testModel = TestModel.objects.get(uuid=taskId)
         testModel.resultData = backtest.getResult(taskId=taskId)
+        testModel.file = f'/testManager/resultGraphs/{strategyName}Graph.html'
         testModel.save()
 
 
