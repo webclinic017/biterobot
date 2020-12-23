@@ -60,7 +60,7 @@ def createDF(dateBegin, dateEnd, ticker, candleLength):
     rowData = pd.DataFrame(columns=['datetime', 'open', 'high', 'low', 'close', 'volume', 'openinterest'])
     for candle in candlesQuerySet:
         rowData = rowData.append({
-            'datetime': datetime.strptime(str(pd.datetime.date(candle.candleTime)), '%Y-%m-%d'),
+            'datetime': candle.candleTime,
             'open': candle.o,
             'high': candle.h,
             'low': candle.l,
