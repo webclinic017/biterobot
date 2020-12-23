@@ -12,16 +12,30 @@ var data_id = '';
 var strategy_id = '';
 var strat_action = '';
 
-/*var result_data = {
+var result_data = {
     data: [],
     files: {
         files: []
     }
+};
+
+var resul_request_data = {
+    data: []
+};
+
+/*var resul_request_data = {
+    data: [
+        {
+            uuid: "12312413242",
+            num: 1
+        }
+    ]
 };*/
-var result_data = {
+
+/*var result_data = {
    data: [
         {
-            num: '1',
+            num: 1,
             name: 'tst1',
             version: '1',
             timeStart: '11.12.2020',
@@ -43,7 +57,7 @@ var result_data = {
             }
         ]
     }
-};
+};*/
 
 $(document).ready(function () {
     $('table.display').DataTable();
@@ -205,7 +219,7 @@ $(document).ready(function () {
         },
         dom: "lfrtBip",
         order: [ 1, 'asc' ],
-        ajax: /*server_url + test_url + 'tests/'*/'',
+        ajax: '',
         columns: [
             {
                 "className":      'details-control',
@@ -533,13 +547,13 @@ function loadStrategyInEditor() {
 }
 
 /** Change strategy and description **/
-function changeStrategy() {
+/*function changeStrategy() {
     let strategyName = document.getElementById("stratSelect");
     let description = document.getElementById("descriptionSelect");
     let index = strategyName.selectedIndex;
     document.req_form.stratName.value = strategyName.value;
     document.req_form.stratDescription.value = description.options[index].value;
-}
+}*/
 
 /** Clear result console **/
 function clearResults() {
@@ -858,7 +872,7 @@ async function uploadStrategies() {
  ******************************************************************/
 
 /** Generating test steps **/
-function testStep(code, req_id) {
+/*function testStep(code, req_id) {
     let request = {
         code: code,
         id: req_id
@@ -867,9 +881,9 @@ function testStep(code, req_id) {
     let json = JSON.stringify(request);
     console.log(json)
     return (json);
-}
+}*/
 
-
+/** Send request to get results of test **/
 function getTestResult (uuid) {
     fetch (server_url + test_url + 'testres/' + uuid + '/', {
         method: 'GET'
@@ -887,19 +901,45 @@ function getTestResult (uuid) {
             return res.json();
         })
         .then(res => {
-            document.getElementById('result_graph_iframe').setAttribute("src", res.file);
-            writeString('Test finished!', new Date());
-            writeString('Results:', new Date());
+            //document.getElementById('result_graph_iframe').setAttribute("src", res.file);
+
+            let i;
+            for (i = 0; i < (resul_request_data.data.length); i++) {
+                if (resul_request_data.data[i].uuid == uuid) {
+                    writeString('Test ' + resul_request_data.data[i].num + ' finished', new Date());
+                    let file = {
+                        id: i
+                    };
+                    result_data.data[i].files.push(file);
+                    //result_data.data[i].files[0].id = i;
+                    let files = {
+                        web_path: res.file,
+                        startCash: res.startCash,
+                        endCash: res.endCash,
+                        resultData: res.resultData
+                    };
+                    result_data.files.files.push(files);
+                    /*result_data.files.files[i].web_path = res.file;
+                    result_data.files.files[i].startCash = res.startCash;
+                    result_data.files.files[i].endCash = res.endCash;
+                    result_data.files.files[i].resultData = res.resultData;*/
+
+                    $('#results_table').DataTable().clear();
+                    $('#results_table').DataTable().rows.add(result_data.data).draw();
+                }
+            }
+
+            /*writeString('Results:', new Date());
             writeString('Start cash: ' + res.startCash, new Date());
             writeString('End cash: ' + res.endCash, new Date());
-            writeString(res.resultData, new Date());
+            writeString(res.resultData, new Date());*/
         })
         .catch(e => {
             writeString('Error: ' + e.message, new Date());
         })
 }
 
-
+/** Send check status request **/
 function getTestStatus (uuid) {
     fetch (server_url + test_url + 'check/' + uuid + '/', {
         method: 'GET'
@@ -918,14 +958,41 @@ function getTestStatus (uuid) {
         })
         .then(res => {
             if (res.tstStatus !== 'DONE' && res.tstStatus !== 'ERROR') {
-                writeString('Status: ' + res.tstStatus, new Date());
+                let i;
+                for (i = 0; i < (resul_request_data.data.length); i++) {
+                    if (resul_request_data.data[i].uuid == uuid) {
+                        writeString('Status of test ' + resul_request_data.data[i].num + ': ' + res.tstStatus, new Date());
+                        result_data.data[i].status = res.tstStatus;
+
+                        $('#results_table').DataTable().clear();
+                        $('#results_table').DataTable().rows.add(result_data.data).draw();
+                    }
+                }
                 setTimeout(getTestStatus(uuid), 3000);
             } else if (res.tstStatus == 'DONE') {
-                writeString('Status: ' + res.tstStatus, new Date());
+                let i;
+                for (i = 0; i < (resul_request_data.data.length); i++) {
+                    if (resul_request_data.data[i].uuid == uuid) {
+                        writeString('Status of test ' + resul_request_data.data[i].num + ': ' + res.tstStatus, new Date());
+                        result_data.data[i].status = res.tstStatus;
+
+                        $('#results_table').DataTable().clear();
+                        $('#results_table').DataTable().rows.add(result_data.data).draw();
+                    }
+                }
                 getTestResult(uuid);
             } else if (res.tstStatus == 'ERROR') {
-                writeString('Status: ' + res.tstStatus, new Date());
-                writeString('Message: ' + res.message, new Date());
+                let i;
+                for (i = 0; i < (resul_request_data.data.length); i++) {
+                    if (resul_request_data.data[i].uuid == uuid) {
+                        writeString('Status of test ' + resul_request_data.data[i].num + ': ' + res.tstStatus, new Date());
+                        writeString('Message: ' + res.message, new Date());
+                        result_data.data[i].status = res.tstStatus;
+
+                        $('#results_table').DataTable().clear();
+                        $('#results_table').DataTable().rows.add(result_data.data).draw();
+                    }
+                }
             }
         })
         .catch(e => {
@@ -934,11 +1001,9 @@ function getTestStatus (uuid) {
 }
 
 
-
-
-
 /** Send request to test strategy **/
 function workStrategyRequest (blob, uuid) {
+    let timeStart = new Date();
     fetch (server_url + test_url + 'tests/', {
         method: 'POST',
         headers: {
@@ -948,7 +1013,42 @@ function workStrategyRequest (blob, uuid) {
     })
         .then(res => {
             if (res.status >= 200 && res.status <= 300) {
-                writeString('Test started', new Date());
+                writeString('Test ' + (resul_request_data.data.length + 1) +' started', new Date());
+                let data_table = $('#data_table').DataTable();
+                let strategy_table = $('#strategy_table').DataTable();
+                let strat_rowIdx = strategy_table.row( {selected: true } ).index();
+                let data_rowIdx = data_table.row( {selected: true } ).index();
+
+                let req_data = {
+                    num: resul_request_data.data.length + 1,
+                    uuid: uuid
+                };
+                resul_request_data.data.push(req_data);
+                /*resul_request_data.data[resul_request_data.data.length].num = resul_request_data.data.length + 1;
+                resul_request_data.data[resul_request_data.data.length].uuid = uuid;*/
+                let data = {
+                    num:  resul_request_data.data.length,
+                    name: strategy_table.cell( strat_rowIdx, 1 ).data(),
+                    version: strategy_table.cell( strat_rowIdx, 2 ).data(),
+                    dateBegin: data_table.cell( data_rowIdx, 3 ).data(),
+                    dateEnd: data_table.cell( data_rowIdx, 4 ).data(),
+                    timeStart: timeStart.getHours() + ':' + timeStart.getMinutes() + ':' + timeStart.getSeconds(),
+                    status: '',
+                    files: []
+                };
+                result_data.data.push(data);
+                console.log(result_data.data);
+                /*result_data.data[resul_request_data.data.length].num = resul_request_data.data.length + 1;
+                result_data.data[resul_request_data.data.length].name = strategy_table.cell( strat_rowIdx, 1 ).data();
+                result_data.data[resul_request_data.data.length].version = strategy_table.cell( strat_rowIdx, 2 ).data();
+                result_data.data[resul_request_data.data.length].dateBegin = data_table.cell( data_rowIdx, 3 ).data();
+                result_data.data[resul_request_data.data.length].dateEnd = data_table.cell( data_rowIdx, 4 ).data();
+                result_data.data[resul_request_data.data.length].timeStart = timeStart.getHours() + ':' + timeStart.getMinutes() + ':' + timeStart.getSeconds();
+                result_data.data[resul_request_data.data.length].status = "";*/
+
+                $('#results_table').DataTable().clear();
+                $('#results_table').DataTable().rows.add(result_data.data).draw();
+
                 getTestStatus(uuid);
             } else {
                 let error = new Error(res.statusText);
