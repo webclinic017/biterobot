@@ -13,7 +13,15 @@ class TestSerializerGET(serializers.Serializer):
     dateTest = serializers.DateField()  # Дата проведения тестирования
     dateBegin = serializers.DateField()  # Дата начала периода тестирования
     dateEnd = serializers.DateField()  # Дата конца периода тестирования
+    resultData = serializers.CharField()
+    startCash = serializers.FloatField()
+    endCash = serializers.FloatField()
     file = serializers.FilePathField(path=f'{settings.BASE_DIR}/testManager/resultGraphs')  # Путь до графика тестирования
+
+# Сериалайзер для CHECK status
+class CheckSerializerGET(serializers.Serializer):
+    tstStatus = serializers.CharField(max_length=50)
+    message = serializers.CharField(max_length=500, default="")
 
 class FilesIdSerializer(serializers.Serializer):
     id = serializers.IntegerField()
@@ -42,6 +50,7 @@ class TestSerializerArchiveGET(serializers.Serializer):
 class FilePathSerializer(serializers.Serializer):
     web_path = serializers.CharField(max_length=1000)
 
+# Сериалайзер для тестирования стратегии POST
 class TestSerializerPOST(serializers.Serializer):
     id = serializers.CharField(max_length=1500)
     id_data = serializers.IntegerField()

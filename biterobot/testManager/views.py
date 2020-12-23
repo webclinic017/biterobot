@@ -4,17 +4,29 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import TestModel
-from .serializers import TestSerializerGET, TestSerializerPOST, FilePathSerializer
+from .serializers import TestSerializerGET, TestSerializerPOST, FilePathSerializer, CheckSerializerGET
+from django.conf import settings
 
 
 @csrf_exempt
 def startPage(request):
     return render(request, 'strategyEditor.html')
 
+# Вьюшка для Check status
 class CheckView(APIView):
-    def get(self, request):
-        pass
+    def get(self, request, uuid):
+        testModel = TestModel.objects.get(uuid=uuid)
+        serializer = CheckSerializerGET(testModel)
 
+        return Response(serializer.data)
+
+# Вьюшка для результатов текущего теста
+class TestView(APIView):
+    def get(self, request, uuid):
+        testModel = TestModel.objects.get(uuid=uuid)
+        serializer = TestSerializerGET(testModel)
+
+        return Response(serializer.data)
 
 class TestArchiveView(APIView):
     def get(self, request):
@@ -31,3 +43,7 @@ class TestArchiveView(APIView):
             test_saved = serializer.save()
 
         return Response({"success": "Test '{}' created successfully"})
+
+@csrf_exempt
+def graphView(request, graphName):
+    return render(request, f'{settings.BASE_DIR}/testManager/resultGraphs/{graphName}')
