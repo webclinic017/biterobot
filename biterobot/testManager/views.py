@@ -2,8 +2,6 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_datatables_editor.viewsets import EditorModelMixin
-import json
 from django.http import JsonResponse, HttpResponseNotFound
 
 from .models import TestModel

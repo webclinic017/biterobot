@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'dataManager.apps.DatamanagerConfig',
     'testManager.apps.TestmanagerConfig',
     'corsheaders',
-    'rest_framework_datatables_editor',
 ]
 
 MIDDLEWARE = [
@@ -79,19 +78,6 @@ TEMPLATES = [
         },
     },
 ]
-
-REST_FRAMEWORK  =  {
-    'DEFAULT_RENDERER_CLASSES' :  (
-        'rest_framework.renderers.JSONRenderer' ,
-        'rest_framework.renderers.BrowsableAPIRenderer' ,
-        'rest_framework_datatables_editor.renderers.DatatablesRenderer' ,
-    ),
-    'DEFAULT_FILTER_BACKENDS' :  (
-        'rest_framework_datatables_editor.filters.DatatablesFilterBackend' ,
-    ),
-    ' DEFAULT_PAGINATION_CLASS ' :  ' rest_framework_datatables_editor.pagination.DatatablesPageNumberPagination ' ,
-    ' PAGE_SIZE ' :  50 ,
-}
 
 WSGI_APPLICATION = 'biterobot.wsgi.application'
 
