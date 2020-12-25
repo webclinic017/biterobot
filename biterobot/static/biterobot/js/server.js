@@ -1,8 +1,8 @@
-//var server_url = '/';
+var server_url = '/';
 var strat_url = 'strategyManager/';//for strategies
 var data_url = 'dataManager/'; //for data
 var test_url = 'testManager/'; //for testing
-var server_url = 'https://biterobot-smxpln76pq-ez.a.run.app/'
+//var server_url = 'https://biterobot-smxpln76pq-ez.a.run.app/'
 
 
 /** Set user token for testing **/
