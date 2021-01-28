@@ -36,7 +36,8 @@ $(document).ready(function () {
     $.fn.dataTable.ext.errMode = 'none';
 
     /** Archive results table editor **/
-    editor_strat = new $.fn.dataTable.Editor( {
+    /*
+    editor_strat = new $.fn.dataTable.altEditor( {
         ajax: server_url + test_url + 'tests/' + strategy_id + '/',
         table: '#archive_table',
         idSrc: 'id',
@@ -71,18 +72,20 @@ $(document).ready(function () {
             }
         ]
     });
-
+*/
     /** Data table editor **/
-    editor_data = new $.fn.dataTable.Editor( {
+    /*
+    editor_data = new $.fn.dataTable.altEditor( {
         processing: false,
         serverSide: false,
         ajax:  server_url + data_url + 'instruments/_id_/',
         table: '#data_table',
         idSrc: 'id'
     });
-
+*/
     /** Strategy table editor **/
-    editor_strategy = new $.fn.dataTable.Editor( {
+    /*
+    editor_strategy = new $.fn.dataTable.altEditor( {
         processing: false,
         serverSide: false,
         ajax:  {
@@ -94,7 +97,7 @@ $(document).ready(function () {
         table: '#strategy_table',
         idSrc: 'id'
     });
-
+*/
     /** Child row for archive results table **/
     function format (d) {
         var rows = '';
@@ -117,7 +120,8 @@ $(document).ready(function () {
     }
 
     /** Current results table editor **/
-    editor_result = new $.fn.dataTable.Editor( {
+    /*
+    editor_result = new $.fn.dataTable.altEditor( {
         data: result_data.data,
         table: '#results_table',
         idSrc: 'id',
@@ -158,7 +162,7 @@ $(document).ready(function () {
         }
         ]
     });
-
+*/
     /** Child row for current results table **/
     function formatResult (d) {
         var rows = '';
@@ -223,6 +227,7 @@ $(document).ready(function () {
         ],
         select: true,
         scrollY: true,
+        altEditor: true,
         buttons: [],
 
         initComplete: function() {
@@ -277,16 +282,17 @@ $(document).ready(function () {
         ],
         select: true,
         scrollY: true,
+        altEditor: true,
         buttons: []
 
     });
 
     /** Strategy table **/
     var strategy_table = $('#strategy_table').DataTable( {
-        select: {
+        /*select: {
             style: 'os',
             selector: 'td:first-child'
-        },
+        },*/
         order: [[ 1, 'asc' ]],
 
         dom: "lfrtBip",
@@ -305,8 +311,10 @@ $(document).ready(function () {
             {data: "version"},
             {data: "description"}
         ],
-        select: true,
+        select: 'single',
+        responsive: true,
         scrollY: true,
+        altEditor: true,
         buttons: [
             {
                 text: "Add",
@@ -339,9 +347,11 @@ $(document).ready(function () {
                     //$('#archive_table').DataTable().ajax.reload(null, false);
                 }
             },
-            {   extend: "remove",
+            {   extend: "selected",
                 className: 'btn-red-control',
-                editor: editor_strategy
+                text: "Delete",
+                name: "delete"
+                /*editor: editor_strategy*/
             },
             {
                 extend: "selectedSingle",
@@ -352,7 +362,18 @@ $(document).ready(function () {
                     chooseAction();
                 }
             }
-        ]
+        ],
+        onDeleteRow: function(datatable, rowdata, success, error) {
+            $.ajax({
+                // a tipycal url would be /{id} with type='DELETE'
+                url: server_url + strat_url + 'strategies/' + strategy_table.row( {selected: true } ).index() + '/',
+                /*idSrc: 'id',*/
+                type: 'DELETE',
+                data: rowdata,
+                success: success,
+                error: error
+            });
+        }
     });
 
     /** Current results table **/
@@ -399,6 +420,7 @@ $(document).ready(function () {
         ],
         select: true,
         scrollY: true,
+        altEditor: true,
         buttons: [],
 
         initComplete: function() {
