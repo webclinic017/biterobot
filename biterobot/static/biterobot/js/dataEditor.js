@@ -1,11 +1,11 @@
 /************************************ For Data *****************************/
 
 /** Loading table's elements and data**/
-var editor;
+//var editor;
 
 $(document).ready(function () {
 
-    editor = new $.fn.dataTable.Editor( {
+    /*editor = new $.fn.dataTable.Editor( {
         processing: false,
         serverSide: false,
         ajax: {
@@ -16,18 +16,15 @@ $(document).ready(function () {
         },
         table: '#data_table',
         idSrc: 'id'
-    });
+    });*/
 
 
-    $('#data_table').DataTable( {
-        select: {
-            style: 'os',
-            selector: 'td:first-child'
-        },
+    var dtEdit_table = $('#data_table').DataTable( {
         order: [[ 1, 'asc' ]],
 
         dom: "lfrtBip",
         ajax: server_url + data_url + 'instruments/',
+        rowId: 'id',
         columns: [
             {
                 "className":      'select-checkbox select-checkbox-all',
@@ -42,11 +39,28 @@ $(document).ready(function () {
             {data: "dateBegin"},
             {data: "dateEnd"}
         ],
-        select: true,
+        select: 'single',
+        responsive: true,
+        altEditor: true,
         buttons: [
-            {extend: "remove", editor: editor}
-        ]
-
+            {
+                extend: "selected",
+                className: 'btn-red-control',
+                text: "Delete",
+                name: "delete"
+            }
+        ],
+        onDeleteRow: function(datatable, rowdata, success, error) {
+            $.ajax({
+                // a tipycal url would be /{id} with type='DELETE'
+                url: server_url + data_url + 'instruments/' + dtEdit_table.row( {selected: true } ).index() + '/',
+                /*idSrc: 'id',*/
+                type: 'DELETE',
+                data: rowdata,
+                success: success,
+                error: error
+            });
+        }
     });
 
     if (getCookie('token') !== undefined && getCookie('token') !== '') {
