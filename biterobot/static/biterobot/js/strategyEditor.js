@@ -373,7 +373,7 @@ $(document).ready(function () {
                 success: success,
                 error: error
             });
-        },
+        }
     });
 
     /** Current results table **/
