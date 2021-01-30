@@ -16,10 +16,22 @@ def startPage(request):
 # Вьюшка для Check status
 class CheckView(APIView):
     def get(self, request, uuid):
-        testModel = TestModel.objects.get(uuid=uuid)
-        serializer = CheckSerializerGET(testModel)
+        try:
+            testModel = TestModel.objects.get(uuid=uuid)
+        except:
+            data = {
+                "tstStatus": 'STARTED',
+                "msg": 'Now test is handling...'
+            }
 
-        return Response(serializer.data)
+            return Response(data)
+
+        data = {
+            "tstStatus": testModel.backtest.getStatus(taskId=uuid),
+            "msg": ''
+        }
+
+        return Response(data)
 
 # Вьюшка для результатов текущего теста
 class TestView(APIView):

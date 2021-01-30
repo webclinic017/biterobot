@@ -4,6 +4,7 @@ from .common import testInit
 from strategyManager.models import StrategyModel
 from dataManager.models import DataIntervalModel
 from django.conf import settings
+from .models import TestModel
 
 
 # Сериалайзер текущего тестирования стратегии
