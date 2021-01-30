@@ -1,41 +1,39 @@
 from rest_framework import serializers
 
 from .models import StrategyModel
-from .common import blobToFile, saveFile, check, deleteFile
+from .common import decodeBase64, saveFile, check, deleteFile
 
-
-# class StrategySerializer(serializers.ModelSerializer):
-#     code = serializers.IntegerField()
-#     body = serializers.CharField(max_length=1000)
-#     class Meta:
-#         model = StrategyModel
-#         fields = ('name', 'description', 'version', 'code', 'body')
-#
-#         def create(self, validated_data):
-#             print(validated_data.pop('code'), validated_data.pop('body'))
-#             validated_data.update({'filePath': 'testPath'})
-#             return StrategyModel.objects.create(**validated_data)
 
 class FileSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=200)
     body = serializers.CharField(max_length=65500)
 
 class StrategySerializerGET(serializers.Serializer):
-    id = serializers.IntegerField()
-    name = serializers.CharField(max_length=200)
-    version = serializers.IntegerField()
-    description = serializers.CharField(max_length=1000)
+    '''
+    DRF serializer for GET-request. Get Strategy info from database
+    '''
+    id = serializers.IntegerField()  # Strategy Id in database (primary key)
+    name = serializers.CharField(max_length=200)  # Strategy name
+    version = serializers.IntegerField()  # Version of the Strategy
+    description = serializers.CharField(max_length=4000)  # Some description about Strategy
 
 class StrategySerializerPOST(serializers.Serializer):
-    name = serializers.CharField(max_length=200)
-    description = serializers.CharField(max_length=1000)
-    file = FileSerializer()
+    '''
+    DRF serializer for POST-request and PUT-request. Add new Strategy info and file
+    '''
+    name = serializers.CharField(max_length=200)  # Strategy name
+    description = serializers.CharField(max_length=1000)  # Some description about Strategy
+    file = FileSerializer()  # Strategy file block
 
+    # Create new Strategy in database, save Strategy file, check Strategy
     def create(self, validated_data):
         fileInfo = validated_data.pop('file')
 
-        saveFile(data=blobToFile(fileInfo['body']), filePath=f'strategyManager/strategies/{validated_data["name"]}.py')
+        # Save Strategy file.py in strategies directory
+        saveFile(data=decodeBase64(fileInfo['body']), filePath=f'strategyManager/strategies/{validated_data["name"]}.py')
 
+        # Check Strategy file.py for Backtrader requirements.
+        # If it not correct - raise exception, delete Strategy file from directory and break (don't save in database)
         try:
             check(strategyPath=f'strategyManager/strategies/{validated_data["name"]}.py')
         except:
@@ -46,16 +44,19 @@ class StrategySerializerPOST(serializers.Serializer):
 
         return StrategyModel.objects.create(**validated_data)
 
+    # Update Strategy in database, update Strategy file
     def update(self, instance, validated_data):
         fileInfo = validated_data.pop('file')
 
-        saveFile(blobToFile(fileInfo['body']), filePath=f'strategyManager/strategies/{instance.name}.py')
+        # Save Strategy file.py in strategies directory
+        saveFile(decodeBase64(fileInfo['body']), filePath=f'strategyManager/strategies/{instance.name}.py')
 
         validated_data.update({'filePath': f'/strategies/{instance.name}.py'})
 
         instance.description = validated_data.get('description', instance.description)
         instance.filePath = validated_data.get('filePath', instance.filePath)
 
+        # Strategy version increment
         instance.version = instance.version + 1
 
         instance.save()

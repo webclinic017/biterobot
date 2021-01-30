@@ -5,10 +5,10 @@ from .views import indexPage, index, dataManager, strategyManager, documentation
 
 urlpatterns = [
     path('admin/', admin.site.urls),  # Admin panel
+    path('', index),  # Main page
     path('strategyManager/', include('strategyManager.urls')),  # strategyManager app
     path('dataManager/', include('dataManager.urls')),  # dataManager app
     path('testManager/', include('testManager.urls')),  # testManager app
-    path('', index),  # Main page
     path('index.html', indexPage),  # Main template
     path('Documentation.html', documentationPage),  # Documentation template
     path('strategyEditor.html', strategyManager),  # Strategies and Tests template
