@@ -9,16 +9,16 @@ from testManager.models import TestModel
 
 
 def testInit(taskId, strategyId, strategyPath, strategyName, version, dateBegin, dateEnd, ticker, candleLength):
+    # Создание модели Теста
+    testModel = TestModel(strategyId =strategyId, name=strategyName, uuid=taskId, dateBegin=dateBegin, dateEnd=dateEnd,
+                            dateTest=datetime.today().strftime('%Y-%m-%d'), ticker=ticker, version=version)
+    testModel.save()
+
     # Получение данных Candle и перевод в DF
     candleDF = createDF(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
 
     # Генерация пути к графику из имени стратегии + Graph.html
     graphPath = f'{settings.BASE_DIR}/testManager/resultGraphs/{strategyName}_{taskId}Graph.html'
-
-    # Создание модели Теста
-    testModel = TestModel(strategyId =strategyId, name=strategyName, uuid=taskId, dateBegin=dateBegin, dateEnd=dateEnd,
-                            dateTest=datetime.today().strftime('%Y-%m-%d'), ticker=ticker, version=version)
-    testModel.save()
 
     # Работа с Backtest
     testModel.backtest.createTask(taskId=taskId, strategyFilePath=strategyPath, data=candleDF, plotFilePath=graphPath)
