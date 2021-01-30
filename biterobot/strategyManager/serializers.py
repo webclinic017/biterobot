@@ -5,8 +5,11 @@ from .common import decodeBase64, saveFile, check, deleteFile
 
 
 class FileSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=200)
-    body = serializers.CharField(max_length=65500)
+    '''
+    DRF serializer for serialize File block in JSON
+    '''
+    name = serializers.CharField(max_length=200)  # File name
+    body = serializers.CharField()  # Base64 string of file
 
 class StrategySerializerGET(serializers.Serializer):
     '''
