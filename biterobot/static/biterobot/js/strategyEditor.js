@@ -832,7 +832,7 @@ function getTestStatus (uuid) {
                         $('#results_table').DataTable().rows.add(result_data.data).draw();
                     }
                 }
-                setTimeout(getTestStatus(uuid), 3000);
+                setTimeout(getTestStatus(uuid), 1000);
             } else if (res.tstStatus == 'DONE') {
                 let i;
                 for (i = 0; i < (resul_request_data.data.length); i++) {
@@ -877,43 +877,7 @@ function workStrategyRequest (blob, uuid) {
     })
         .then(res => {
             if (res.status >= 200 && res.status <= 300) {
-                writeString('Test ' + (resul_request_data.data.length + 1) +' started', new Date());
-                let data_table = $('#data_table').DataTable();
-                let strategy_table = $('#strategy_table').DataTable();
-                let strat_rowIdx = strategy_table.row( {selected: true } ).index();
-                let data_rowIdx = data_table.row( {selected: true } ).index();
 
-                let req_data = {
-                    num: resul_request_data.data.length + 1,
-                    uuid: uuid
-                };
-                resul_request_data.data.push(req_data);
-                let data = {
-                    num:  resul_request_data.data.length,
-                    name: strategy_table.cell( strat_rowIdx, 1 ).data(),
-                    version: strategy_table.cell( strat_rowIdx, 2 ).data(),
-                    dateBegin: data_table.cell( data_rowIdx, 3 ).data(),
-                    dateEnd: data_table.cell( data_rowIdx, 4 ).data(),
-                    timeStart: timeStart.getHours() + ':' + timeStart.getMinutes() + ':' + timeStart.getSeconds(),
-                    status: '',
-                    files: []
-                };
-                result_data.data.push(data);
-
-                let files = {
-                    web_path: '',
-                    startCash: '',
-                    endCash: '',
-                    resultData: ''
-                };
-                result_data.files.files.push(files);
-
-                //console.log(result_data.data);
-
-                $('#results_table').DataTable().clear();
-                $('#results_table').DataTable().rows.add(result_data.data).draw();
-
-                getTestStatus(uuid);
             } else {
                 let error = new Error(res.statusText);
                 writeString('HTTP response code: ' + res.status, new Date());
@@ -932,6 +896,44 @@ function workStrategyRequest (blob, uuid) {
         .catch(e => {
             writeString('Error: ' + e.message, new Date());
         })
+
+    writeString('Test ' + (resul_request_data.data.length + 1) +' created', new Date());
+        let data_table = $('#data_table').DataTable();
+        let strategy_table = $('#strategy_table').DataTable();
+        let strat_rowIdx = strategy_table.row( {selected: true } ).index();
+        let data_rowIdx = data_table.row( {selected: true } ).index();
+
+        let req_data = {
+            num: resul_request_data.data.length + 1,
+            uuid: uuid
+        };
+        resul_request_data.data.push(req_data);
+        let data = {
+            num:  resul_request_data.data.length,
+            name: strategy_table.cell( strat_rowIdx, 1 ).data(),
+            version: strategy_table.cell( strat_rowIdx, 2 ).data(),
+            dateBegin: data_table.cell( data_rowIdx, 3 ).data(),
+            dateEnd: data_table.cell( data_rowIdx, 4 ).data(),
+            timeStart: timeStart.getHours() + ':' + timeStart.getMinutes() + ':' + timeStart.getSeconds(),
+            status: '',
+            files: []
+        };
+        result_data.data.push(data);
+
+        let files = {
+            web_path: '',
+            startCash: '',
+            endCash: '',
+            resultData: ''
+        };
+        result_data.files.files.push(files);
+
+        //console.log(result_data.data);
+
+    $('#results_table').DataTable().clear();
+    $('#results_table').DataTable().rows.add(result_data.data).draw();
+
+    getTestStatus(uuid);
 }
 
 
