@@ -32,6 +32,7 @@ var resul_request_data = {
 
 /** Init tables and editors **/
 $(document).ready(function () {
+
     $('table.display').DataTable();
     $.fn.dataTable.ext.errMode = 'none';
 
