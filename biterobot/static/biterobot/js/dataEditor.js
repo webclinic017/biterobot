@@ -5,6 +5,8 @@
 
 $(document).ready(function () {
 
+    setMaxSysDate();
+
     /*editor = new $.fn.dataTable.Editor( {
         processing: false,
         serverSide: false,
