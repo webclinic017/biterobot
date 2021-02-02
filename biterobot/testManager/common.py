@@ -10,7 +10,7 @@ from testManager.models import TestModel
 
 def testInit(taskId, strategyId, strategyPath, strategyName, version, dateBegin, dateEnd, ticker, candleLength):
     # Создание модели Теста
-    testModel = TestModel(strategyId =strategyId, name=strategyName, uuid=taskId, dateBegin=dateBegin, dateEnd=dateEnd,
+    testModel = TestModel(strategyId=strategyId, name=strategyName, uuid=taskId, dateBegin=dateBegin, dateEnd=dateEnd,
                             dateTest=datetime.today().strftime('%Y-%m-%d'), ticker=ticker, version=version)
     testModel.save()
 

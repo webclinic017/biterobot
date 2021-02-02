@@ -18,6 +18,11 @@ class CheckView(APIView):
     def get(self, request, uuid):
         try:
             testModel = TestModel.objects.get(uuid=uuid)
+
+            data = {
+                "tstStatus": testModel.backtest.getStatus(taskId=uuid),
+                "msg": ''
+            }
         except:
             data = {
                 "tstStatus": 'STARTED',
@@ -25,11 +30,6 @@ class CheckView(APIView):
             }
 
             return Response(data)
-
-        data = {
-            "tstStatus": testModel.backtest.getStatus(taskId=uuid),
-            "msg": ''
-        }
 
         return Response(data)
 
