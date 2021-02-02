@@ -67,6 +67,9 @@ class DataIntervalModel(models.Model):
     ticker = models.CharField(max_length=100)  # Instrument's ticker
 
 class CandleModel(models.Model):
+    '''
+    Django model for Candle
+    '''
     instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)  # Instrument's id in database
     dataInterval = models.ForeignKey(DataIntervalModel, on_delete=models.CASCADE)  # DataInterval's id in database
     candleLength = models.CharField(max_length=15)  # Length of candle

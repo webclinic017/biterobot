@@ -15,7 +15,7 @@ class StrategySerializerGET(serializers.Serializer):
     '''
     DRF serializer for GET-request. Get Strategy info from database
     '''
-    id = serializers.IntegerField()  # Strategy Id in database (primary key)
+    id = serializers.IntegerField()  # Strategy id in database (primary key)
     name = serializers.CharField(max_length=200)  # Strategy name
     version = serializers.IntegerField()  # Version of the Strategy
     description = serializers.CharField(max_length=4000)  # Some description about Strategy
