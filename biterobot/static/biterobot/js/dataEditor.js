@@ -7,6 +7,7 @@ $(document).ready(function () {
 
     setMaxSysDate();
 
+    $.fn.dataTable.ext.errMode = 'none';
     /*editor = new $.fn.dataTable.Editor( {
         processing: false,
         serverSide: false,
@@ -168,15 +169,13 @@ function sendData(blob) {
         body: blob
     })
         .then(res => {
-            if (res.status == 200  || res.status == 201) {
-                //uploadData();
+            if (res.status >= 200  && res.status <= 300) {
                 $('#data_table').DataTable().ajax.reload(null, false);
                 showAddMessage('Data loaded', true);
                 sendGetTickers();
             }  else if (res.status == 500) {
                 showAddMessage('There are some problems with request! Check inserted data or token and try again.', false);
             } else {
-                //console.log(res);
                 let error = new Error(res.statusText);
                 error.response = res;
                 throw error;
