@@ -3,21 +3,26 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import JsonResponse, HttpResponseNotFound
+from django.conf import settings
+import os
 
 from .models import TestModel
-from .serializers import TestSerializerGET, TestSerializerPOST, FilePathSerializer, CheckSerializerGET, TestSerializerArchiveGET
-from django.conf import settings
+from .serializers import TestSerializerGET, TestSerializerPOST, TestSerializerArchiveGET
 
 
-@csrf_exempt
-def startPage(request):
-    return render(request, 'strategyEditor.html')
-
-# Вьюшка для Check status
 class CheckView(APIView):
+    '''
+    DRF view for one status of Test request. .R..
+    '''
+    # Handle GET-request for read status of Test by uuid(taskId) and return them
     def get(self, request, uuid):
         try:
             testModel = TestModel.objects.get(uuid=uuid)
+
+            data = {
+                "tstStatus": testModel.backtest.getStatus(taskId=uuid),
+                "msg": ''
+            }
         except:
             data = {
                 "tstStatus": 'STARTED',
@@ -26,15 +31,13 @@ class CheckView(APIView):
 
             return Response(data)
 
-        data = {
-            "tstStatus": testModel.backtest.getStatus(taskId=uuid),
-            "msg": ''
-        }
-
         return Response(data)
 
-# Вьюшка для результатов текущего теста
 class TestView(APIView):
+    '''
+    DRF view for one Test request. .R..
+    '''
+    # Handle GET-request for read one Test info from database and return them
     def get(self, request, uuid):
         testModel = TestModel.objects.get(uuid=uuid)
         serializer = TestSerializerGET(testModel)
@@ -42,22 +45,26 @@ class TestView(APIView):
         return Response(serializer.data)
 
 class TestArchiveView(APIView):
+    '''
+    DRF view for Tests requests. CR..
+    '''
+    # Handle GET-request for read Tests info from database and return them
     def get(self, request, id):
         tests = TestModel.objects.filter(strategyId=id)
         serializer = TestSerializerArchiveGET(tests, many=True)
-        serializerFilePath = FilePathSerializer(many=True)
 
         return Response(serializer.data)
 
+    # Handle POST-request for create new Test
     def post(self, request):
         test = request.data
         serializer = TestSerializerPOST(data=test)
         if serializer.is_valid(raise_exception=False):
-            test_saved = serializer.save()
+            serializer.save()
 
         return Response({"success": "Test '{}' created successfully"})
 
-@csrf_exempt
+# View that need to return result form one Test with special structure of JSON, that needs for frontend tables
 def testView(request, id):
     testIdList = []
     nameList = []
@@ -131,6 +138,7 @@ def testView(request, id):
     else:
         return HttpResponseNotFound()
 
-@csrf_exempt
+# Return render template of Graph.html (file with testing results in Graph)
 def graphView(request, graphName):
-    return render(request, f'{settings.BASE_DIR}/testManager/resultGraphs/{graphName}')
+    return render(request, os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                        f'{settings.BASE_DIR}/testManager/resultGraphs/{graphName}'))

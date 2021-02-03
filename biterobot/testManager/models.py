@@ -1,22 +1,28 @@
 from django.db import models
 from django.conf import settings
 
-from dataManager.models import InstrumentModel
 from .backtest import manager
 
 
 class TestModel(models.Model):
-    tstStatus = models.CharField(max_length=50)
-    backtest = manager.BacktestManager()
-    strategyId = models.IntegerField()
-    name = models.CharField(max_length=200)  # Название стратегии + Test
-    uuid = models.CharField(max_length=1000)  # Уникальный id тестирования
-    dateBegin = models.DateField()  # Дата начала периода тестирования
-    dateEnd = models.DateField()  # Дата конца периода тестирования
-    dateTest = models.DateField()  # Дата проведения тестирования
-    ticker = models.CharField(max_length=100)  # Тикер на котором проводили тестирование
-    version = models.IntegerField()  # Версия стратегии
-    startCash = models.FloatField(null=True)  # Начальный кошелек
-    endCash = models.FloatField(null=True)  # Конечный кошелек
-    resultData = models.TextField(null=True)  # Данныые результата тестировани
-    file = models.FilePathField(path=f'{settings.BASE_DIR}/testManager/resultGraphs', null=True)  # Путь до графика тестирования
+    '''
+    Django model for Test
+    '''
+    tstStatus = models.CharField(max_length=50, null=True)  # Test status for task in Backtest module
+    backtest = manager.BacktestManager()  # Backtest object for async Tests (not stored in the database)
+    strategyId = models.IntegerField()  # Strategy' id in database
+    name = models.CharField(max_length=200)  # Test name = 'Strategy's name + Test'
+    uuid = models.CharField(max_length=1000)  # Unique identifier string for the Test, that uses in async functions in Backtest
+    dateBegin = models.DateField()  # Date of beginning a Data interval for Test
+    dateEnd = models.DateField()  # Date of ending a Data interval for Test
+    dateTest = models.DateField()  # Date of testing
+    ticker = models.CharField(max_length=100)  # Instrument's ticker for the Test
+    version = models.IntegerField()  # Strategy's version
+    startCash = models.FloatField(null=True)  # Wallet before testing with conditional cash (default in Backtest module = 1000)
+    endCash = models.FloatField(null=True)  # Wallet after testing with conditional cash
+    resultData = models.TextField(null=True)  # Results of testing (long string), get from Backtest module
+    file = models.FilePathField(path=f'{settings.BASE_DIR}/testManager/resultGraphs', null=True)  # Path to Graph file on servers's directory
+
+    # Method for displaying name, when call model
+    def __str__(self):
+        return self.name
