@@ -4,13 +4,13 @@ from .views import indexPage, index, dataManager, strategyManager, documentation
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('strategyManager/', include('strategyManager.urls')),
-    path('dataManager/', include('dataManager.urls')),
-    path('testManager/', include('testManager.urls')),
-    path('', index),
-    path('index.html', indexPage),
-    path('Documentation.html', documentationPage),
-    path('strategyEditor.html', strategyManager),
-    path('DataEditor.html', dataManager),
+    path('admin/', admin.site.urls),  # Admin panel
+    path('', index),  # Main page
+    path('strategyManager/', include('strategyManager.urls')),  # strategyManager app
+    path('dataManager/', include('dataManager.urls')),  # dataManager app
+    path('testManager/', include('testManager.urls')),  # testManager app
+    path('index.html', indexPage),  # Main template
+    path('Documentation.html', documentationPage),  # Documentation template
+    path('strategyEditor.html', strategyManager),  # Strategies and Tests template
+    path('DataEditor.html', dataManager),  # Data template
 ]

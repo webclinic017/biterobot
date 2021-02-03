@@ -1,6 +1,7 @@
 from django.db import models
 
 
+# Instrument's types Enumerate
 TYPE_BOND = "BOND"
 TYPE_STOCK = "STOCK"
 TYPE_CURRENCY = "CURRENCY"
@@ -13,6 +14,7 @@ TYPE_CHOICES = (
     ("ETF", TYPE_ETF),
 )
 
+# Instrument's currency Enumerate
 CURRENCY_RUB = "RUB"
 CURRENCY_USD = "USD"
 CURRENCY_EUR = "EUR"
@@ -37,44 +39,43 @@ CURRENCY_CHOICES = (
 
 
 class InstrumentModel(models.Model):
-    name = models.CharField(max_length=200)  # Название инструмента (Apple, Tesla и т.д.)
-    ticker = models.CharField(max_length=100)  # Сокращенное название инструмента
-    figi = models.CharField(max_length=150)  # Идентификатор торгового инструмента
-    instrumentType = models.CharField(max_length=20, choices=TYPE_CHOICES, default=TYPE_BOND)
-    isin = models.CharField(max_length=150)  # Международный идентификационный код ценной бумаги
-    minPriceIncrement = models.FloatField()  # Минимальная цена
-    lot = models.IntegerField()  # Минимальный лот
-    minQuantity = models.IntegerField()  # Минимальное количество
-    currency = models.CharField(max_length=20, choices=CURRENCY_CHOICES, default=CURRENCY_USD)  # Валюта
+    '''
+    Django model for Instrument
+    '''
+    name = models.CharField(max_length=200)  # Instrument's name
+    ticker = models.CharField(max_length=100)  # Short name in the exchange information of instruments
+    figi = models.CharField(max_length=150)  # Financial instrument global identifier
+    instrumentType = models.CharField(max_length=20, choices=TYPE_CHOICES, default=TYPE_BOND)  # Type of instrument
+    isin = models.CharField(max_length=150)  # International security identification number
+    minPriceIncrement = models.FloatField()  # Minimum price increment of instrument
+    lot = models.IntegerField()  # Minimum lot of instrument
+    minQuantity = models.IntegerField()  # Minimum quantity to buy of instrument
+    currency = models.CharField(max_length=20, choices=CURRENCY_CHOICES, default=CURRENCY_USD)  # Currency of instrument
 
+    # Method for displaying name, when call model
     def __str__(self):
         return self.name
 
-class TinkoffAPI(models.Model):
-    """
-    Model for TinkoffAPI class. It is used for storing token and Tinkoff wrapper class
-    """
-
-    class Meta:
-        managed = False
-
-    token = str
-    tinkoffWrapper = None  # Класс TinkoffAPI
-
 class DataIntervalModel(models.Model):
-    instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)
-    dateBegin = models.DateField()
-    dateEnd = models.DateField()
-    candleLength = models.CharField(max_length=15)  # Интервал свечи (5 минут, 15 минут, день и т.д.)
-    ticker = models.CharField(max_length=100)  # ВРЕМЕННО
+    '''
+    Django model for Data interval
+    '''
+    instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)  # Instrument's id in database
+    dateBegin = models.DateField()  # Date of beginning the Interval
+    dateEnd = models.DateField()  # Date of ending the Interval
+    candleLength = models.CharField(max_length=15)  # Length of candle
+    ticker = models.CharField(max_length=100)  # Instrument's ticker
 
 class CandleModel(models.Model):
-    instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)
-    dataInterval = models.ForeignKey(DataIntervalModel, on_delete=models.CASCADE)
-    candleLength = models.CharField(max_length=15)  # Интервал свечи (5 минут, 15 минут, день и т.д.)
-    o = models.FloatField()  # Открытие свечи
-    c = models.FloatField()  # Закрытие свечи
-    h = models.FloatField()  # Высший уровень свечи - хвост
-    l = models.FloatField()  # Низший уровень свечи - хвост
-    v = models.IntegerField()  # Объем торгов
-    candleTime = models.DateTimeField()  # Время начала свечи в формате datetime
+    '''
+    Django model for Candle
+    '''
+    instrument = models.ForeignKey(InstrumentModel, on_delete=models.CASCADE)  # Instrument's id in database
+    dataInterval = models.ForeignKey(DataIntervalModel, on_delete=models.CASCADE)  # DataInterval's id in database
+    candleLength = models.CharField(max_length=15)  # Length of candle
+    o = models.FloatField()  # Open level of candle
+    c = models.FloatField()  # Close level of candle
+    h = models.FloatField()  # High level of candle
+    l = models.FloatField()  # Low level of candle
+    v = models.IntegerField()  # Volume of trading
+    candleTime = models.DateTimeField()  # Time of candle's start

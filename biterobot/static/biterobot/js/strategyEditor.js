@@ -7,9 +7,6 @@
 /** Loading table's elements and data**/
 
 var editor_strat; // Editor for archive results
-var editor_data; // Editor for data
-var editor_strategy; // Editor for strategies
-var editor_result; // Editor for current results
 
 var last_message = new Date(); // Time of last message in console
 
@@ -32,11 +29,13 @@ var resul_request_data = {
 
 /** Init tables and editors **/
 $(document).ready(function () {
+
     $('table.display').DataTable();
     $.fn.dataTable.ext.errMode = 'none';
 
     /** Archive results table editor **/
-    editor_strat = new $.fn.dataTable.Editor( {
+    /*
+    editor_strat = new $.fn.dataTable.altEditor( {
         ajax: server_url + test_url + 'tests/' + strategy_id + '/',
         table: '#archive_table',
         idSrc: 'id',
@@ -71,29 +70,7 @@ $(document).ready(function () {
             }
         ]
     });
-
-    /** Data table editor **/
-    editor_data = new $.fn.dataTable.Editor( {
-        processing: false,
-        serverSide: false,
-        ajax:  server_url + data_url + 'instruments/_id_/',
-        table: '#data_table',
-        idSrc: 'id'
-    });
-
-    /** Strategy table editor **/
-    editor_strategy = new $.fn.dataTable.Editor( {
-        processing: false,
-        serverSide: false,
-        ajax:  {
-            remove: {
-                url: server_url + strat_url + 'strategies/_id_/',
-                type: 'DELETE'
-            }
-        },
-        table: '#strategy_table',
-        idSrc: 'id'
-    });
+*/
 
     /** Child row for archive results table **/
     function format (d) {
@@ -115,49 +92,6 @@ $(document).ready(function () {
             rows +
             '</table>');
     }
-
-    /** Current results table editor **/
-    editor_result = new $.fn.dataTable.Editor( {
-        data: result_data.data,
-        table: '#results_table',
-        idSrc: 'id',
-        fields: [ {
-            label: "N:",
-            name: "num"
-        }, {
-            label: "Strategy name:",
-            name: "name"
-        }, {
-            label: "Version:",
-            name: "version"
-        }, {
-            label: "Time start:",
-            name: "timeStart"
-        }, {
-            label: "Date begin:",
-            name: "dateBegin"
-        }, {
-            label: "Date end:",
-            name: "dateEnd"
-        }, {
-            label: "Current status:",
-            name: "status"
-        }, {
-            label: "files:",
-            name: "files[].id",
-            type: "uploadMany",
-            display: function (fileId, counter) {
-                if (fileId !== null) {
-                    return fileId ?
-                        '<img src="'+ editor_result.file( 'files', fileId ).web_path + '" style="width=50%; height=50%;"/>' :
-                        null;
-                }
-            },
-            clearText: "Clear",
-            noFileText: 'No results'
-        }
-        ]
-    });
 
     /** Child row for current results table **/
     function formatResult (d) {
@@ -223,6 +157,7 @@ $(document).ready(function () {
         ],
         select: true,
         scrollY: true,
+        altEditor: true,
         buttons: [],
 
         initComplete: function() {
@@ -277,16 +212,17 @@ $(document).ready(function () {
         ],
         select: true,
         scrollY: true,
+        altEditor: true,
         buttons: []
 
     });
 
     /** Strategy table **/
     var strategy_table = $('#strategy_table').DataTable( {
-        select: {
+        /*select: {
             style: 'os',
             selector: 'td:first-child'
-        },
+        },*/
         order: [[ 1, 'asc' ]],
 
         dom: "lfrtBip",
@@ -305,8 +241,10 @@ $(document).ready(function () {
             {data: "version"},
             {data: "description"}
         ],
-        select: true,
+        select: 'single',
+        responsive: true,
         scrollY: true,
+        altEditor: true,
         buttons: [
             {
                 text: "Add",
@@ -339,9 +277,10 @@ $(document).ready(function () {
                     //$('#archive_table').DataTable().ajax.reload(null, false);
                 }
             },
-            {   extend: "remove",
+            {   extend: "selected",
                 className: 'btn-red-control',
-                editor: editor_strategy
+                text: "Delete",
+                name: "delete"
             },
             {
                 extend: "selectedSingle",
@@ -352,7 +291,17 @@ $(document).ready(function () {
                     chooseAction();
                 }
             }
-        ]
+        ],
+        onDeleteRow: function(datatable, rowdata, success, error) {
+            $.ajax({
+                // a tipycal url would be /{id} with type='DELETE'
+                url: server_url + strat_url + 'strategies/' + strategy_table.row( {selected: true } ).id() + '/',
+                type: 'DELETE',
+                data: rowdata,
+                success: success,
+                error: error
+            });
+        }
     });
 
     /** Current results table **/
@@ -399,6 +348,7 @@ $(document).ready(function () {
         ],
         select: true,
         scrollY: true,
+        altEditor: true,
         buttons: [],
 
         initComplete: function() {
@@ -485,14 +435,12 @@ $(window).resize(function () {
 /** Show strategy editor **/
 function showEditor() {
     document.getElementById('strategy-editor-add').removeAttribute("class");
-    //document.getElementById('strategy-editor-add-button').setAttribute("class", 'd-none');
 }
 
 
 /** Hide strategy editor **/
 function hideEditor() {
     document.getElementById('strategy-editor-add').setAttribute("class", 'd-none');
-    //document.getElementById('strategy-editor-add-button').setAttribute("class", 'btn btn-dark');
 }
 
 
@@ -519,7 +467,6 @@ function loadStrategyInEditor() {
         let reader = new FileReader();
         reader.onload = function (e) {
             editor.setValue(e.target.result.toString());
-            //console.log(editor.getValue());
         };
 
         reader.readAsText(file);
@@ -569,13 +516,12 @@ function loadStrategy(stratName, stratFile, description) {
         name: stratName,
         description: description,
         file: {
-            name: stratName + '.py'/*document.req_form.stratFile.files[0].name*/,
+            name: stratName + '.py',
             body: stratFile
         }
     };
 
     let json = JSON.stringify(request);
-    //console.log(json)
     return (json);
 }
 
@@ -586,13 +532,12 @@ function updateStrategy(stratFile, description, stratName) {
             id: strategy_id,
             description: description,
             file: {
-                name: stratName + '.py'/*document.req_form.stratFile.files[0].name*/,
+                name: stratName + '.py',
                 body: stratFile
             }
         };
 
     let json = JSON.stringify(request);
-    //console.log(json)
     return (json);
 }
 
@@ -605,7 +550,6 @@ function testStrategy(data, strategy, uuid) {
             id_strat: strategy
         }
         let json = JSON.stringify(request);
-        //console.log(json)
         return (json);
 }
 
@@ -614,12 +558,12 @@ function testStrategy(data, strategy, uuid) {
 async function chooseAction () {
     let description = document.req_form.stratDescription.value;
     let stratName = document.req_form.stratName.value;
-    let stratFile = new Blob([editor.getValue()], {type: 'text/plain'})/*document.req_form.stratFile.files[0];*/;
+    let stratFile = new Blob([editor.getValue()], {type: 'text/plain'});
     if (strat_action == 'load') { // Loading strategy
         if (editor.getValue() !== '' && stratName !== '' && description !== '') {
             let reader = new FileReader();
 
-            reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
+            reader.readAsDataURL(stratFile); // convert Blob to base64 and call onload
 
             reader.onload = function() {
                 //console.log(reader.result)
@@ -650,7 +594,7 @@ async function chooseAction () {
             if (editor.getValue() !== '' && description !== '') {
                 let reader = new FileReader();
 
-                reader.readAsDataURL(stratFile); // конвертирует Blob в base64 и вызывает onload
+                reader.readAsDataURL(stratFile); // convert Blob to base64 and call onload
 
                 reader.onload = function() {
                     //console.log(reader.result)
@@ -698,7 +642,6 @@ async function chooseAction () {
 /** Write string in console **/
 function writeString(str, now) {
     let strRes = document.getElementById('console-res').value;
-    //let now = new Date();
     if (strRes !== '') {
         strRes = strRes + '\n';
     }
@@ -755,14 +698,6 @@ function getTestResult (uuid) {
                         id: i
                     };
                     result_data.data[i].files.push(file);
-                    //result_data.data[i].files[0].id = i;
-                    /*let files = {
-                        web_path: res.file,
-                        startCash: res.startCash,
-                        endCash: res.endCash,
-                        resultData: res.resultData
-                    };
-                    result_data.files.files.push(files);*/
                     result_data.files.files[i].web_path = res.file;
                     result_data.files.files[i].startCash = res.startCash;
                     result_data.files.files[i].endCash = res.endCash;
@@ -802,14 +737,16 @@ function getTestStatus (uuid) {
                 let i;
                 for (i = 0; i < (resul_request_data.data.length); i++) {
                     if (resul_request_data.data[i].uuid == uuid) {
-                        writeString('Status of test ' + resul_request_data.data[i].num + ': ' + res.tstStatus, new Date());
+                        if (res.tstStatus !== result_data.data[i].status) {
+                            writeString('Status of test ' + resul_request_data.data[i].num + ': ' + res.tstStatus, new Date());
                         result_data.data[i].status = res.tstStatus;
 
                         $('#results_table').DataTable().clear();
                         $('#results_table').DataTable().rows.add(result_data.data).draw();
+                        }
                     }
                 }
-                setTimeout(getTestStatus(uuid), 3000);
+                setTimeout(getTestStatus(uuid), 1000);
             } else if (res.tstStatus == 'DONE') {
                 let i;
                 for (i = 0; i < (resul_request_data.data.length); i++) {
@@ -854,43 +791,7 @@ function workStrategyRequest (blob, uuid) {
     })
         .then(res => {
             if (res.status >= 200 && res.status <= 300) {
-                writeString('Test ' + (resul_request_data.data.length + 1) +' started', new Date());
-                let data_table = $('#data_table').DataTable();
-                let strategy_table = $('#strategy_table').DataTable();
-                let strat_rowIdx = strategy_table.row( {selected: true } ).index();
-                let data_rowIdx = data_table.row( {selected: true } ).index();
 
-                let req_data = {
-                    num: resul_request_data.data.length + 1,
-                    uuid: uuid
-                };
-                resul_request_data.data.push(req_data);
-                let data = {
-                    num:  resul_request_data.data.length,
-                    name: strategy_table.cell( strat_rowIdx, 1 ).data(),
-                    version: strategy_table.cell( strat_rowIdx, 2 ).data(),
-                    dateBegin: data_table.cell( data_rowIdx, 3 ).data(),
-                    dateEnd: data_table.cell( data_rowIdx, 4 ).data(),
-                    timeStart: timeStart.getHours() + ':' + timeStart.getMinutes() + ':' + timeStart.getSeconds(),
-                    status: '',
-                    files: []
-                };
-                result_data.data.push(data);
-
-                let files = {
-                    web_path: '',
-                    startCash: '',
-                    endCash: '',
-                    resultData: ''
-                };
-                result_data.files.files.push(files);
-
-                //console.log(result_data.data);
-
-                $('#results_table').DataTable().clear();
-                $('#results_table').DataTable().rows.add(result_data.data).draw();
-
-                getTestStatus(uuid);
             } else {
                 let error = new Error(res.statusText);
                 writeString('HTTP response code: ' + res.status, new Date());
@@ -909,6 +810,44 @@ function workStrategyRequest (blob, uuid) {
         .catch(e => {
             writeString('Error: ' + e.message, new Date());
         })
+
+    writeString('Test ' + (resul_request_data.data.length + 1) +' created', new Date());
+        let data_table = $('#data_table').DataTable();
+        let strategy_table = $('#strategy_table').DataTable();
+        let strat_rowIdx = strategy_table.row( {selected: true } ).index();
+        let data_rowIdx = data_table.row( {selected: true } ).index();
+
+        let req_data = {
+            num: resul_request_data.data.length + 1,
+            uuid: uuid
+        };
+        resul_request_data.data.push(req_data);
+        let data = {
+            num:  resul_request_data.data.length,
+            name: strategy_table.cell( strat_rowIdx, 1 ).data(),
+            version: strategy_table.cell( strat_rowIdx, 2 ).data(),
+            dateBegin: data_table.cell( data_rowIdx, 3 ).data(),
+            dateEnd: data_table.cell( data_rowIdx, 4 ).data(),
+            timeStart: timeStart.getHours() + ':' + timeStart.getMinutes() + ':' + timeStart.getSeconds(),
+            status: '',
+            files: []
+        };
+        result_data.data.push(data);
+
+        let files = {
+            web_path: '',
+            startCash: '',
+            endCash: '',
+            resultData: ''
+        };
+        result_data.files.files.push(files);
+
+        //console.log(result_data.data);
+
+    $('#results_table').DataTable().clear();
+    $('#results_table').DataTable().rows.add(result_data.data).draw();
+
+    getTestStatus(uuid);
 }
 
 

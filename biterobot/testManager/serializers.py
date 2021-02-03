@@ -1,73 +1,73 @@
 from rest_framework import serializers
+from django.conf import settings
 
 from .common import testInit
 from strategyManager.models import StrategyModel
 from dataManager.models import DataIntervalModel
-from django.conf import settings
 
 
-# Сериалайзер текущего тестирования стратегии
 class TestSerializerGET(serializers.Serializer):
-    uuid = serializers.CharField(max_length=1000)  # Уникальный id тестирования
-    name = serializers.CharField(max_length=200)  # Название стратегии + Test
-    version = serializers.IntegerField()  # Версия стратегии
-    dateTest = serializers.DateField()  # Дата проведения тестирования
-    dateBegin = serializers.DateField()  # Дата начала периода тестирования
-    dateEnd = serializers.DateField()  # Дата конца периода тестирования
-    resultData = serializers.CharField()  # Результаты тестирования
-    startCash = serializers.FloatField()  # Начальный кошелек
-    endCash = serializers.FloatField()  # Конечный кошелек
-    file = serializers.FilePathField(path=f'{settings.BASE_DIR}/testManager/resultGraphs')  # Путь до графика тестирования
+    '''
+    DRF serializer for GET-request. Get one Test info from database
+    '''
+    uuid = serializers.CharField(max_length=1000)  # Unique identifier string for the Test, that uses in async functions in Backtest
+    name = serializers.CharField(max_length=200)  # Test name = 'Strategy's name + Test'
+    version = serializers.IntegerField()  # Strategy's version
+    dateTest = serializers.DateField()  # Date of testing
+    dateBegin = serializers.DateField()  # Date of beginning a Data interval for Test
+    dateEnd = serializers.DateField()  # Date of ending a Data interval for Test
+    resultData = serializers.CharField()  # Results of testing (long string), get from Backtest module
+    startCash = serializers.FloatField()  # Wallet before testing with conditional cash (default in Backtest module = 1000)
+    endCash = serializers.FloatField()  # Wallet after testing with conditional cash
+    file = serializers.FilePathField(path=f'{settings.BASE_DIR}/testManager/resultGraphs')  # Path to Graph file on servers's directory
 
-# Сериалайзер для CHECK status
 class CheckSerializerGET(serializers.Serializer):
-    tstStatus = serializers.CharField(max_length=50)
-    message = serializers.CharField(max_length=500, default="")
+    '''
+    DRF serializer for GET-request. Get status of Test by uuid(taskId) and return them
+    '''
+    tstStatus = serializers.CharField(max_length=50)  # Test status for task in Backtest module
+    message = serializers.CharField(max_length=500, default="")  # Additional message, default = ''
 
-# Сериалайзер Id файлов
-class FileIdSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-
-# Сериалайзер дополнений
-class FilePathSerializer(serializers.Serializer):
-    web_path = serializers.CharField(max_length=1000)
-    startCash = serializers.FloatField()
-    endCash = serializers.FloatField()
-
-# Сериалайзер архивных данных Тестов
 class TestSerializerArchiveGET(serializers.Serializer):
-    id = serializers.IntegerField()
-    name = serializers.CharField(max_length=200)  # Название стратегии + Test
-    version = serializers.IntegerField()  # Версия стратегии
-    dateTest = serializers.DateField()  # Дата проведения тестирования
-    dateBegin = serializers.DateField()  # Дата начала периода тестирования
-    dateEnd = serializers.DateField()  # Дата конца периода тестирования
+    '''
+    DRF serializer for GET-request. Get Tests info from database
+    '''
+    id = serializers.IntegerField()  # Test id in database (primary key)
+    name = serializers.CharField(max_length=200)  # Test name = 'Strategy's name + Test'
+    version = serializers.IntegerField()  # Strategy's version
+    dateTest = serializers.DateField()  # Date of testing
+    dateBegin = serializers.DateField()  # Date of beginning a Data interval for Test
+    dateEnd = serializers.DateField()  # Date of ending a Data interval for Test
 
-# Сериалайзер для тестирования стратегии POST
 class TestSerializerPOST(serializers.Serializer):
-    id = serializers.CharField(max_length=1500)
-    id_data = serializers.IntegerField()
-    id_strat = serializers.IntegerField()
+    '''
+    DRF serializer for POST-request. Add new Test info in database, start testing
+    '''
+    id = serializers.CharField(max_length=1500)  # Test id in database (primary key)
+    id_data = serializers.IntegerField()  # Data id in database (primary key)
+    id_strat = serializers.IntegerField()  # Strategy id in database (primary key)
 
+    # Create new Test info in database, start testing
     def create(self, validated_data):
         taskId = validated_data.pop('id')
         dataId = validated_data.pop('id_data')
         strategyId = validated_data.pop('id_strat')
 
-        # Получение данных из базы Strategy
+        # Get data from Strategy
         strategy = StrategyModel.objects.filter(id=strategyId)
         strategyName = strategy[0].name
         version = strategy[0].version
 
-        # Получение данных из базы DataInterval
+        # Get data from DataInterval
         data = DataIntervalModel.objects.filter(id=dataId)
         ticker = data[0].ticker
         candleLength = data[0].candleLength
         dateBegin = data[0].dateBegin
         dateEnd = data[0].dateEnd
 
+        # Call test initialization function
         testInit(taskId=taskId, strategyId=strategyId, strategyPath=f'{settings.BASE_DIR}/strategyManager/strategies/{strategyName}.py', strategyName=strategyName,
                     version=version, dateBegin=dateBegin, dateEnd=dateEnd,
-                        ticker=ticker, candleLength=candleLength)  # Передаем путь стратегии для старта тестирования
+                        ticker=ticker, candleLength=candleLength)
 
-        return 0  # т.к. все данные в базу были уже записаны в common
+        return 0  # All Test info save in testInit(...)

@@ -3,6 +3,7 @@ var strat_url = 'strategyManager/';//for strategies
 var data_url = 'dataManager/'; //for data
 var test_url = 'testManager/'; //for testing
 //var server_url = 'https://biterobot-smxpln76pq-ez.a.run.app/'
+//var server_url = 'https://a51d6b62-1920-45e4-b298-e0c28a5e20f9.mock.pstmn.io/';
 
 
 /** Set user token for testing **/
@@ -43,6 +44,18 @@ function setMaxDate () {
     } else {
         dtbegin.removeAttribute("max");
     }
+}
+
+function setMaxSysDate() {
+    let today = new Date();
+    let dd = String(today.getDate()).padStart(2, '0');
+    let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    let yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+
+    document.getElementById("date_begin").setAttribute("max", today);
+    document.getElementById("date_end").setAttribute("max", today);
 }
 
 function showEmptyField(field) {

@@ -25,11 +25,12 @@
 
 
   <link rel="stylesheet" href="../static/biterobot/css/styles.css">
+
+
   <link rel="stylesheet" href="../static/biterobot/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="../static/biterobot/dataTables/Select-1.3.1/css/select.dataTables.min.css">
-  <link rel="stylesheet" href="../static/biterobot/dataTables/Buttons-1.6.5/css/buttons.dataTables.min.css">
   <link rel="stylesheet" href="../static/biterobot/dataTables/DataTables-1.10.22/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="../static/biterobot/dataTables/Editor-1.9.6/css/editor.dataTables.min.css">
+    <link rel="stylesheet" href="../static/biterobot/dataTables/Select-1.3.1/css/select.dataTables.min.css">
+  <link rel="stylesheet" href="../static/biterobot/dataTables/Buttons-1.6.5/css/buttons.dataTables.min.css">
   <link rel="stylesheet" href="../static/biterobot/dataTables/Buttons-1.6.5/css/buttons.bootstrap4.min.css">
 
 
@@ -41,18 +42,13 @@
   <script src="../static/assets/dropdown/js/nav-dropdown.js"></script>
   <script src="../static/assets/dropdown/js/navbar-dropdown.js"></script>
   <script src="../static/assets/touchswipe/jquery.touch-swipe.min.js"></script>
-  <script src="../static/assets/theme/js/script.js"></script>
+  <!--<script src="../static/assets/theme/js/script.js"></script>-->
 
 
-  <!--<link rel="stylesheet" href="css/select.bootstrap4.css">-->
-  <script src="../static/biterobot/js/jquery-3.5.1.min.js"></script>
   <script src="../static/biterobot/dataTables/DataTables-1.10.22/js/jquery.dataTables.min.js"></script>
-  <!--<script src="js/dataTables.bootstrap4.min.js"></script>-->
+    <script src="../static/biterobot/dataTables/Select-1.3.1/js/dataTables.select.min.js"></script>
   <script src="../static/biterobot/dataTables/Buttons-1.6.5/js/dataTables.buttons.min.js"></script>
-  <script src="../static/biterobot/dataTables/Buttons-1.6.5/js/buttons.bootstrap4.min.js"></script>
-  <script src="../static/biterobot/dataTables/Select-1.3.1/js/dataTables.select.min.js"></script>
-  <script src="../static/biterobot/dataTables/Editor-1.9.6/js/dataTables.editor.min.js"></script>
-
+  <script src="../static/biterobot/dataTables/AltEditor/src/dataTables.altEditor.free.js"></script>
 
   <script src="../static/biterobot/js/server.js"></script>
   <script src="../static/biterobot/js/dataEditor.js"></script>
@@ -93,7 +89,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link link text-white text-primary display-4" href="/strategyEditor.html">Strategy Editor</a>
+                        <a class="nav-link link text-white text-primary display-4" href="/StrategyEditor.html">Strategy Editor</a>
                     </li>
 
                     <li class="nav-item">
@@ -125,7 +121,7 @@
 
 <section>
 
-<div style="position: relative; overflow: hidden; padding-top:2%; background-color: #1c1c1c">
+<div style="position: relative; overflow: hidden; padding-top:2%; background-color: #1c1c1c;  min-height: 82vh">
 
 <!--<img src="../static/assets/images/mbr-3-1920x1280.jpg" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" alt="" class="hide">-->
 
@@ -208,8 +204,8 @@
 
 
 <section class="footer3 cid-s48P1Icc8J" once="footers" id="footer3-z">
-
-    <div class="container">
+    <div class="navbar-fixed-bottom row-fluid">
+        <div class="container">
         <div class="media-container-row align-center mbr-white">
             <div class="row social-row">
                 <div class="social-list align-right pb-2" style="justify-content: center!important;">
@@ -226,6 +222,8 @@
             </div>
         </div>
     </div>
+    </div>
+
 </section>
 
 </body>
