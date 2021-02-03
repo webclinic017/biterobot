@@ -295,7 +295,7 @@ $(document).ready(function () {
         onDeleteRow: function(datatable, rowdata, success, error) {
             $.ajax({
                 // a tipycal url would be /{id} with type='DELETE'
-                url: server_url + strat_url + 'strategies/' + strategy_table.row( {selected: true } ).index() + '/',
+                url: server_url + strat_url + 'strategies/' + strategy_table.row( {selected: true } ).id() + '/',
                 type: 'DELETE',
                 data: rowdata,
                 success: success,
