@@ -53,7 +53,7 @@ function setMaxSysDate() {
     let yyyy = today.getFullYear();
 
     today = yyyy + '-' + mm + '-' + dd;
-    console.log(today);
+
     document.getElementById("date_begin").setAttribute("max", today);
     document.getElementById("date_end").setAttribute("max", today);
 }
