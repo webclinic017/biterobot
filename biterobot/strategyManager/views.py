@@ -1,7 +1,9 @@
 from django.shortcuts import render
+from rest_framework import permissions
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.auth.models import User
 
 from .models import StrategyModel
 from .serializers import StrategySerializerGET, StrategySerializerPOST
@@ -16,9 +18,14 @@ class StrategyView(APIView):
     '''
     DRF view for Strategies requests. CRUD
     '''
+    # Auth permissions
+    permission_classes = [permissions.IsAuthenticated]
+
     # Handle GET-request for read Strategies from database and return them
     def get(self, request):
-        strategies = StrategyModel.objects.all()
+        ownerId = User.objects.filter(auth_token=request.headers['Authorization'])
+
+        strategies = StrategyModel.objects.all(userId=ownerId)
         serializer = StrategySerializerGET(strategies, many=True)
 
         return Response({'data': serializer.data})
@@ -26,6 +33,10 @@ class StrategyView(APIView):
     # Handle POST-request for create new Strategy
     def post(self, request):
         strategy = request.data
+
+        # Add user auth token from headers in context
+        strategy.update({'userToken': request.headers['Authorization']})
+
         serializer = StrategySerializerPOST(data=strategy)
 
         if serializer.is_valid(raise_exception=True):

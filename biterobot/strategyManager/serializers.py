@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 
 from .models import StrategyModel
 from .common import decodeBase64, saveFile, check, deleteFile
@@ -30,6 +31,10 @@ class StrategySerializerPOST(serializers.Serializer):
 
     # Create new Strategy in database, save Strategy file, check Strategy
     def create(self, validated_data):
+        ownerId = User.objects.filter(auth_token=validated_data.pop('userToken'))
+
+        validated_data.update({'userId': ownerId})
+
         fileInfo = validated_data.pop('file')
 
         # Save Strategy file.py in strategies directory
@@ -45,7 +50,11 @@ class StrategySerializerPOST(serializers.Serializer):
 
         validated_data.update({'filePath': f'/strategies/{validated_data["name"]}.py'})
 
-        return StrategyModel.objects.create(**validated_data)
+        try:
+            return StrategyModel.objects.create(**validated_data)
+        except:
+            deleteFile(f'strategies/{validated_data["name"]}.py')
+            raise
 
     # Update Strategy in database, update Strategy file
     def update(self, instance, validated_data):
