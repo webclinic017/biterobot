@@ -1,10 +1,15 @@
 from django.contrib import admin
 from django.urls import path, include
+
 from .views import indexPage, index, dataManager, strategyManager, documentationPage
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),  # Admin panel
+
+    path('auth/', include('djoser.urls')),  # Djoser path for authentication
+    path('auth/', include('djoser.urls.authtoken')),  # Djoser path for authentication (tokens)
+
     path('', index),  # Main page
     path('strategyManager/', include('strategyManager.urls')),  # strategyManager app
     path('dataManager/', include('dataManager.urls')),  # dataManager app
