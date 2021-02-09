@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .common import dataHandler
+from dataManager.services.services import dataHandler
 
 
 class InstrumentSerializerGET(serializers.Serializer):

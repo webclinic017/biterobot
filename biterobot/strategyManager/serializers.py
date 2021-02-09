@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 
 from .models import StrategyModel
-from .common import decodeBase64, saveFile, check, deleteFile
+from .services.services import decodeBase64, saveFile, check, deleteFile
 
 
 class FileSerializer(serializers.Serializer):

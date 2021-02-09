@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 from .models import StrategyModel
 from .serializers import StrategySerializerGET, StrategySerializerPOST
-from .common import deleteFile
+from strategyManager.services.services import deleteFile
 
 
 # Return render template of Strategies and Tests page
