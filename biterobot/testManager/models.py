@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 
-from .backtest import manager
+from .services.backtest import manager
 
 
 class TestModel(models.Model):

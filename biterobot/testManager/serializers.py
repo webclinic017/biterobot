@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.conf import settings
 
-from .common import testInit
+from testManager.services.services import testInit
 from strategyManager.models import StrategyModel
 from dataManager.models import DataIntervalModel
 

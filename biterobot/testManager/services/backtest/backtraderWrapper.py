@@ -10,7 +10,7 @@ import backtrader as bt
 from backtrader_plotting import Bokeh
 from pandas import DataFrame
 
-from testManager.backtest.const import taskStatus
+from .const import taskStatus
 
 
 def runBacktestParallel(init: dict, result: dict) -> None:

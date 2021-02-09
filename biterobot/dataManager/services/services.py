@@ -1,5 +1,5 @@
-from .tinkoffAPI.tinkoffApi import *
-from .models import InstrumentModel, DataIntervalModel, CandleModel
+from dataManager.models import InstrumentModel, DataIntervalModel, CandleModel
+from dataManager.services.tinkoffAPI.tinkoffApi import *
 
 
 def checkInstrumentExists(ticker: str) -> bool:
