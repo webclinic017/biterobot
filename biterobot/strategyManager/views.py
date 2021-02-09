@@ -18,14 +18,8 @@ class StrategyView(APIView):
     '''
     DRF view for Strategies requests. CRUD
     '''
-    # Auth permissions
-    permission_classes = [permissions.IsAuthenticated]
-
     # Handle GET-request for read Strategies from database and return them
     def get(self, request):
-        ownerId = User.objects.filter(auth_token=request.headers['Authorization'])
-
-        strategies = StrategyModel.objects.all(userId=ownerId)
         serializer = StrategySerializerGET(strategies, many=True)
 
         return Response({'data': serializer.data})
@@ -33,9 +27,6 @@ class StrategyView(APIView):
     # Handle POST-request for create new Strategy
     def post(self, request):
         strategy = request.data
-
-        # Add user auth token from headers in context
-        strategy.update({'userToken': request.headers['Authorization']})
 
         serializer = StrategySerializerPOST(data=strategy)
 

@@ -31,10 +31,6 @@ class StrategySerializerPOST(serializers.Serializer):
 
     # Create new Strategy in database, save Strategy file, check Strategy
     def create(self, validated_data):
-        ownerId = User.objects.filter(auth_token=validated_data.pop('userToken'))
-
-        validated_data.update({'userId': ownerId})
-
         fileInfo = validated_data.pop('file')
 
         # Save Strategy file.py in strategies directory
