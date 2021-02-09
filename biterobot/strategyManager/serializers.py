@@ -58,6 +58,7 @@ class StrategySerializerPOST(serializers.Serializer):
 
     # Update Strategy in database, update Strategy file
     def update(self, instance, validated_data):
+        #TODO: Проверка стратегии, как при POST
         fileInfo = validated_data.pop('file')
 
         # Save Strategy file.py in strategies directory
