@@ -1,9 +1,8 @@
 from django.shortcuts import render
-from rest_framework import permissions
+from django.conf import settings
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth.models import User
 
 from .models import StrategyModel
 from .serializers import StrategySerializerGET, StrategySerializerPOST
@@ -20,6 +19,8 @@ class StrategyView(APIView):
     '''
     # Handle GET-request for read Strategies from database and return them
     def get(self, request):
+        strategies = StrategyModel.objects.all()
+
         serializer = StrategySerializerGET(strategies, many=True)
 
         return Response({'data': serializer.data})
@@ -51,6 +52,6 @@ class StrategyView(APIView):
         strategy = get_object_or_404(StrategyModel.objects.all(), id=pk)
         strategy.delete()
 
-        deleteFile(filePath=f'strategies/{strategy.name}.py')  # Delete Strategy file
+        deleteFile(f'{settings.BASE_DIR}/strategyManager/strategies/{strategy.name}.py')  # Delete Strategy file
 
         return Response({"message": "Strategy with name `{}` has been deleted.".format(pk)}, status=204)
