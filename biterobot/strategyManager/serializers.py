@@ -1,5 +1,5 @@
+from django.conf import settings
 from rest_framework import serializers
-from django.contrib.auth.models import User
 
 from .models import StrategyModel
 from .services.services import decodeBase64, saveFile, check, deleteFile
@@ -41,15 +41,15 @@ class StrategySerializerPOST(serializers.Serializer):
         try:
             check(strategyPath=f'strategyManager/strategies/{validated_data["name"]}.py')
         except:
-            deleteFile(f'strategies/{validated_data["name"]}.py')
+            deleteFile(f'{settings.BASE_DIR}/strategyManager/strategies/{validated_data["name"]}.py')
             raise
 
-        validated_data.update({'filePath': f'/strategies/{validated_data["name"]}.py'})
+        validated_data.update({'filePath': f'../strategies/{validated_data["name"]}.py'})
 
         try:
             return StrategyModel.objects.create(**validated_data)
         except:
-            deleteFile(f'strategies/{validated_data["name"]}.py')
+            deleteFile(f'{settings.BASE_DIR}/strategyManager/strategies/{validated_data["name"]}.py')
             raise
 
     # Update Strategy in database, update Strategy file
