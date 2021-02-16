@@ -22,7 +22,22 @@
   <link rel="preload" as="style" href="../static/assets/mobirise/css/mbr-additional.css">
   <link rel="stylesheet" href="../static/assets/mobirise/css/mbr-additional.css" type="text/css">
 
+  <link rel="stylesheet" href="../static/biterobot/css/auth.css">
 
+  <script src="../static/assets/web/assets/jquery/jquery.min.js"></script>
+  <script src="../static/assets/popper/popper.min.js"></script>
+  <script src="../static/assets/tether/tether.min.js"></script>
+  <script src="../static/assets/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../static/assets/smoothscroll/smooth-scroll.js"></script>
+  <script src="../static/assets/parallax/jarallax.min.js"></script>
+  <script src="../static/assets/mbr-switch-arrow/mbr-switch-arrow.js"></script>
+  <script src="../static/assets/dropdown/js/nav-dropdown.js"></script>
+  <script src="../static/assets/dropdown/js/navbar-dropdown.js"></script>
+  <script src="../static/assets/touchswipe/jquery.touch-swipe.min.js"></script>
+  <script src="../static/assets/theme/js/script.js"></script>
+
+  <script src="../static/biterobot/js/server.js"></script>
+  <script src="../static/biterobot/js/auth.js"></script>
 </head>
 <body>
 
@@ -80,12 +95,163 @@
                     <li class="nav-item">
                         <a class="nav-link link text-white text-primary display-4" href="/index.html#content1-d">About</a>
                     </li>-->
+                    <div id="user-var"></div>
+
                 </ul>
             </div>
         </div>
     </nav>
 
 </section>
+
+
+<!-- Modal -->
+<div class="modal fade bs-modal-sm log-sign" id="myModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+
+            <div class="bs-example bs-example-tabs">
+                <ul id="myTab" class="nav nav-tabs">
+                  <li id="tab1" class="tab-style login-shadow active">
+                      <a href="#signin" data-toggle="tab">Log In</a>
+                  </li>
+                  <li id="tab2" class=" tab-style ">
+                      <a href="#signup" data-toggle="tab">Sign Up</a>
+                  </li>
+
+                </ul>
+            </div>
+
+            <div class="modal-body">
+                <div id="myTabContent" class="tab-content">
+
+                    <div class="tab-pane fade active in show" id="signin">
+                        <form class="form-horizontal" id="signin-form" action="#">
+                            <fieldset>
+                            <!-- Sign In Form -->
+                            <!-- Text input-->
+
+                                <div class="group">
+                                    <input required="" class="input" type="text" name="username">
+                                    <span class="highlight"></span>
+                                    <span class="bar"></span>
+                                    <label class="label">Login</label>
+                                </div>
+
+                            <!-- Password input-->
+                                <div class="group">
+                                    <input required="" class="input" type="password" name="password">
+                                    <span class="highlight"></span>
+                                    <span class="bar"></span>
+                                    <label class="label">Password</label>
+                                </div>
+                                <em>minimum 6 characters</em>
+
+                                <div class="forgot-link">
+                                    <a href="#forgot" data-toggle="modal" data-target="#forgot-password"> I forgot my password</a>
+                                </div>
+
+                            <!-- Button -->
+                                <div class="control-group">
+                                    <label class="control-label" for="signin"></label>
+                                    <div class="controls">
+                                        <button id="signin-btn" name="signin" class="btn btn-primary btn-block">Log In</button>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                        <div id="login-error-msg"></div>
+                    </div>
+
+
+                    <div class="tab-pane fade" id="signup">
+                        <form class="form-horizontal" id="signup-form" action="#">
+                            <fieldset>
+                            <!-- Sign Up Form -->
+                            <!-- Text input-->
+                                <div class="group">
+                                    <input required="true" class="input" type="text" name="username" >
+                                    <span class="highlight"></span>
+                                    <span class="bar"></span>
+                                    <label class="label">User name</label>
+                                </div>
+
+
+                            <!-- Text input-->
+                                <div class="group">
+                                    <input required="true" class="input" type="email" name="email" >
+                                    <span class="highlight"></span>
+                                    <span class="bar"></span>
+                                    <label class="label">Email</label>
+                                </div>
+
+                            <!-- Password input-->
+                                <div class="group">
+                                    <input required="true" class="input" type="password" maxlength="8" name="password" >
+                                    <span class="highlight"></span>
+                                    <span class="bar"></span>
+                                    <label class="label">Password</label>
+                                </div>
+                                <em>1-8 Characters</em>
+
+                            <!-- Button -->
+                                <div class="control-group">
+                                    <label class="control-label" for="confirmsignup"></label>
+                                    <div class="controls">
+                                        <button id="confirmsignup" name="confirmsignup" class="btn btn-primary btn-block" type="button">Sign Up</button>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                        <div id="register-error-msg"></div>
+                    </div>
+            </div>
+        </div>
+        <!--<div class="modal-footer">
+            <center>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </center>
+        </div>-->
+        </div>
+    </div>
+</div>
+
+
+<!--modal2-->
+<div class="modal fade bs-modal-sm" id="forgot-password" tabindex="0" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Password will be sent to your email</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <fieldset>
+                        <div class="group">
+                            <input required="" class="input" type="text">
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label class="label">Email address</label>
+                        </div>
+
+
+                        <div class="control-group">
+                            <label class="control-label" for="forpassword"></label>
+                            <div class="controls">
+                                <button id="forpassword" name="forpassword" class="btn btn-primary btn-block">Send</button>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
 
 
 <section class="header1 cid-s48MCQYojq mbr-fullscreen mbr-parallax-background" id="header1-f">
@@ -251,6 +417,7 @@
 </section>
 -->
 
+
 <section class="content1 cid-s48vrXhP0J" id="content1-d">
     
     <div class="container">
@@ -293,18 +460,5 @@
 </section>
 
 
-  <script src="../static/assets/web/assets/jquery/jquery.min.js"></script>
-  <script src="../static/assets/popper/popper.min.js"></script>
-  <script src="../static/assets/tether/tether.min.js"></script>
-  <script src="../static/assets/bootstrap/js/bootstrap.min.js"></script>
-  <script src="../static/assets/smoothscroll/smooth-scroll.js"></script>
-  <script src="../static/assets/parallax/jarallax.min.js"></script>
-  <script src="../static/assets/mbr-switch-arrow/mbr-switch-arrow.js"></script>
-  <script src="../static/assets/dropdown/js/nav-dropdown.js"></script>
-  <script src="../static/assets/dropdown/js/navbar-dropdown.js"></script>
-  <script src="../static/assets/touchswipe/jquery.touch-swipe.min.js"></script>
-  <script src="../static/assets/theme/js/script.js"></script>
-  
-  
 </body>
 </html>

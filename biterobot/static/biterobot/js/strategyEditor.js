@@ -774,7 +774,7 @@ function getTestStatus (uuid) {
             }
         })
         .catch(e => {
-            writeString('Error: ' + e.message, new Date());
+            writeStrig('Error: ' + e.message, new Date());
         })
 }
 
