@@ -1,12 +1,11 @@
 from django.shortcuts import render
-from django.conf import settings
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import StrategyModel
 from .serializers import StrategySerializerGET, StrategySerializerPOST
-from strategyManager.services.services import deleteFile
+from strategyManager.services import services
 
 
 # Return render template of Strategies and Tests page
@@ -38,9 +37,11 @@ class StrategyView(APIView):
 
     # Handle PUT-request for update Strategy
     def put(self, request, pk):
+        strategy = request.data
+        
         saved_strategy = get_object_or_404(StrategyModel.objects.all(), id=pk)
-        data = request.data
-        serializer = StrategySerializerPOST(instance=saved_strategy, data=data, partial=True)
+
+        serializer = StrategySerializerPOST(instance=saved_strategy, data=strategy, partial=True)
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -49,9 +50,6 @@ class StrategyView(APIView):
 
     # Handle DELETE-request for delete Strategy
     def delete(self, request, pk):
-        strategy = get_object_or_404(StrategyModel.objects.all(), id=pk)
-        strategy.delete()
-
-        deleteFile(f'{settings.BASE_DIR}/strategyManager/strategies/{strategy.name}.py')  # Delete Strategy file
+        services.deleteStrategy(id=pk)
 
         return Response({"message": "Strategy with name `{}` has been deleted.".format(pk)}, status=204)

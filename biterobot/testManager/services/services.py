@@ -5,72 +5,55 @@ import os
 
 from dataManager.models import DataIntervalModel, CandleModel
 from testManager.models import TestModel
+from testManager.services import dbServices
 
 
-def testInit(taskId: str, strategyId: int, strategyPath: str, strategyName: str, version: int,
-             dateBegin: datetime, dateEnd: datetime, ticker: str, candleLength: str):
+def testInit(taskId: str, strategyId: int, dataId: int):
     '''
     Initialize Test, add necessary data in Test and start Test
     :param taskId: Unique identifier string for the Test, that uses in async functions in Backtest
     :param strategyId: Strategy's id in database
-    :param strategyPath: Strategy's path on server's directory
-    :param strategyName: Strategy's name
-    :param version: Strategy's version
-    :param dateBegin: Date of beginning a Data interval for Test
-    :param dateEnd: Date of ending a Data interval for Test
-    :param ticker: Instrument's ticker for the Test
-    :param candleLength: Length of candle
+    :param dataId: DataInterval's id in database
     :return: -
     '''
-    # Create model of the Test with data that hoes from request
-    testModel = TestModel(strategyId=strategyId, name=strategyName, uuid=taskId, dateBegin=dateBegin, dateEnd=dateEnd,
-                            dateTest=datetime.today().strftime('%Y-%m-%d'), ticker=ticker, version=version)
-    testModel.save()
+    testInfo = dbServices.initTestInfo(taskId=taskId, strategyId=strategyId, dataId=dataId)  # return [0]strategyName, [1]]version, [2]]ticker, [3]candleLength,
+                                                                                                                        # [4]dateBegin, [5]dateEnd, testModel[6]
 
     # Transform financial data from database. A long process!
-    candleDF = createDF(dateBegin=dateBegin, dateEnd=dateEnd, ticker=ticker, candleLength=candleLength)
+    candleDF = createDF(dateBegin=testInfo[4], dateEnd=testInfo[5], ticker=testInfo[2], candleLength=testInfo[3])
 
     # Generating the graph path = 'the strategy name + Graph.html'
     graphPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                             f'{settings.BASE_DIR}/testManager/resultGraphs/{strategyName}_{taskId}Graph.html')
+                             f'{settings.BASE_DIR}/testManager/resultGraphs/{testInfo[0]}_{taskId}Graph.html')
 
     # Create task in Backtest module
-    testModel.backtest.createTask(taskId=taskId, strategyFilePath=strategyPath, data=candleDF, plotFilePath=graphPath)
+    testInfo[6].backtest.createTask(taskId=taskId, strategyFilePath=f'{settings.BASE_DIR}/strategyManager/strategies/{testInfo[0]}.py',
+                                    data=candleDF, plotFilePath=graphPath)
 
-    # Updating the Test in database, add status
-    testModel = TestModel.objects.get(uuid=taskId)
-    testModel.tstStatus = testModel.backtest.getStatus(taskId=taskId)
-    testModel.save()
+    dbServices.saveStatusInfo(taskId=taskId)
 
     # Start task in Backtest module
-    testModel.backtest.run(taskId=taskId)
+    testInfo[6].backtest.run(taskId=taskId)
 
-    # Updating the Test in database, add status
-    testModel = TestModel.objects.get(uuid=taskId)
-    testModel.tstStatus = testModel.backtest.getStatus(taskId=taskId)
-    testModel.save()
+    dbServices.saveStatusInfo(taskId=taskId)
 
     # Waiting for process of the Test, update status in database, save results, end testing
     while True:
-        if testModel.backtest.getStatus(taskId=taskId) == "DONE":
+        if testInfo[6].backtest.getStatus(taskId=taskId) == "DONE":
             testModel = TestModel.objects.get(uuid=taskId)
             testModel.tstStatus = testModel.backtest.getStatus(taskId=taskId)
             result = testModel.backtest.getResult(taskId=taskId)
             testModel.resultData = result[2]
             testModel.startCash = result[0]
             testModel.endCash = result[1]
-            testModel.file = f'/testManager/resultGraphs/{strategyName}_{taskId}Graph.html'
+            testModel.file = f'/testManager/resultGraphs/{testInfo[0]}_{taskId}Graph.html'
             testModel.save()
             break
-        if testModel.backtest.getStatus(taskId=taskId) == "ERROR":
-            testModel = TestModel.objects.get(uuid=taskId)
-            testModel.tstStatus = testModel.backtest.getStatus(taskId=taskId)
-            testModel.save()
+        if testInfo[6].backtest.getStatus(taskId=taskId) == "ERROR":
+            dbServices.saveStatusInfo(taskId=taskId)
             break
-        if testModel.backtest.getStatus(taskId=taskId) == "PAUSED":
-            testModel = TestModel.objects.get(uuid=taskId)
-            testModel.tstStatus = testModel.backtest.getStatus(taskId=taskId)
-            testModel.save()
+        if testInfo[6].backtest.getStatus(taskId=taskId) == "PAUSED":
+            dbServices.saveStatusInfo(taskId=taskId)
 
 def createDF(dateBegin: datetime, dateEnd: datetime, ticker: str, candleLength: str) -> pd.DataFrame:
     '''
@@ -102,3 +85,88 @@ def createDF(dateBegin: datetime, dateEnd: datetime, ticker: str, candleLength: 
     rowData.set_index('datetime', inplace=True)
 
     return rowData
+
+def getArchiveTests(strategyId: int) -> (dict, None):
+    '''
+    Get results for one Strategy tests with a special structure of JSON, that needs for frontend tables
+    :param strategyId: Strategy' id in database
+    :return: Dict of tests results with a special struct
+    '''
+    tests = TestModel.objects.filter(strategyId=strategyId)
+
+    if len(tests) != 0:
+        testIdList = []
+        nameList = []
+        versionList = []
+        dateTestList = []
+        dateBeginList = []
+        dateEndList = []
+        fileIdList = []
+
+        webPathList = []
+        resultList = []
+        startCashList = []
+        endCashList = []
+
+        dataList = []
+        fileList = []
+
+        i = 0
+        for test in tests:
+            testIdList.append(test.id)
+            nameList.append(test.name + '_' + str(test.id))
+            versionList.append(test.version)
+            dateTestList.append(test.dateTest)
+            dateBeginList.append(test.dateBegin)
+            dateEndList.append(test.dateEnd)
+            fileIdList.append(i)
+
+            dataList.append(
+                {
+                    "id": testIdList[i],
+                    "name": nameList[i],
+                    "version": versionList[i],
+                    "dateTest": dateTestList[i],
+                    "dateBegin": dateBeginList[i],
+                    "dateEnd": dateEndList[i],
+                    "files": [
+                        {"id": fileIdList[i]}
+                    ]
+                }
+            )
+
+            webPathList.append(test.file)
+            resultList.append(test.resultData)
+            startCashList.append(test.startCash)
+            endCashList.append(test.endCash)
+
+            fileList.append(
+                {
+                    "web_path": webPathList[i],
+                    "startCash": startCashList[i],
+                    "endCash": endCashList[i],
+                    "resultData": resultList[i]
+                }
+            )
+
+            i += 1
+
+        strategyTests = {
+            "data":
+                dataList,
+            "files": {
+                "files": fileList
+            }
+        }
+
+        return strategyTests
+    else:
+        return None
+
+def getGraphPath(graphName: str) -> str:
+    '''
+    Get result's of Test Graph path
+    :param graphName: Name of Graph
+    :return: Path to Graph in directory
+    '''
+    return  os.path.join(os.path.abspath(os.path.dirname(__file__)), f'{settings.BASE_DIR}/testManager/resultGraphs/{graphName}')
