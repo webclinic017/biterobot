@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from dataManager.services.services import dataHandler
+from dataManager.services import services
 
 
 class InstrumentSerializerGET(serializers.Serializer):
@@ -26,7 +26,7 @@ class InstrumentSerializerPOST(serializers.Serializer):
 
     # Create new Data info, candles, instruments in database, download it from Tinkoff API
     def create(self, validated_data):
-        dataHandler(token=validated_data.pop('token'), ticker=validated_data.pop('ticker'), dateBegin=validated_data.pop('frDate'), dateEnd=validated_data.pop('toDate'), candleLength=validated_data.pop('candleLength'))
+        services.instrumentHandler(token=validated_data.pop('token'), ticker=validated_data.pop('ticker'), dateBegin=validated_data.pop('frDate'), dateEnd=validated_data.pop('toDate'), candleLength=validated_data.pop('candleLength'))
 
         return 0  # All Data save in dataHandler(...)
 

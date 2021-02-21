@@ -1,16 +1,21 @@
+import datetime
+
 from dataManager.models import InstrumentModel, DataIntervalModel, CandleModel
 from dataManager.services.tinkoffAPI.tinkoffApi import *
+from dataManager.services import dbServices
 
 
-def checkInstrumentExists(ticker: str) -> bool:
+def checkInstrumentExists(ticker: str) -> (InstrumentModel, 0):
     '''
     Checking that Instrument exists in database
     :param ticker: Name of instrument's ticker
-    :return: True(if the Instrument exists) or False(if the Instrument doesn't exists)
+    :return: Instrument instance or False(if the Instrument doesn't exists)
     '''
-    if len(InstrumentModel.objects.filter(ticker=ticker)) == 0:
-        return False
-    return True
+    try:
+        instrument = dbServices.getInstrumentInfo(ticker=ticker)
+    except:
+        return 0
+    return instrument
 
 def addInstrument(ticker: str, token: str):
     '''
@@ -22,23 +27,7 @@ def addInstrument(ticker: str, token: str):
     tinkoffApi = TinkoffApi(token=token)
     instrumentInfo = asyncio.run(tinkoffApi.getInfoByTicker(ticker=ticker))
 
-    # minQuantity = 1, because tinkoffAPI returns None on this parameter
-    instrument = InstrumentModel(ticker=instrumentInfo.ticker, name=instrumentInfo.name, figi=instrumentInfo.figi, instrumentType=instrumentInfo.type.name, isin=instrumentInfo.isin,
-                                    minPriceIncrement=instrumentInfo.minPriceIncrement, lot=instrumentInfo.lot, minQuantity=1, currency=instrumentInfo.currency.name)
-    instrument.save()
-
-def addDateInterval(ticker: str, instrument: int, dateBegin: datetime, dateEnd: datetime, candleLength: str):
-    '''
-    Add Date interval with Instrument and candle information where we have Instrument's data in database
-    :param ticker: Name of instrument's ticker
-    :param instrument: Instrument's id in database
-    :param dateBegin: Date of beginning the Interval
-    :param dateEnd: Date of ending the Interval
-    :param candleLength: Length of candles on this Interval
-    :return: -
-    '''
-    dateInterval = DataIntervalModel(ticker=ticker, instrument=instrument, dateBegin=dateBegin, dateEnd=dateEnd, candleLength=candleLength)
-    dateInterval.save()
+    dbServices.saveInstrumentInfo(instrumentInfo=instrumentInfo)
 
 def addCandles(token: str, instrument: int, dataInterval: int, figi: str, dateFrom: datetime, dateTo: datetime, candleInterval: str):
     '''
@@ -55,11 +44,9 @@ def addCandles(token: str, instrument: int, dataInterval: int, figi: str, dateFr
     tinkoffApi = TinkoffApi(token=token)
     candles = asyncio.run(tinkoffApi.getCandles(figi=figi, dateFrom=dateFrom, dateTo=dateTo, candleInterval=candleInterval))
 
-    for c in candles:
-        candle = CandleModel(instrument=instrument, dataInterval=dataInterval, candleLength=c.interval.name, o=c.o, c=c.c, h=c.h, l=c.l, v=c.v, candleTime=c.time)
-        candle.save()
+    dbServices.saveCandlesInfo(candles=candles, instrument=instrument, dataInterval=dataInterval)
 
-def dataHandler(token: str, ticker: str, dateBegin: datetime, dateEnd: datetime, candleLength: str):
+def instrumentHandler(token: str, ticker: str, dateBegin: datetime, dateEnd: datetime, candleLength: str):
     '''
     Handle requests on add Candles in database
     :param token: Tinkoff_Invest token for Tinkoff OpenAPI
@@ -69,14 +56,14 @@ def dataHandler(token: str, ticker: str, dateBegin: datetime, dateEnd: datetime,
     :param candleLength: Length of candle
     :return: -
     '''
-    if not checkInstrumentExists(ticker=ticker):
+    instrument = checkInstrumentExists(ticker=ticker)
+    if instrument == 0:
         addInstrument(ticker=ticker, token=token)
+        instrument = dbServices.getInstrumentInfo(ticker=ticker)
+    figi = instrument.figi
 
-    instrument = InstrumentModel.objects.get(ticker=ticker)
-    figi = InstrumentModel.objects.get(ticker=ticker).figi
+    dbServices.saveDateIntervalInfo(ticker=ticker, instrument=instrument, dateBegin=dateBegin, dateEnd=dateEnd, candleLength=candleLength)
 
-    addDateInterval(ticker=ticker, instrument=instrument, dateBegin=dateBegin, dateEnd=dateEnd, candleLength=candleLength)
-
-    dataInterval = DataIntervalModel.objects.get(ticker=ticker, dateBegin=dateBegin, dateEnd=dateEnd, candleLength=candleLength)
+    dataInterval = dbServices.getDataIntervalInfo(ticker=ticker, dateBegin=dateBegin, dateEnd=dateEnd, candleLength=candleLength)
 
     addCandles(token=token, instrument=instrument, dataInterval=dataInterval, figi=figi, dateFrom=dateBegin, dateTo=dateEnd, candleInterval=candleLength)

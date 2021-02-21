@@ -2,8 +2,6 @@ from rest_framework import serializers
 from django.conf import settings
 
 from testManager.services.services import testInit
-from strategyManager.models import StrategyModel
-from dataManager.models import DataIntervalModel
 
 
 class TestSerializerGET(serializers.Serializer):
@@ -53,21 +51,7 @@ class TestSerializerPOST(serializers.Serializer):
         dataId = validated_data.pop('id_data')
         strategyId = validated_data.pop('id_strat')
 
-        # Get data from Strategy
-        strategy = StrategyModel.objects.filter(id=strategyId)
-        strategyName = strategy[0].name
-        version = strategy[0].version
-
-        # Get data from DataInterval
-        data = DataIntervalModel.objects.filter(id=dataId)
-        ticker = data[0].ticker
-        candleLength = data[0].candleLength
-        dateBegin = data[0].dateBegin
-        dateEnd = data[0].dateEnd
-
         # Call test initialization function
-        testInit(taskId=taskId, strategyId=strategyId, strategyPath=f'{settings.BASE_DIR}/strategyManager/strategies/{strategyName}.py', strategyName=strategyName,
-                    version=version, dateBegin=dateBegin, dateEnd=dateEnd,
-                        ticker=ticker, candleLength=candleLength)
+        testInit(taskId=taskId, strategyId=strategyId, dataId=dataId)
 
         return 0  # All Test info save in testInit(...)
